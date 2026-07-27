@@ -7,6 +7,36 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  .arene {
+    background: #10141d; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(16,20,29,.35), 0 2px 8px rgba(16,20,29,.2);
+  }
+  .arene canvas { display: block; width: 100%; height: auto; }
+  .commandes {
+    display: flex; gap: 10px; padding: 14px 16px; background: #171c27;
+    flex-wrap: wrap; align-items: center; border-top: 1px solid #232a38;
+  }
+  .cmd {
+    font-family: inherit; font-size: 14.5px; font-weight: 700; border: 0;
+    border-radius: 10px; padding: 11px 20px; cursor: pointer; color: #fff;
+    transition: transform .1s, filter .15s;
+  }
+  .cmd:hover:not(:disabled) { filter: brightness(1.12); }
+  .cmd:active:not(:disabled) { transform: translateY(1px); }
+  .cmd:disabled { opacity: .32; cursor: default; }
+  .cmd-att { background: linear-gradient(180deg, #f28a2e, #dd6a0c); }
+  .cmd-spe { background: linear-gradient(180deg, #b05de0, #8a3ec4); }
+  .cmd-rej { background: #2b3346; }
+  .cmd-note { color: #7f8ba3; font-size: 13.5px; margin-left: auto; }
+
+  .lanceur { text-align: center; padding: 56px 20px; }
+  .lanceur p { color: #8fa0bb; margin-bottom: 18px; }
+
+  .moteur-tete { display: flex; align-items: center; gap: 12px; margin: 32px 0 8px; flex-wrap: wrap; }
+  .moteur-tete h3 { margin: 0; }
+  .moteur-tete .btn-ghost { margin-left: auto; }
+</style>
 </head>
 <body>
 
@@ -22,9 +52,10 @@
   <div class="hero">
     <div class="eyebrow">Bonus</div>
     <h1>Où tu peux aller</h1>
-    <p class="lede">Le même jeu que dans ton projet, mais avec des dessins qui bougent.
-    <strong>Tout est écrit en Python</strong>, avec les mêmes boucles, les mêmes conditions
-    et les mêmes dictionnaires que ceux que tu connais. Rien de magique.</p>
+    <p class="lede">Le même duel que dans ton projet, mais <strong>jouable</strong>.
+    C'est toi qui choisis quand attaquer. Et tout ce qui décide de l'issue du combat
+    est écrit en Python juste en dessous, avec les dictionnaires et les conditions
+    que tu connais déjà. <strong>Tu peux le modifier, et le jeu change.</strong></p>
   </div>
 
   <div class="box prof">
@@ -35,165 +66,118 @@
 
   <section class="etape">
     <div class="etape-head"><div class="etape-num">🐉</div><div>
-      <h2>Duel de créatures, version animée</h2>
-      <div class="etape-meta">lance et regarde le combat se dérouler</div></div></div>
+      <h2>Duel de créatures</h2>
+      <div class="etape-meta">à toi de jouer</div></div></div>
 
-    <p>Le combat est calculé exactement comme dans la version texte : des dictionnaires
-    pour les points de vie et la force, une boucle qui alterne les tours, du hasard
-    pour les dégâts. <strong>La seule différence, c'est qu'au lieu d'écrire le résultat,
-    on le dessine.</strong></p>
+    <div class="arene">
+      <div id="lanceur" class="lanceur">
+        <p>Le moteur Python est prêt.</p>
+        <button class="cmd cmd-att" id="go">⚔  Commencer le duel</button>
+      </div>
+      <canvas id="jeu" width="1280" height="720" style="display:none"></canvas>
+      <div class="commandes" id="cmds" style="display:none">
+        <button class="cmd cmd-att" id="b-att">Attaquer</button>
+        <button class="cmd cmd-spe" id="b-spe">Attaque spéciale</button>
+        <button class="cmd cmd-rej" id="b-rej" style="display:none">Rejouer</button>
+        <span class="cmd-note" id="note"></span>
+      </div>
+    </div>
 
-    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Lance-le</div>
-      <div data-cellule data-tortue="oui"><script type="text/python">
-import turtle
+    <div class="moteur-tete">
+      <h3>Le moteur, en Python</h3>
+      <button class="btn-ghost" id="recharger">↻ Modifier et relancer</button>
+    </div>
+
+    <p class="hint" style="margin-top:0">Change les points de vie, la force, les couleurs
+    ou les noms, puis clique sur <strong>Modifier et relancer</strong>.
+    Le jeu change immédiatement.</p>
+
+    <div id="moteur"><script type="text/python">
+import json
 import random
 
-# ----- Les créatures : exactement les mêmes dictionnaires -----
-pv = {"Gnamien": 60, "Kolokolo": 75}
-force = {"Gnamien": 12, "Kolokolo": 9}
-couleur = {"Gnamien": "#f07818", "Kolokolo": "#12b5c4"}
+# ----- Les créatures : les mêmes dictionnaires que dans ton projet -----
+pv = {"Gnamien": 62, "Kolokolo": 74}
+force = {"Gnamien": 13, "Kolokolo": 10}
+couleur = {"Gnamien": "#f89020", "Kolokolo": "#25c6d8"}
 
 moi = "Gnamien"
 lui = "Kolokolo"
 
-# ----- Les outils de dessin -----
-c = turtle.Turtle()
-c.speed(10)
-c.hideturtle()
+etat = {}
 
 
-def rectangle(x, y, larg, haut, remplissage):
-    c.penup()
-    c.goto(x, y)
-    c.pendown()
-    c.color(remplissage, remplissage)
-    c.begin_fill()
-    for i in range(2):
-        c.forward(larg)
-        c.right(90)
-        c.forward(haut)
-        c.right(90)
-    c.end_fill()
+def nouvelle_partie():
+    etat["mes_pv"] = pv[moi]
+    etat["ses_pv"] = pv[lui]
+    etat["special"] = True
+    etat["tour"] = 1
+    etat["fini"] = ""
 
 
-def texte(x, y, message, couleur_texte, taille):
-    c.penup()
-    c.goto(x, y)
-    c.color(couleur_texte)
-    c.write(message, align="center", font=("Arial", taille, "normal"))
+def jouer(action):
+    coups = []
 
+    # --- ton attaque ---
+    degats = force[moi] + random.randint(0, 7)
 
-def creature(x, y, teinte, taille):
-    c.penup()
-    c.goto(x, y)
-    c.setheading(0)
-    c.pendown()
-    c.color("#1f2430", teinte)
-    c.begin_fill()
-    c.circle(taille)
-    c.end_fill()
-    # les yeux
-    c.penup()
-    c.goto(x - taille // 2, y + taille + 8)
-    c.color("#1f2430")
-    c.dot(9)
-    c.goto(x + taille // 2, y + taille + 8)
-    c.dot(9)
+    if action == "speciale" and etat["special"]:
+        degats = degats * 2
+        etat["special"] = False
 
+    etat["ses_pv"] = max(0, etat["ses_pv"] - degats)
+    coups.append(["lui", degats, action])
 
-def barre_de_vie(x, restant, depart, teinte):
-    rectangle(x - 60, 60, 120, 14, "#3a4152")
-    largeur = int(120 * restant / depart)
-    if largeur > 0:
-        rectangle(x - 60, 60, largeur, 14, teinte)
+    if etat["ses_pv"] == 0:
+        etat["fini"] = "victoire"
+        return json.dumps([coups, etat])
 
+    # --- sa riposte ---
+    riposte = force[lui] + random.randint(0, 7)
+    etat["mes_pv"] = max(0, etat["mes_pv"] - riposte)
+    coups.append(["moi", riposte, "normale"])
 
-def scene(mes_pv, ses_pv, message):
-    rectangle(-260, 180, 520, 360, "#1f2430")
+    if etat["mes_pv"] == 0:
+        etat["fini"] = "defaite"
 
-    creature(-110, -60, couleur[moi], 34)
-    creature(110, -60, couleur[lui], 34)
-
-    texte(-110, 82, moi, "#cdd6e6", 13)
-    texte(110, 82, lui, "#cdd6e6", 13)
-
-    barre_de_vie(-110, mes_pv, pv[moi], "#0e8a55")
-    barre_de_vie(110, ses_pv, pv[lui], "#0e8a55")
-
-    texte(-110, 26, str(mes_pv) + " PV", "#8fa6c9", 11)
-    texte(110, 26, str(ses_pv) + " PV", "#8fa6c9", 11)
-
-    texte(0, -140, message, "#ffd9b3", 14)
-    turtle.pause(0.55)
-
-
-# ----- Le combat : la même boucle que dans ta version texte -----
-mes_pv = pv[moi]
-ses_pv = pv[lui]
-tour = 1
-
-scene(mes_pv, ses_pv, "Le combat commence !")
-
-while mes_pv > 0 and ses_pv > 0:
-    degats = force[moi] + random.randint(0, 6)
-    ses_pv = ses_pv - degats
-    if ses_pv < 0:
-        ses_pv = 0
-    scene(mes_pv, ses_pv, "Tour " + str(tour) + " : tu infliges " + str(degats))
-
-    if ses_pv == 0:
-        break
-
-    riposte = force[lui] + random.randint(0, 6)
-    mes_pv = mes_pv - riposte
-    if mes_pv < 0:
-        mes_pv = 0
-    scene(mes_pv, ses_pv, "Il riposte : " + str(riposte) + " degats")
-
-    tour = tour + 1
-
-if ses_pv == 0:
-    scene(mes_pv, ses_pv, "VICTOIRE en " + str(tour) + " tours !")
-else:
-    scene(mes_pv, ses_pv, "DEFAITE...")
-      </script></div></div>
+    etat["tour"] = etat["tour"] + 1
+    return json.dumps([coups, etat])
+    </script></div>
 
     <div class="box reel">
-      <div class="box-title">🌍 Ce qui a changé, et ce qui n'a pas changé</div>
-      <p><strong>Rien n'a changé dans la logique.</strong> Les mêmes dictionnaires,
-      la même boucle <code>while</code>, le même <code>random.randint</code>,
-      les mêmes conditions.</p>
-      <p><strong>Ce qui a été ajouté</strong> : quatre fonctions de dessin
-      (<code>rectangle</code>, <code>texte</code>, <code>creature</code>,
-      <code>barre_de_vie</code>) et une fonction <code>scene</code> qui les assemble.
-      Elles n'utilisent que ce que tu connais depuis la séance 6.</p>
-      <p>C'est exactement comme ça que marche un vrai jeu : un moteur qui calcule,
-      et un affichage qui dessine ce que le moteur a décidé. Les deux sont séparés.</p>
+      <div class="box-title">🌍 Ce que tu peux écrire, et ce qui viendra plus tard</div>
+      <p><strong>Le moteur ci-dessus, tu sais déjà l'écrire.</strong> Deux dictionnaires,
+      <code>random.randint</code>, des conditions, une valeur à usage unique.
+      Il n'y a rien dedans que tu n'aies pas vu en dix séances. Modifie-le, tu verras.</p>
+      <p><strong>Le dessin, non, pas encore.</strong> Il est écrit dans le langage du navigateur,
+      qui n'est pas Python. Mais ce n'est pas le point : ce qu'il faut retenir, c'est que
+      <strong>le moteur et l'affichage sont deux choses séparées</strong>. Python décide,
+      l'écran montre. On peut changer l'un sans toucher à l'autre.</p>
+      <p>Et sur ton ordinateur, avec <strong>pygame</strong>, tu écrirais les deux en Python.
+      Le moteur resterait exactement celui-là.</p>
     </div>
 
     <div class="box defi">
-      <div class="box-title">🔥 Ce que tu peux modifier tout de suite</div>
+      <div class="box-title">🔥 À essayer tout de suite dans le moteur</div>
       <ul style="margin-bottom:0">
-        <li>Les couleurs des créatures, leurs points de vie, leur force</li>
-        <li><code>turtle.pause(0.55)</code> : le temps d'affichage de chaque image</li>
-        <li>La taille des créatures dans <code>creature(-110, -60, ..., 34)</code></li>
-        <li>Ajoute une troisième créature et fais un tournoi</li>
+        <li>Mets <code>force["Kolokolo"]</code> à <code>25</code> et vois si tu survis</li>
+        <li>Change les couleurs, ou les noms des créatures</li>
+        <li>Fais que l'attaque spéciale soit utilisable <strong>deux</strong> fois</li>
+        <li>Ajoute une chance sur cinq de rater complètement son coup</li>
       </ul>
     </div>
   </section>
 
   <section class="etape">
     <div class="etape-head"><div class="etape-num">🚀</div><div>
-      <h2>Et après, ça donne quoi ?</h2>
+      <h2>Et après ?</h2>
       <div class="etape-meta">la vraie marche suivante</div></div></div>
 
-    <p>Cette page dessine avec <code>turtle</code>, qui est fait pour apprendre.
-    Pour un vrai jeu, on utilise <strong>pygame</strong> : de vraies images,
-    du son, le clavier et la souris en direct.</p>
+    <p>Avec <strong>pygame</strong>, tu écris le jeu entier en Python : les images,
+    le son, le clavier, la souris. Et tu réutilises ton moteur tel quel.</p>
 
-    <p>Mais le plus important : <strong>ta boucle de combat ne changerait pas d'une ligne.</strong>
-    Tu remplacerais seulement les fonctions de dessin. C'est pour ça qu'on a appris
-    à séparer le calcul et l'affichage.</p>
+    <p>C'est ça, un programme bien découpé : <strong>tu changes l'écran, tu gardes le cerveau.</strong>
+    C'est aussi pour ça qu'on a passé une séance entière sur les fonctions.</p>
 
     <p style="margin-top:26px">
       <a href="seance-09.html" style="color:var(--orange);font-weight:650">← Retour à la séance 9</a>
@@ -207,6 +191,354 @@ else:
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="assets/moteur.js"></script>
+
+<script>
+/* ============================================================
+   Python décide, le canvas dessine.
+   ============================================================ */
+(function () {
+  const cv = document.getElementById("jeu");
+  const ctx = cv.getContext("2d");
+  const W = 1280, H = 720;
+
+  let py = null, editeur = null;
+  let jeuPret = false, enCours = false;
+
+  const vue = {
+    noms: { moi: "", lui: "" }, teintes: { moi: "#f89020", lui: "#25c6d8" },
+    pvMax: { moi: 1, lui: 1 }, pv: { moi: 1, lui: 1 }, pvAff: { moi: 1, lui: 1 },
+    lunge: { moi: 0, lui: 0 }, secousse: 0, flash: { moi: 0, lui: 0 },
+    flottants: [], particules: [], fini: "", tour: 1, special: true, t: 0,
+  };
+
+  /* ---------- outils ---------- */
+  function rrect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  const melange = (hex, vers, n) => {
+    const v = parseInt(hex.slice(1), 16);
+    const m = (c) => Math.round(c + (vers - c) * (n / 100));
+    return "rgb(" + m((v >> 16) & 255) + "," + m((v >> 8) & 255) + "," + m(v & 255) + ")";
+  };
+  const eclaircir = (h, n) => melange(h, 255, n);
+  const assombrir = (h, n) => melange(h, 0, n);
+
+  function fond() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#161c2a"); g.addColorStop(.55, "#101623"); g.addColorStop(1, "#0a0e17");
+    ctx.fillStyle = g; ctx.fillRect(-40, -40, W + 80, H + 80);
+
+    const h = ctx.createRadialGradient(W / 2, H * .62, 40, W / 2, H * .62, W * .55);
+    h.addColorStop(0, "rgba(90,120,190,.18)"); h.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = h; ctx.fillRect(-40, -40, W + 80, H + 80);
+
+    ctx.fillStyle = "rgba(255,255,255,.035)";
+    ctx.beginPath(); ctx.ellipse(W / 2, H * .84, W * .44, 62, 0, 0, 6.283); ctx.fill();
+
+    for (let i = 0; i < 44; i++) {
+      const x = (i * 337) % W, y = (i * 149) % (H * .48);
+      ctx.fillStyle = "rgba(255,255,255," + (.05 + .05 * Math.sin(vue.t / 700 + i)) + ")";
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }
+
+  function corps(r) {
+    ctx.beginPath();
+    ctx.moveTo(0, -r * 1.02);
+    ctx.bezierCurveTo(r * .95, -r * .95, r * 1.02, r * .55, r * .48, r * .92);
+    ctx.bezierCurveTo(r * .18, r * 1.06, -r * .18, r * 1.06, -r * .48, r * .92);
+    ctx.bezierCurveTo(-r * 1.02, r * .55, -r * .95, -r * .95, 0, -r * 1.02);
+    ctx.closePath();
+  }
+
+  function creature(x, y, r, teinte, cote, flash) {
+    const bob = Math.sin(vue.t / 420 + (cote === "moi" ? 0 : 1.6)) * 7;
+    const dx = cote === "moi" ? vue.lunge.moi : -vue.lunge.lui;
+
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.beginPath(); ctx.ellipse(x, y + r * .98, r * 1.05, r * .26, 0, 0, 6.283); ctx.fill();
+
+    ctx.save();
+    ctx.translate(x + dx, y + bob);
+    if (cote === "lui") ctx.scale(-1, 1);
+
+    const au = ctx.createRadialGradient(0, 0, r * .5, 0, 0, r * 1.7);
+    au.addColorStop(0, teinte + "44"); au.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = au; ctx.beginPath(); ctx.arc(0, 0, r * 1.7, 0, 6.283); ctx.fill();
+
+    const g = ctx.createLinearGradient(0, -r, 0, r);
+    g.addColorStop(0, eclaircir(teinte, 38)); g.addColorStop(1, assombrir(teinte, 28));
+    ctx.fillStyle = g; corps(r); ctx.fill();
+
+    ctx.fillStyle = assombrir(teinte, 45);
+    if (cote === "moi") {
+      [-1, 1].forEach((s) => {
+        ctx.beginPath();
+        ctx.moveTo(s * r * .42, -r * .88);
+        ctx.lineTo(s * r * .72, -r * 1.5);
+        ctx.lineTo(s * r * .18, -r * .98);
+        ctx.closePath(); ctx.fill();
+      });
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(0, -r * 1.02); ctx.lineTo(-r * .12, -r * 1.62); ctx.lineTo(r * .34, -r * 1.02);
+      ctx.closePath(); ctx.fill();
+    }
+
+    ctx.fillStyle = "#0d1119";
+    [-1, 1].forEach((s) => {
+      ctx.beginPath(); ctx.ellipse(s * r * .3, -r * .16, r * .13, r * .19, 0, 0, 6.283); ctx.fill();
+    });
+    ctx.fillStyle = "rgba(255,255,255,.9)";
+    [-1, 1].forEach((s) => {
+      ctx.beginPath(); ctx.arc(s * r * .3 + r * .05, -r * .23, r * .045, 0, 6.283); ctx.fill();
+    });
+
+    ctx.strokeStyle = "rgba(0,0,0,.45)";
+    ctx.lineWidth = r * .07; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.arc(0, r * .18, r * .3, .35, Math.PI - .35); ctx.stroke();
+
+    if (flash > 0) {
+      ctx.globalAlpha = flash * .75;
+      ctx.fillStyle = "#fff"; corps(r); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+  }
+
+  function barre(x, y, w, h, ratio, nom) {
+    ctx.font = "700 30px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#dbe3f2"; ctx.textAlign = "left";
+    ctx.fillText(nom, x, y - 16);
+
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    rrect(x, y, w, h, h / 2); ctx.fill();
+
+    const larg = Math.max(0, Math.min(1, ratio)) * w;
+    if (larg > 2) {
+      const c = ratio > .5 ? "#2fbe7a" : ratio > .25 ? "#e8b23a" : "#e0553f";
+      const g = ctx.createLinearGradient(x, y, x, y + h);
+      g.addColorStop(0, eclaircir(c, 30)); g.addColorStop(1, c);
+      ctx.fillStyle = g; rrect(x, y, larg, h, h / 2); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.22)";
+      rrect(x + 3, y + 3, Math.max(0, larg - 6), h * .32, h * .16); ctx.fill();
+    }
+    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 2;
+    rrect(x, y, w, h, h / 2); ctx.stroke();
+  }
+
+  /* ---------- boucle ----------
+     On préfère requestAnimationFrame, mais certains contextes le gèlent
+     (onglet en arrière-plan, panneau d'aperçu). On bascule alors sur un
+     minuteur classique pour que l'animation tourne quand même. */
+  let modeRAF = true, secours = null, dernier = 0;
+
+  function suivant() {
+    if (modeRAF) {
+      const id = requestAnimationFrame(boucle);
+      secours = setTimeout(() => {
+        modeRAF = false;
+        cancelAnimationFrame(id);
+        boucle(performance.now());
+      }, 250);
+    } else {
+      setTimeout(() => boucle(performance.now()), 16);
+    }
+  }
+
+  function boucle(ts) {
+    clearTimeout(secours);
+    const dt = Math.min(50, ts - dernier || 16);
+    dernier = ts; vue.t += dt;
+
+    ["moi", "lui"].forEach((c) => {
+      vue.pvAff[c] += (vue.pv[c] - vue.pvAff[c]) * Math.min(1, dt / 130);
+      vue.lunge[c] *= Math.pow(.86, dt / 16);
+      vue.flash[c] = Math.max(0, vue.flash[c] - dt / 220);
+    });
+    vue.secousse *= Math.pow(.88, dt / 16);
+    vue.flottants = vue.flottants.filter((f) => { f.vie -= dt; f.y -= dt * .055; return f.vie > 0; });
+    vue.particules = vue.particules.filter((p) => {
+      p.vie -= dt; p.x += p.vx * dt / 16; p.y += p.vy * dt / 16; p.vy += dt * .012;
+      return p.vie > 0;
+    });
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate((Math.random() - .5) * vue.secousse, (Math.random() - .5) * vue.secousse);
+
+    fond();
+    creature(W * .28, H * .58, 118, vue.teintes.moi, "moi", vue.flash.moi);
+    creature(W * .72, H * .58, 118, vue.teintes.lui, "lui", vue.flash.lui);
+
+    barre(70, 84, 440, 34, vue.pvAff.moi / vue.pvMax.moi, vue.noms.moi);
+    barre(W - 510, 84, 440, 34, vue.pvAff.lui / vue.pvMax.lui, vue.noms.lui);
+
+    ctx.font = "600 24px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#93a2bd"; ctx.textAlign = "left";
+    ctx.fillText(Math.ceil(vue.pvAff.moi) + " / " + vue.pvMax.moi + " PV", 70, 148);
+    ctx.textAlign = "right";
+    ctx.fillText(Math.ceil(vue.pvAff.lui) + " / " + vue.pvMax.lui + " PV", W - 70, 148);
+
+    ctx.textAlign = "center"; ctx.fillStyle = "#6f7d97";
+    ctx.font = "700 22px -apple-system, Segoe UI, sans-serif";
+    ctx.fillText("TOUR " + vue.tour, W / 2, 96);
+
+    vue.particules.forEach((p) => {
+      ctx.globalAlpha = Math.max(0, p.vie / p.max);
+      ctx.fillStyle = p.c;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    vue.flottants.forEach((f) => {
+      ctx.globalAlpha = Math.min(1, f.vie / 380);
+      ctx.font = "800 " + f.taille + "px -apple-system, Segoe UI, sans-serif";
+      ctx.textAlign = "center"; ctx.lineWidth = 7;
+      ctx.strokeStyle = "rgba(8,10,16,.85)"; ctx.strokeText(f.txt, f.x, f.y);
+      ctx.fillStyle = f.c; ctx.fillText(f.txt, f.x, f.y);
+      ctx.globalAlpha = 1;
+    });
+
+    if (vue.fini) {
+      ctx.fillStyle = "rgba(8,11,18,.72)"; ctx.fillRect(-40, -40, W + 80, H + 80);
+      ctx.textAlign = "center";
+      ctx.font = "800 84px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = vue.fini === "victoire" ? "#3fd48c" : "#e0553f";
+      ctx.fillText(vue.fini === "victoire" ? "VICTOIRE" : "DÉFAITE", W / 2, H / 2 - 6);
+      ctx.font = "600 30px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#9fb0cc";
+      ctx.fillText("en " + vue.tour + " tours", W / 2, H / 2 + 48);
+    }
+
+    suivant();
+  }
+
+  function impact(cote, degats, special) {
+    const x = cote === "moi" ? W * .28 : W * .72, y = H * .5;
+    vue.flash[cote] = 1;
+    vue.secousse = special ? 34 : 18;
+    vue.lunge[cote === "moi" ? "lui" : "moi"] = special ? 60 : 38;
+
+    vue.flottants.push({
+      x: x, y: y, txt: "-" + degats, vie: 900,
+      taille: special ? 76 : 54, c: special ? "#d79bff" : "#ff8f6e",
+    });
+    if (special) {
+      vue.flottants.push({ x: W / 2, y: H * .3, txt: "SPÉCIALE !", vie: 1000, taille: 46, c: "#d79bff" });
+    }
+    const teinte = cote === "moi" ? vue.teintes.moi : vue.teintes.lui;
+    for (let i = 0; i < (special ? 44 : 24); i++) {
+      const a = Math.random() * 6.283, v = 2 + Math.random() * (special ? 9 : 6);
+      vue.particules.push({
+        x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2,
+        r: 2 + Math.random() * 5, c: Math.random() < .5 ? teinte : "#ffffff",
+        vie: 600 + Math.random() * 400, max: 900,
+      });
+    }
+  }
+
+  /* ---------- liaison avec Python ---------- */
+  const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function litDict(nom) {
+    const v = py.globals.get(nom);
+    return v && v.toJs ? v.toJs() : v;
+  }
+
+  function demarrerPartie() {
+    py.globals.get("nouvelle_partie")();
+    const moi = py.globals.get("moi"), lui = py.globals.get("lui");
+    const pv = litDict("pv"), coul = litDict("couleur");
+    vue.noms = { moi: moi, lui: lui };
+    vue.pvMax = { moi: pv.get(moi), lui: pv.get(lui) };
+    vue.pv = { moi: pv.get(moi), lui: pv.get(lui) };
+    vue.pvAff = { moi: pv.get(moi), lui: pv.get(lui) };
+    vue.teintes = { moi: coul.get(moi), lui: coul.get(lui) };
+    vue.fini = ""; vue.tour = 1; vue.special = true;
+    vue.flottants = []; vue.particules = [];
+    majBoutons();
+  }
+
+  function majBoutons() {
+    const fin = !!vue.fini;
+    document.getElementById("b-att").disabled = fin || enCours;
+    document.getElementById("b-spe").disabled = fin || enCours || !vue.special;
+    document.getElementById("b-rej").style.display = fin ? "" : "none";
+    document.getElementById("note").textContent = fin
+      ? "Le combat est terminé."
+      : vue.special ? "L'attaque spéciale double les dégâts, une seule fois."
+                    : "Attaque spéciale déjà utilisée.";
+  }
+
+  async function jouer(action) {
+    if (!jeuPret || enCours || vue.fini) return;
+    enCours = true; majBoutons();
+
+    const brut = py.globals.get("jouer")(action);
+    const donnees = JSON.parse(brut);
+    const coups = donnees[0], etat = donnees[1];
+
+    for (let k = 0; k < coups.length; k++) {
+      const cible = coups[k][0], degats = coups[k][1], type = coups[k][2];
+      vue.pv[cible] = Math.max(0, vue.pv[cible] - degats);
+      impact(cible, degats, type === "speciale");
+      if (k < coups.length - 1) await attendre(760);
+    }
+
+    await attendre(520);
+    vue.tour = etat.tour;
+    vue.special = etat.special;
+    vue.fini = etat.fini;
+    enCours = false; majBoutons();
+  }
+
+  /* ---------- mise en place ---------- */
+  window.addEventListener("DOMContentLoaded", () => {
+    const hote = document.getElementById("moteur");
+    const code = lireCode(hote);
+    hote.innerHTML = "";
+    editeur = CodeMirror(hote, {
+      value: code, mode: "python", theme: "material-darker",
+      lineNumbers: true, indentUnit: 4, viewportMargin: Infinity,
+      extraKeys: { Tab: (cm) => cm.replaceSelection("    ") },
+    });
+
+    document.getElementById("go").onclick = async () => {
+      const b = document.getElementById("go");
+      b.textContent = "…";
+      py = await demarrerPython();
+      py.runPython(editeur.getValue());
+      demarrerPartie();
+      jeuPret = true;
+      document.getElementById("lanceur").style.display = "none";
+      cv.style.display = "block";
+      document.getElementById("cmds").style.display = "flex";
+      suivant();
+    };
+
+    document.getElementById("b-att").onclick = () => jouer("normale");
+    document.getElementById("b-spe").onclick = () => jouer("speciale");
+    document.getElementById("b-rej").onclick = () => demarrerPartie();
+
+    document.getElementById("recharger").onclick = async () => {
+      if (!py) { document.getElementById("go").click(); return; }
+      try {
+        py.runPython(editeur.getValue());
+        demarrerPartie();
+      } catch (e) {
+        alert("Le moteur ne démarre pas :\n\n" +
+              String(e.message || e).split("\n").slice(-4).join("\n"));
+      }
+    };
+  });
+})();
+</script>
 
 </body>
 </html>
