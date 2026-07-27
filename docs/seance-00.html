@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 0 — Ton premier programme</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-flag"></div>
+    <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 0</a>
+    <nav class="steps">
+      <a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+      <a href="#e4">4</a><a href="#e5">5</a><a href="#defi">★</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 0 · 1 h 30</div>
+    <h1>Ton premier programme</h1>
+    <p class="lede">Aujourd'hui, aucun cours. À la fin de la séance tu auras dessiné le drapeau
+    ivoirien en écrivant toi-même les instructions. Une image que tu as fabriquée, pas copiée.</p>
+  </div>
+
+  <!-- ============================ ÉTAPE 1 ============================ -->
+  <section class="etape" id="e1">
+    <div class="etape-head">
+      <div class="etape-num">1</div>
+      <div>
+        <h2>Faire parler la machine</h2>
+        <div class="etape-meta">10 minutes · la toute première instruction</div>
+      </div>
+    </div>
+
+    <p>Un ordinateur ne devine rien. Il ne comprend pas le français, il ne comprend pas non plus
+    ce que tu <em>voulais</em> dire. Il exécute des instructions, dans l'ordre, une par une,
+    de haut en bas. Ta première instruction s'appelle <code>print</code> : elle veut dire
+    <strong>« affiche ça »</strong>.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+print("Bonjour")
+print("Je m'appelle Yann")
+print("J'ai 15 ans")
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule>
+          <script type="text/python">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Ce qu'on fait maintenant</div>
+      <p>Tape trois lignes qui parlent de toi. Puis <strong>déplace la deuxième ligne tout en bas</strong>
+      et relance. Regarde ce qui change.</p>
+    </div>
+
+    <p>Tu viens de vérifier la règle numéro un : <strong>l'ordre compte</strong>. La machine lit
+    de haut en bas, elle ne saute jamais une ligne et elle ne remet rien dans le bon ordre à ta place.</p>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Ça va planter, et c'est normal</div>
+      <p>Enlève un guillemet. Ou écris <code>Print</code> avec un grand P. Lance quand même.</p>
+      <p>Python t'insulte en anglais ? Non — il t'explique. <strong>Lis toujours la dernière ligne
+      du message rouge à voix haute.</strong> C'est l'habitude la plus utile de toute l'année :
+      un programmeur ne fuit pas les erreurs, il les lit.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 2 ============================ -->
+  <section class="etape" id="e2">
+    <div class="etape-head">
+      <div class="etape-num">2</div>
+      <div>
+        <h2>Une tortue qui tient un crayon</h2>
+        <div class="etape-meta">10 minutes · avancer, tourner</div>
+      </div>
+    </div>
+
+    <p>Imagine une tortue posée au milieu d'une feuille, avec un crayon attaché sous le ventre.
+    Elle ne sait faire que deux choses : <strong>avancer</strong> et <strong>tourner</strong>.
+    Partout où elle passe, elle laisse un trait.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(100)
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule data-tortue="oui">
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+
+crayon.forward(100)
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <p><code>forward(100)</code> : avance de 100. <code>right(90)</code> : tourne de 90 degrés
+    vers la droite. Le nombre entre parenthèses, c'est <strong>le réglage</strong>. Change-le,
+    et le résultat change. C'est aussi simple que ça.</p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Petit défi avant de continuer</div>
+      <p>Sans que je te dise comment : fais un <strong>carré</strong>. Tu as tout ce qu'il faut.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VISUALISATION INTERACTIVE ==================== -->
+  <section class="etape" id="viz">
+    <div class="etape-head">
+      <div class="etape-num">👁️</div>
+      <div>
+        <h2>Comprendre l'angle sans faire de maths</h2>
+        <div class="etape-meta">bouge les curseurs, regarde la forme</div>
+      </div>
+    </div>
+
+    <p>Avance, tourne, recommence. Selon l'angle, la figure se referme… ou part en vrille.
+    Trouve les angles qui donnent un <strong>triangle</strong>, un <strong>carré</strong>,
+    un <strong>hexagone</strong>.</p>
+
+    <div class="widget">
+      <div class="widget-grid">
+        <div>
+          <div class="slider-row">
+            <label>Avancer de <span class="val" id="v-dist">80</span></label>
+            <input type="range" id="s-dist" min="20" max="140" value="80">
+          </div>
+          <div class="slider-row">
+            <label>Tourner à droite de <span class="val" id="v-ang">90°</span></label>
+            <input type="range" id="s-ang" min="10" max="180" value="90">
+          </div>
+          <div class="slider-row">
+            <label>Répéter <span class="val" id="v-rep">4 fois</span></label>
+            <input type="range" id="s-rep" min="2" max="14" value="4">
+          </div>
+          <div class="widget-code" id="viz-code"></div>
+          <p class="hint" id="viz-msg" style="margin-top:12px"></p>
+        </div>
+        <canvas id="viz-canvas" width="260" height="260"
+                style="background:#fff;border:1px solid var(--line);border-radius:10px;width:100%"></canvas>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Cette tortue, ce n'est pas un jouet : c'est exactement le principe qui pilote une
+      <strong>imprimante 3D</strong>, une <strong>machine à découper</strong> dans un atelier,
+      un <strong>bras robot</strong> dans une usine, ou le <strong>drone</strong> qui filme
+      un match. Une tête qui avance, qui tourne, qui pose ou lève son outil.
+      Tu apprends aujourd'hui le langage de toutes ces machines.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 3 ============================ -->
+  <section class="etape" id="e3">
+    <div class="etape-head">
+      <div class="etape-num">3</div>
+      <div>
+        <h2>Se déplacer sans dessiner</h2>
+        <div class="etape-meta">10 minutes · lever le crayon, choisir un endroit</div>
+      </div>
+    </div>
+
+    <p>Problème : pour dessiner trois bandes côte à côte, il faut se déplacer <em>sans laisser
+    de trace</em> entre chaque bande. D'où deux nouvelles instructions :</p>
+
+    <ul>
+      <li><code>penup()</code> — lève le crayon</li>
+      <li><code>pendown()</code> — repose le crayon</li>
+      <li><code>goto(x, y)</code> — va directement à cet endroit précis</li>
+    </ul>
+
+    <p>La feuille a un centre, qui est le point <code>(0, 0)</code>. Vers la droite, x augmente.
+    Vers le haut, y augmente. Comme en maths, et pour une fois ça sert.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(3)
+
+crayon.penup()
+crayon.goto(-150, 100)
+crayon.pendown()
+
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule data-tortue="oui">
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(3)
+
+
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Deux essais à faire</div>
+      <p>1. <strong>Enlève la ligne <code>penup()</code></strong> et relance. Tu vois le trait
+      parasite qui traverse ? Voilà à quoi ça sert.</p>
+      <p>2. Change les nombres du <code>goto</code> et regarde le rectangle se déplacer.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 4 ============================ -->
+  <section class="etape" id="e4">
+    <div class="etape-head">
+      <div class="etape-num">4</div>
+      <div>
+        <h2>Mettre de la couleur</h2>
+        <div class="etape-meta">10 minutes · contour, remplissage</div>
+      </div>
+    </div>
+
+    <p>Trois instructions suffisent :</p>
+    <ul>
+      <li><code>color("black", "orange")</code> — contour noir, intérieur orange</li>
+      <li><code>begin_fill()</code> — « à partir d'ici, je remplis »</li>
+      <li><code>end_fill()</code> — « voilà, j'ai fini, remplis maintenant »</li>
+    </ul>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(3)
+
+crayon.penup()
+crayon.goto(-150, 100)
+crayon.pendown()
+
+crayon.color("black", "orange")
+crayon.begin_fill()
+
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+
+crayon.end_fill()
+crayon.hideturtle()
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule data-tortue="oui">
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(3)
+
+
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 L'erreur à faire exprès</div>
+      <p>Supprime la ligne <code>end_fill()</code> et relance. Rien ne se remplit.
+      Tu as dit à la machine « je commence à remplir » sans jamais dire « j'ai fini ».
+      Elle attend toujours. <strong>Une instruction qu'on ouvre, on la ferme.</strong></p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 5 ============================ -->
+  <section class="etape" id="e5">
+    <div class="etape-head">
+      <div class="etape-num">5</div>
+      <div>
+        <h2>Le drapeau complet</h2>
+        <div class="etape-meta">30 minutes · orange, blanc, vert</div>
+      </div>
+    </div>
+
+    <p>Tu sais faire <strong>une</strong> bande. Le drapeau en a trois. Elles font 100 de large,
+    donc elles commencent à <code>-150</code>, <code>-50</code> et <code>50</code>.</p>
+
+    <p>Copie ton propre bloc deux fois — <strong>ton code à toi, pas celui du prof</strong> —
+    et change à chaque fois deux choses seulement : le point de départ et la couleur.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(6)
+
+# --- Bande orange ---
+crayon.penup()
+crayon.goto(-150, 100)
+crayon.pendown()
+crayon.color("black", "orange")
+crayon.begin_fill()
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.end_fill()
+
+# --- Bande blanche ---
+crayon.penup()
+crayon.goto(-50, 100)
+crayon.pendown()
+crayon.color("black", "white")
+crayon.begin_fill()
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.end_fill()
+
+# --- Bande verte ---
+crayon.penup()
+crayon.goto(50, 100)
+crayon.pendown()
+crayon.color("black", "green")
+crayon.begin_fill()
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.forward(100)
+crayon.right(90)
+crayon.forward(200)
+crayon.right(90)
+crayon.end_fill()
+
+crayon.hideturtle()
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule data-tortue="oui">
+          <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(6)
+
+# --- Bande orange ---
+
+
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le moment blanc sur blanc</div>
+      <p>Quand tu lances la bande du milieu, tu vas dire « ça n'a pas marché ».
+      Regarde mieux : le rectangle est là, tu vois son contour.
+      Du blanc sur du blanc, ça ne se voit pas — <strong>c'est pour ça qu'on a mis un contour noir</strong>.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Retiens cette sensation</div>
+      <p>Tu viens d'écrire trois fois presque exactement la même chose. C'était long et pénible.</p>
+      <p><strong>Dans quelques semaines, je te montrerai comment l'écrire une seule fois.</strong>
+      Et ce jour-là tu comprendras pourquoi ça t'a soulé aujourd'hui. Garde ce fichier.</p>
+    </div>
+  </section>
+
+  <!-- ============================ DÉFI ============================ -->
+  <section class="etape" id="defi">
+    <div class="etape-head">
+      <div class="etape-num">★</div>
+      <div>
+        <h2>Défi : un autre pays</h2>
+        <div class="etape-meta">10 minutes · seulement les couleurs changent</div>
+      </div>
+    </div>
+
+    <p>Tous ces drapeaux ont trois bandes verticales. <strong>Ton code marche déjà</strong> :
+    il n'y a que les trois couleurs à changer.</p>
+
+    <table style="border-collapse:collapse;width:100%;font-size:15.5px;margin:18px 0">
+      <thead><tr style="text-align:left;border-bottom:2px solid var(--line)">
+        <th style="padding:9px 8px">Pays</th><th>Bande 1</th><th>Bande 2</th><th>Bande 3</th></tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">Mali</td><td><code>green</code></td><td><code>yellow</code></td><td><code>red</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">Guinée</td><td><code>red</code></td><td><code>yellow</code></td><td><code>green</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">Nigeria</td><td><code>green</code></td><td><code>white</code></td><td><code>green</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">Tchad</td><td><code>blue</code></td><td><code>yellow</code></td><td><code>red</code></td></tr>
+        <tr><td style="padding:8px">France</td><td><code>blue</code></td><td><code>white</code></td><td><code>red</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="panel moi">
+      <div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule data-tortue="oui">
+        <script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(0)
+
+
+        </script>
+      </div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Défi bonus, pour les rapides</div>
+      <p>Le drapeau du <strong>Bénin</strong> : une bande verte verticale à gauche,
+      puis deux bandes horizontales (jaune en haut, rouge en bas). Débrouille-toi.</p>
+    </div>
+  </section>
+
+  <!-- ============================ FIN ============================ -->
+  <section class="etape">
+    <div class="etape-head">
+      <div class="etape-num">🏠</div>
+      <div>
+        <h2>Avant de partir</h2>
+        <div class="etape-meta">5 minutes</div>
+      </div>
+    </div>
+
+    <ol>
+      <li>Fais une <strong>capture d'écran</strong> de ton drapeau et envoie-la moi.</li>
+      <li>Recopie ton code final dans Thonny et enregistre-le sous <code>drapeau.py</code>
+      dans ton dossier <code>mes_programmes</code>.</li>
+    </ol>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>Dessine le drapeau d'un pays à bandes <strong>horizontales</strong> :
+      Sierra Leone, Gambie, Pays-Bas, Allemagne… celui que tu veux.</p>
+      <p class="hint" style="margin-top:8px">Ce n'est pas juste changer les couleurs cette fois.
+      Il va falloir réfléchir aux positions. C'est fait exprès.</p>
+    </div>
+
+    <p style="margin-top:30px"><a href="index.html" style="color:var(--orange);font-weight:650">← Retour au programme</a></p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+/* ---------- Widget « comprendre l'angle » ---------- */
+(function () {
+  const cv = document.getElementById("viz-canvas");
+  if (!cv) return;
+  const ctx = cv.getContext("2d");
+  const sD = document.getElementById("s-dist"),
+        sA = document.getElementById("s-ang"),
+        sR = document.getElementById("s-rep");
+
+  function dessiner() {
+    const d = +sD.value, a = +sA.value, r = +sR.value;
+    document.getElementById("v-dist").textContent = d;
+    document.getElementById("v-ang").textContent = a + "°";
+    document.getElementById("v-rep").textContent = r + " fois";
+    document.getElementById("viz-code").textContent =
+      "for i in range(" + r + "):\n" +
+      "    crayon.forward(" + d + ")\n" +
+      "    crayon.right(" + a + ")";
+
+    // calcul du tracé
+    const pts = [[0, 0]];
+    let x = 0, y = 0, h = 0;
+    for (let i = 0; i < r; i++) {
+      x += d * Math.cos((h * Math.PI) / 180);
+      y += d * Math.sin((h * Math.PI) / 180);
+      pts.push([x, y]);
+      h -= a;
+    }
+    // cadrage automatique
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const larg = Math.max(maxX - minX, 1), haut = Math.max(maxY - minY, 1);
+    const k = Math.min((cv.width - 40) / larg, (cv.height - 40) / haut, 1.6);
+    const ox = cv.width / 2 - ((minX + maxX) / 2) * k;
+    const oy = cv.height / 2 + ((minY + maxY) / 2) * k;
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const px = ox + p[0] * k, py = oy - p[1] * k;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.strokeStyle = "#f07818";
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+
+    // point de départ
+    ctx.beginPath();
+    ctx.arc(ox, oy, 4, 0, 6.284);
+    ctx.fillStyle = "#0e8a55";
+    ctx.fill();
+
+    // la figure se referme-t-elle ?
+    const ecart = Math.hypot(x, y);
+    const msg = document.getElementById("viz-msg");
+    if (ecart < 3) {
+      const noms = {3:"un triangle",4:"un carré",5:"un pentagone",6:"un hexagone",
+                    8:"un octogone",10:"un décagone",12:"un dodécagone"};
+      msg.innerHTML = "✅ <strong style='color:var(--green)'>La figure se referme — " +
+        (noms[r] || "une figure à " + r + " côtés") + ".</strong> " +
+        a + " × " + r + " = " + (a * r) + "°. Tu as fait un tour complet.";
+    } else {
+      msg.innerHTML = "La tortue termine à " + Math.round(ecart) +
+        " du départ. Pour refermer, il faut que <strong>angle × répétitions = 360</strong>.";
+    }
+  }
+  [sD, sA, sR].forEach(s => s.addEventListener("input", dessiner));
+  dessiner();
+})();
+</script>
+
+</body>
+</html>
