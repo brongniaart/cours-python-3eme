@@ -21,12 +21,24 @@ class Exerciseur {
   constructor(el, exos) {
     this.el = el;
     this.exos = exos;
-    this.iExo = 0;
+    this.cle = "exo:" + MEM.page();
+    const repris = MEM.lireObjet(this.cle, null);
+    this.iExo = repris ? Math.min(repris.finis || 0, exos.length - 1) : 0;
     this.iTrou = 0;
     this.essais = 0;
     this.reponses = {};      // index de ligne -> texte validé
-    this.stats = { reussis: 0, montres: 0 };
+    this.stats = repris ? repris.stats : { reussis: 0, montres: 0 };
+    this.reprise = !!(repris && repris.finis);
     this.rendre();
+  }
+
+  /* combien d'exercices terminés, pour reprendre plus tard */
+  _sauverProgres(finis) {
+    MEM.ecrireObjet(this.cle, {
+      finis: finis,
+      total: this.exos.length,
+      stats: this.stats,
+    });
   }
 
   get exo() { return this.exos[this.iExo]; }
@@ -77,6 +89,11 @@ class Exerciseur {
           '<div class="exo-pastilles">' + pastilles + "</div>" +
           '<h3 class="exo-titre">' + esc(ex.titre) + "</h3>" +
         "</div>" +
+        (this.reprise && this.iTrou === 0
+          ? '<p class="exo-contexte" style="color:var(--green);font-weight:600">' +
+            "↩ Tu reprends où tu t'étais arrêté la dernière fois." +
+            ' <a href="#" id="exo-zero" style="color:var(--ink-soft);font-weight:400">tout recommencer</a></p>'
+          : "") +
         (ex.contexte ? '<p class="exo-contexte">' + ex.contexte + "</p>" : "") +
         '<div class="exo-code">' + lignes + "</div>" +
         '<div class="exo-consigne">' +
@@ -101,6 +118,16 @@ class Exerciseur {
     }
     this.el.querySelector("#exo-ok").onclick = () => this.verifier();
     this.el.querySelector("#exo-aide").onclick = () => this.indice();
+
+    const zero = this.el.querySelector("#exo-zero");
+    if (zero) zero.onclick = (e) => {
+      e.preventDefault();
+      MEM.effacer(this.cle);
+      this.iExo = 0; this.iTrou = 0; this.essais = 0;
+      this.reponses = {}; this.stats = { reussis: 0, montres: 0 };
+      this.reprise = false;
+      this.rendre();
+    };
   }
 
   maj() {
@@ -187,6 +214,8 @@ class Exerciseur {
     ).join("\n");
 
     const dernier = this.iExo >= this.exos.length - 1;
+    this.reprise = false;
+    this._sauverProgres(this.iExo + 1);
 
     this.el.innerHTML =
       '<div class="exo-zone">' +
@@ -211,7 +240,7 @@ class Exerciseur {
     src.type = "text/python";
     src.textContent = code;
     hote.appendChild(src);
-    new Cellule(hote);
+    new Cellule(hote, { memorise: false });
     this.el.querySelector("#exo-next").onclick = () => {
       if (dernier) { this.bilan(); }
       else { this.iExo++; this.iTrou = 0; this.essais = 0; this.reponses = {}; this.rendre(); }
@@ -236,8 +265,10 @@ class Exerciseur {
       "</div></div>";
 
     this.el.querySelector("#exo-again").onclick = () => {
+      MEM.effacer(this.cle);
       this.iExo = 0; this.iTrou = 0; this.essais = 0;
       this.reponses = {}; this.stats = { reussis: 0, montres: 0 };
+      this.reprise = false;
       this.rendre();
     };
   }

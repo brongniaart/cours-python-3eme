@@ -317,3 +317,38 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
 .exo-fin { text-align: center; padding: 20px 0 6px; }
 .exo-fin .score { font-size: 30px; font-weight: 750; letter-spacing: -.02em; }
 .exo-fin .mot { color: var(--ink-soft); margin-top: 6px; }
+
+/* ============================================================
+   Avancement de l'élève (page d'accueil)
+   ============================================================ */
+.avanc {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 28px; margin: 40px 0 0; box-shadow: var(--shadow);
+}
+.avanc > h2 { font-size: 22px; margin-bottom: 4px; }
+.avanc > .sous { color: var(--ink-soft); margin-bottom: 20px; font-size: 15.5px; }
+
+.avanc-vide { color: var(--ink-soft); font-size: 15.5px; }
+.avanc-vide p:first-child { color: var(--ink); }
+
+.avanc-tete { display: flex; gap: 36px; flex-wrap: wrap; margin-bottom: 16px; }
+.avanc-gros { font-size: 30px; font-weight: 750; letter-spacing: -.02em; color: var(--orange); line-height: 1.1; }
+.avanc-tete span { font-size: 13.5px; color: var(--ink-soft); }
+
+.avanc-barre { height: 9px; background: var(--bg-soft); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
+.avanc-barre i { display: block; height: 100%; background: var(--green); transition: width .4s; }
+
+.avanc-liste { display: flex; flex-direction: column; gap: 2px; margin-bottom: 20px; }
+.avanc-l {
+  display: flex; align-items: center; gap: 13px; padding: 9px 11px;
+  border-radius: 9px; text-decoration: none; color: var(--ink); transition: background .12s;
+}
+.avanc-l:hover { background: var(--bg-soft); }
+.avanc-n {
+  flex: none; width: 25px; height: 25px; border-radius: 7px; background: var(--green-soft);
+  color: var(--green); font-weight: 750; font-size: 12.5px; display: grid; place-items: center;
+}
+.avanc-t { font-weight: 600; font-size: 15px; }
+.avanc-d { margin-left: auto; font-size: 13.5px; color: var(--ink-soft); }
+
+.avanc-bar { display: flex; gap: 9px; flex-wrap: wrap; }

@@ -7,6 +7,44 @@
 let pyodide = null;
 let pyReady = null;
 
+/* ============================================================
+   Mémoire locale : tout ce que l'élève écrit est conservé
+   dans son navigateur, et rechargé à la visite suivante.
+   ============================================================ */
+const MEM = {
+  page() {
+    const f = location.pathname.split("/").pop() || "index.html";
+    return f.replace(".html", "") || "index";
+  },
+  lire(cle) {
+    try { return localStorage.getItem("cp3:" + cle); } catch (e) { return null; }
+  },
+  ecrire(cle, valeur) {
+    try { localStorage.setItem("cp3:" + cle, valeur); } catch (e) { /* mode privé */ }
+  },
+  effacer(cle) {
+    try { localStorage.removeItem("cp3:" + cle); } catch (e) { /* rien */ }
+  },
+  lireObjet(cle, defaut) {
+    const b = this.lire(cle);
+    if (!b) return defaut;
+    try { return JSON.parse(b); } catch (e) { return defaut; }
+  },
+  ecrireObjet(cle, obj) { this.ecrire(cle, JSON.stringify(obj)); },
+  toutesLesCles() {
+    const r = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith("cp3:")) r.push(k.slice(4));
+      }
+    } catch (e) { /* rien */ }
+    return r;
+  },
+};
+
+let compteurCellules = 0;
+
 /* ---------- Le module turtle, écrit en Python ---------- */
 const TURTLE_PY = String.raw`
 import math, json
@@ -440,22 +478,35 @@ class Toile {
 
 /* ---------- Une cellule de code exécutable ---------- */
 class Cellule {
-  constructor(el) {
+  constructor(el, opts) {
     this.el = el;
     this.avecTortue = el.dataset.tortue === "oui";
     this.editeur = null;
     this.sortie = null;
     this.toile = null;
+    this.memorise = !(opts && opts.memorise === false);
+    this.cle = this.memorise ? "code:" + MEM.page() + ":" + compteurCellules++ : null;
     this._monter();
+  }
+
+  _sauver() {
+    if (!this.cle) return;
+    clearTimeout(this._t);
+    this._t = setTimeout(() => {
+      const v = this.editeur.getValue();
+      if (v.trim()) MEM.ecrire(this.cle, v);
+      else MEM.effacer(this.cle);
+    }, 400);
   }
 
   _monter() {
     const depart = lireCode(this.el);
+    const garde = this.cle ? MEM.lire(this.cle) : null;
     const holder = document.createElement("div");
     this.el.appendChild(holder);
 
     this.editeur = CodeMirror(holder, {
-      value: depart,
+      value: garde !== null ? garde : depart,
       mode: "python",
       theme: "material-darker",
       lineNumbers: true,
@@ -483,13 +534,45 @@ class Cellule {
       this.editeur.setValue("");
       this.sortie.classList.remove("on");
       if (this.toile) this.toile.cv.classList.remove("on");
+      this._sauver();
     };
+
+    bar.append(bRun, bClear);
+
+    if (this.cle) {
+      const bDepart = document.createElement("button");
+      bDepart.className = "btn-ghost";
+      bDepart.title = "Revenir au code de départ";
+      bDepart.textContent = "↺";
+      bDepart.onclick = () => {
+        this.editeur.setValue(depart);
+        this._sauver();
+      };
+      bar.append(bDepart);
+
+      this.editeur.on("change", () => {
+        this._sauver();
+        if (this.marque) {
+          this.marque.textContent = "sauvegardé";
+          this.marque.style.opacity = "1";
+          clearTimeout(this._tm);
+          this._tm = setTimeout(() => { this.marque.style.opacity = ".45"; }, 1400);
+        }
+      });
+    }
 
     const astuce = document.createElement("span");
     astuce.className = "hint";
     astuce.textContent = "Ctrl + Entrée pour lancer";
+    bar.append(astuce);
 
-    bar.append(bRun, bClear, astuce);
+    if (this.cle) {
+      this.marque = document.createElement("span");
+      this.marque.className = "hint";
+      this.marque.style.cssText = "margin-left:auto;opacity:.45;transition:opacity .3s";
+      this.marque.textContent = garde !== null ? "repris de la dernière fois" : "sauvegarde automatique";
+      bar.append(this.marque);
+    }
     this.el.appendChild(bar);
     this.btn = bRun;
 

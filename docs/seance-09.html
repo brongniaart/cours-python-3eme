@@ -68,7 +68,8 @@
       <h2>Choisis ton projet</h2>
       <div class="etape-meta">10 minutes · et on ne change plus d'avis après</div></div></div>
 
-    <p>Trois propositions, ou la tienne si tu as mieux. Clique pour voir le plan de bataille.</p>
+    <p>Cinq propositions, ou la tienne si tu as mieux. Toutes utilisent uniquement
+    ce que tu sais déjà faire. Clique pour voir le plan de bataille.</p>
 
     <div class="projets" id="p-cartes"></div>
 
@@ -161,6 +162,11 @@
       <div class="etape-meta">15 minutes · la dernière épreuve</div></div></div>
 
     <p>Tu présentes ton programme comme si je ne l'avais jamais vu. Quatre temps :</p>
+
+    <p style="margin:18px 0">
+      <button class="btn-run" onclick="imprimerFiche()">🖨  Imprimer ma fiche projet</button>
+      <span class="hint" style="margin-left:10px">ton plan, ton code et les quatre points, sur une feuille</span>
+    </p>
 
     <ol>
       <li><strong>Ce que ça fait</strong> - en une phrase, sans vocabulaire technique</li>
@@ -396,36 +402,61 @@ window.EXERCICES = [
 /* ---------- Choix du projet et plan de bataille ---------- */
 (function () {
   const PROJETS = [
-    { id: "pendu", ico: "🔤", nom: "Le pendu", niv: "f", nivTxt: "abordable",
-      desc: "L'ordinateur choisit un mot, tu proposes des lettres, tu as 7 vies.",
+    { id: "maquis", ico: "🍲", nom: "Chef de maquis", niv: "m", nivTxt: "moyen",
+      desc: "Tu tiens un maquis. Les clients arrivent, commandent au hasard, et le soir tu fais ta caisse.",
       etapes: [
-        ["Une liste de mots et un tirage au hasard", "random.choice sur une liste de 10 mots"],
-        ["Afficher le mot masqué", "des tirets, autant que de lettres"],
-        ["Demander une lettre et vérifier si elle y est", "le mot-clé in te dit si elle est dedans"],
-        ["Révéler les lettres trouvées", "reconstruire le mot masqué à chaque tour"],
-        ["Compter les vies et détecter la fin", "gagné si plus de tirets, perdu si 0 vie"],
-        ["Blinder les saisies", "une seule lettre, pas un chiffre, pas vide"],
+        ["Le menu et les stocks", "deux dictionnaires : plat → prix, et plat → quantité restante"],
+        ["Un client arrive et commande", "random.choice pour tirer 1 à 3 plats de la carte"],
+        ["Encaisser", "calculer le total de la commande et l'ajouter à la caisse du jour"],
+        ["Gérer la rupture de stock", "si le plat est à 0, tu t'excuses et le client repart"],
+        ["La journée complète", "une boucle de 5 clients, puis le bilan du soir"],
+        ["Sauvegarder la recette", "écrire le total du jour dans un fichier, en mode ajout"],
       ] },
-    { id: "budget", ico: "💰", nom: "Le gestionnaire de budget", niv: "m", nivTxt: "moyen",
-      desc: "Tu notes tes dépenses en FCFA, il calcule les totaux et les garde en mémoire.",
+
+    { id: "foot", ico: "⚽", nom: "Carrière de footballeur", niv: "f", nivTxt: "abordable",
+      desc: "Tu démarres en équipe locale. Chaque saison tu joues, tu marques, tu progresses, et les gros clubs appellent.",
       etapes: [
-        ["Le menu principal", "ajouter, afficher, total, quitter - brique 2"],
-        ["Ajouter une dépense", "un dictionnaire catégorie → montant"],
-        ["Afficher toutes les dépenses", "une boucle sur le dictionnaire"],
-        ["Calculer le total et la plus grosse dépense", "sum, max - séance 5"],
-        ["Sauvegarder dans un fichier", "mode ajout - brique 3"],
-        ["Relire le fichier au démarrage", "pour retrouver ses données"],
+        ["Créer ton joueur", "nom, poste, niveau de départ à 50, club de départ"],
+        ["Jouer un match", "buts = random.randint(0, niveau // 25), le niveau change les chances"],
+        ["Une saison de 10 matchs", "une boucle, et le total de buts dans une liste"],
+        ["Progresser", "une fonction qui fait monter le niveau selon les buts marqués"],
+        ["Les transferts", "au-dessus d'un certain niveau, un club plus fort te recrute"],
+        ["Sauvegarder la carrière", "écrire chaque saison dans un fichier, pour reprendre plus tard"],
       ] },
-    { id: "quiz", ico: "🎓", nom: "Le quiz de révision", niv: "f", nivTxt: "abordable",
-      desc: "Un quiz sur une matière de ton choix, avec score, corrections et record.",
+
+    { id: "duel", ico: "🐉", nom: "Duel de créatures", niv: "m", nivTxt: "moyen",
+      desc: "Tu choisis ta créature, l'ordinateur prend la sienne, et vous vous affrontez au tour par tour.",
       etapes: [
-        ["Les questions dans un dictionnaire", "question → bonne réponse"],
-        ["Poser les questions dans un ordre aléatoire", "random.shuffle sur les clés"],
-        ["Compter le score", "et accepter les majuscules avec .lower()"],
-        ["Afficher la correction des erreurs", "garder les ratées dans une liste"],
-        ["Donner une mention finale", "l'escalier de conditions de la séance 3"],
-        ["Enregistrer le record", "lire le fichier, comparer, réécrire si mieux"],
+        ["Trois créatures", "un dictionnaire par créature : nom, points de vie, force d'attaque"],
+        ["Choisir son camp", "tu prends la tienne, l'ordinateur tire une des autres au hasard"],
+        ["Un tour d'attaque", "dégâts = force + random.randint(0, 5), les PV adverses baissent"],
+        ["Le combat complet", "une boucle qui alterne les deux, jusqu'à ce que des PV tombent à 0"],
+        ["L'attaque spéciale", "utilisable une seule fois dans le combat, dégâts doublés"],
+        ["Le tableau des victoires", "compter les combats gagnés et les garder dans un fichier"],
       ] },
+
+    { id: "millions", ico: "💰", nom: "Qui veut gagner des millions", niv: "f", nivTxt: "abordable",
+      desc: "Un quiz à paliers, avec des jokers. Une seule erreur et tu repars avec ce que tu as sécurisé.",
+      etapes: [
+        ["Les questions", "un dictionnaire question → bonne réponse, sur le thème de ton choix"],
+        ["Les paliers de gains", "une liste : 5000, 10000, 25000... en FCFA"],
+        ["Poser les questions", "dans un ordre aléatoire, en s'arrêtant à la première erreur"],
+        ["Le joker 50/50", "élimine deux mauvaises réponses, utilisable une seule fois"],
+        ["Le joker abandonner", "tu repars avec les gains déjà acquis"],
+        ["Le record", "enregistrer le meilleur gain dans un fichier et le comparer"],
+      ] },
+
+    { id: "evasion", ico: "🗝️", nom: "L'évasion", niv: "d", nivTxt: "exigeant",
+      desc: "Un jeu d'aventure au texte. Tu explores des salles, tu ramasses des objets, et tu dois sortir avant la fin du temps.",
+      etapes: [
+        ["La carte", "un dictionnaire : salle → description, et un autre : salle → sorties possibles"],
+        ["Se déplacer", "l'utilisateur tape nord, sud, est ou ouest, et tu vérifies que la sortie existe"],
+        ["L'inventaire", "une liste, et des objets à ramasser dans certaines salles"],
+        ["La porte fermée", "elle ne s'ouvre que si la clé est dans l'inventaire"],
+        ["Le compte à rebours", "un compteur de tours qui descend, perdu s'il tombe à zéro"],
+        ["Les deux fins", "une victoire, une défaite, et la proposition de rejouer"],
+      ] },
+
     { id: "libre", ico: "💡", nom: "Ton idée", niv: "d", nivTxt: "à cadrer ensemble",
       desc: "Tu as mieux ? Parfait. On découpe ton idée en étapes ensemble.",
       etapes: [
@@ -438,8 +469,10 @@ window.EXERCICES = [
       ] },
   ];
 
-  let sel = 0;
-  const faits = {};
+  const garde = MEM.lireObjet("projet", { sel: 0, faits: {} });
+  let sel = garde.sel || 0;
+  const faits = garde.faits || {};
+  window.__projet = () => ({ p: PROJETS[sel], faits: faits[PROJETS[sel].id] || {} });
 
   const eC = document.getElementById("p-cartes");
   eC.innerHTML = PROJETS.map((p, i) =>
@@ -458,7 +491,11 @@ window.EXERCICES = [
       "</strong><span>" + e[1] + "</span></div></div>"
     ).join("");
     document.querySelectorAll("#p-etapes .et").forEach(el => {
-      el.onclick = () => { faits[p.id][el.dataset.i] = !faits[p.id][el.dataset.i]; plan(); };
+      el.onclick = () => {
+        faits[p.id][el.dataset.i] = !faits[p.id][el.dataset.i];
+        MEM.ecrireObjet("projet", { sel: sel, faits: faits });
+        plan();
+      };
     });
     const n = Object.values(faits[p.id]).filter(Boolean).length;
     document.getElementById("p-barre").style.width = (n / p.etapes.length * 100) + "%";
@@ -471,13 +508,59 @@ window.EXERCICES = [
   eC.querySelectorAll(".projet").forEach(el => {
     el.onclick = () => {
       sel = +el.dataset.i;
+      MEM.ecrireObjet("projet", { sel: sel, faits: faits });
       eC.querySelectorAll(".projet").forEach(x => x.classList.remove("on"));
       el.classList.add("on");
       plan();
     };
   });
+  eC.querySelectorAll(".projet").forEach((x, i) => x.classList.toggle("on", i === sel));
   plan();
 })();
+
+/* ---------- Fiche de projet imprimable ---------- */
+function imprimerFiche() {
+  const { p, faits } = window.__projet();
+  const code = MEM.lire("code:seance-09:0") || "(le code n'a pas encore été écrit)";
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const etapes = p.etapes.map((e, i) =>
+    "<li" + (faits[i] ? ' class="ok"' : "") + ">" + (faits[i] ? "✓ " : "☐ ") + esc(e[0]) + "</li>"
+  ).join("");
+
+  const html =
+    '<!doctype html><html lang="fr"><head><meta charset="utf-8">' +
+    "<title>Ma fiche projet</title><style>" +
+    "@page{size:A4;margin:18mm 16mm}" +
+    "body{font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#1c1a17}" +
+    "h1{font-size:24pt;margin:0 0 4px;letter-spacing:-.02em}" +
+    ".sous{color:#5c5750;margin-bottom:22px}" +
+    "h2{font-size:13pt;border-bottom:2px solid #f07818;padding-bottom:5px;margin:24px 0 10px}" +
+    "ul{padding-left:0;list-style:none}li{margin-bottom:6px}li.ok{color:#0e8a55;font-weight:600}" +
+    "pre{background:#f7f5f0;border:1px solid #e2dcd0;border-left:3px solid #5c5750;" +
+    "border-radius:4px;padding:12px 14px;font-family:Menlo,Consolas,monospace;font-size:9pt;" +
+    "line-height:1.5;white-space:pre-wrap}" +
+    ".oral{background:#fdf0e2;border:1px solid #f7d8b8;border-radius:8px;padding:14px 17px}" +
+    ".oral ol{padding-left:18px}.oral li{margin-bottom:7px}" +
+    "</style></head><body>" +
+    "<h1>" + p.ico + " " + esc(p.nom) + "</h1>" +
+    '<div class="sous">Projet final du cours de Python</div>' +
+    "<h2>Mon plan de bataille</h2><ul>" + etapes + "</ul>" +
+    '<h2>Ma présentation</h2><div class="oral"><ol>' +
+    "<li><strong>Ce que ça fait</strong> : ....................................................</li>" +
+    "<li><strong>La démonstration</strong> : je l'utilise en vrai devant vous</li>" +
+    "<li><strong>Le morceau dont je suis le plus fier</strong> : ..............................</li>" +
+    "<li><strong>Ce qui a été le plus dur</strong> : ...........................................</li>" +
+    "</ol></div>" +
+    "<h2>Mon code</h2><pre>" + esc(code) + "</pre>" +
+    "</body></html>";
+
+  const w = window.open("", "_blank");
+  if (!w) { alert("Autorise les fenêtres pop-up pour imprimer ta fiche."); return; }
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
 </script>
 
 </body>
