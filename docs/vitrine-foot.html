@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrière de footballeur - La vitrine</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="vitrine.html"><span class="brand-dot"></span> Python - La vitrine</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Bonus · jouable</div>
+    <h1>Carrière de footballeur</h1>
+    <p class="lede">Tu démarres à l'ASEC. Chaque saison, tes buts dépendent de ton niveau,
+    et ton niveau dépend de tes buts. <strong>Marque assez, et les gros clubs appellent.</strong></p>
+  </div>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">⚽</div><div>
+      <h2>Huit saisons</h2>
+      <div class="etape-meta">à toi de jouer</div></div></div>
+
+    <div class="arene">
+      <div id="lanceur" class="lanceur">
+        <p>Le moteur Python est prêt.</p>
+        <button class="cmd cmd-att" id="go">⚽  Signer ton premier contrat</button>
+      </div>
+      <canvas id="jeu" width="1280" height="720" style="display:none"></canvas>
+      <div class="commandes" id="cmds" style="display:none">
+        <button class="cmd cmd-att" id="b-saison">Jouer la saison</button>
+        <button class="cmd cmd-rej" id="b-rej" style="display:none">Nouvelle carrière</button>
+        <span class="cmd-note" id="note"></span>
+      </div>
+    </div>
+
+    <div class="moteur-tete">
+      <h3>Le moteur, en Python</h3>
+      <button class="btn-ghost" id="recharger">↻ Modifier et relancer</button>
+    </div>
+
+    <p class="hint" style="margin-top:0">Change les clubs, le nombre de saisons, la façon
+    dont le niveau progresse, puis clique sur <strong>Modifier et relancer</strong>.</p>
+
+    <div id="moteur"><script type="text/python">
+import json
+import random
+
+clubs = ["ASEC Mimosas", "Africa Sports", "Esperance", "FC Porto", "Real Madrid"]
+
+couleur = {
+    "ASEC Mimosas": "#f2c200",
+    "Africa Sports": "#e0553f",
+    "Esperance": "#d84a6b",
+    "FC Porto": "#4f8ef0",
+    "Real Madrid": "#e9edf5",
+}
+
+SAISONS = 8
+
+etat = {}
+
+
+def nouvelle_partie():
+    etat["niveau"] = 50
+    etat["palier"] = 0
+    etat["saison"] = 0
+    etat["buts"] = []
+    etat["fini"] = ""
+
+
+def jouer_saison():
+    etat["saison"] = etat["saison"] + 1
+
+    buts = 0
+    for match in range(10):
+        buts = buts + random.randint(0, etat["niveau"] // 18)
+
+    etat["buts"].append(buts)
+
+    if buts >= 15:
+        gain = 10
+    elif buts >= 8:
+        gain = 5
+    else:
+        gain = 1
+
+    etat["niveau"] = etat["niveau"] + gain
+
+    transfert = ""
+    if etat["niveau"] >= 60 + etat["palier"] * 15 and etat["palier"] < 4:
+        etat["palier"] = etat["palier"] + 1
+        transfert = clubs[etat["palier"]]
+
+    if etat["saison"] >= SAISONS:
+        etat["fini"] = "fin"
+
+    return json.dumps([buts, gain, transfert, etat])
+    </script></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que tu peux écrire, et ce qui viendra plus tard</div>
+      <p><strong>Le moteur ci-dessus, tu sais déjà l'écrire.</strong> Une liste de clubs,
+      une boucle de dix matchs, <code>random.randint</code>, un escalier de conditions
+      pour le gain de niveau, et une liste qui garde les buts de chaque saison.</p>
+      <p><strong>Le dessin, pas encore.</strong> Mais remarque : Python ne dessine
+      aucune barre. Il renvoie une liste de nombres, et l'écran en fait un graphique.
+      C'est exactement ce que fait un tableur avec tes données.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 À essayer tout de suite dans le moteur</div>
+      <ul style="margin-bottom:0">
+        <li>Mets <code>SAISONS</code> à <code>15</code> pour une plus longue carrière</li>
+        <li>Change les clubs et leurs couleurs, mets ton équipe préférée</li>
+        <li>Rends les transferts plus durs : remplace <code>15</code> par <code>25</code></li>
+        <li>Ajoute une blessure : une saison sur six, les buts sont divisés par deux</li>
+      </ul>
+    </div>
+  </section>
+
+  <p style="margin-top:20px">
+    <a href="vitrine.html" style="color:var(--orange);font-weight:650">← Tous les jeux</a>
+    &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+  </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+(function () {
+  const cv = document.getElementById("jeu");
+  const ctx = cv.getContext("2d");
+  const W = 1280, H = 720;
+
+  let py = null, editeur = null, jeuPret = false, enCours = false;
+
+  const vue = {
+    club: "", teinte: "#f2c200", saison: 0, total: 8,
+    niveau: 50, niveauAff: 50, buts: [], hauteurs: [],
+    flottants: [], confettis: [], banniere: null, secousse: 0, t: 0,
+    fini: "",
+  };
+
+  function rrect(x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  const melange = (hex, vers, n) => {
+    const v = parseInt(hex.slice(1), 16);
+    const m = (c) => Math.round(c + (vers - c) * (n / 100));
+    return "rgb(" + m((v >> 16) & 255) + "," + m((v >> 8) & 255) + "," + m(v & 255) + ")";
+  };
+  const eclaircir = (h, n) => melange(h, 255, n);
+  const assombrir = (h, n) => melange(h, 0, n);
+
+  function fond() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#0f2418"); g.addColorStop(.6, "#0b1a12"); g.addColorStop(1, "#08120c");
+    ctx.fillStyle = g; ctx.fillRect(-40, -40, W + 80, H + 80);
+
+    // bandes de pelouse
+    for (let i = 0; i < 12; i++) {
+      ctx.fillStyle = i % 2 ? "rgba(255,255,255,.018)" : "rgba(0,0,0,.05)";
+      ctx.fillRect(i * (W / 12), H * .3, W / 12, H);
+    }
+    // ligne médiane
+    ctx.strokeStyle = "rgba(255,255,255,.07)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(W / 2, H * .78, 130, 0, 6.283); ctx.stroke();
+  }
+
+  function ecusson(x, y, r, teinte, nom) {
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.beginPath(); ctx.arc(x + 3, y + 5, r, 0, 6.283); ctx.fill();
+    const g = ctx.createLinearGradient(x, y - r, x, y + r);
+    g.addColorStop(0, eclaircir(teinte, 28)); g.addColorStop(1, assombrir(teinte, 22));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.stroke();
+
+    const ini = nom.split(" ").map((m) => m[0]).join("").slice(0, 3).toUpperCase();
+    ctx.font = "800 " + Math.round(r * .72) + "px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = assombrir(teinte, 62);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(ini, x, y + 1);
+    ctx.textBaseline = "alphabetic";
+  }
+
+  function jauge(x, y, w, h, val, min, max) {
+    ctx.fillStyle = "rgba(255,255,255,.08)"; rrect(x, y, w, h, h / 2); ctx.fill();
+    const r = Math.max(0, Math.min(1, (val - min) / (max - min)));
+    if (r > 0) {
+      const g = ctx.createLinearGradient(x, y, x + w, y);
+      g.addColorStop(0, "#2fbe7a"); g.addColorStop(1, "#8ff0b8");
+      ctx.fillStyle = g; rrect(x, y, r * w, h, h / 2); ctx.fill();
+    }
+    ctx.strokeStyle = "rgba(255,255,255,.16)"; ctx.lineWidth = 2;
+    rrect(x, y, w, h, h / 2); ctx.stroke();
+  }
+
+  function graphique() {
+    const x0 = 96, y0 = H - 118, larg = W - 192, hMax = 300;
+    const n = vue.total;
+    const pas = larg / n;
+    const record = Math.max(12, ...vue.buts);
+
+    // axe
+    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x0 - 20, y0); ctx.lineTo(x0 + larg, y0); ctx.stroke();
+
+    for (let i = 0; i < n; i++) {
+      const bx = x0 + i * pas + pas * .16, bw = pas * .68;
+      const cible = vue.buts[i] !== undefined ? (vue.buts[i] / record) * hMax : 0;
+      if (vue.hauteurs[i] === undefined) vue.hauteurs[i] = 0;
+      const h = vue.hauteurs[i];
+
+      // emplacement vide
+      ctx.fillStyle = "rgba(255,255,255,.045)";
+      rrect(bx, y0 - 26, bw, 22, 8); ctx.fill();
+
+      if (h > 1) {
+        const g = ctx.createLinearGradient(0, y0 - h, 0, y0);
+        g.addColorStop(0, eclaircir(vue.teinte, 26)); g.addColorStop(1, assombrir(vue.teinte, 18));
+        ctx.fillStyle = g;
+        rrect(bx, y0 - h, bw, h, 10); ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,.2)";
+        rrect(bx + 4, y0 - h + 4, bw - 8, Math.min(18, h - 8), 7); ctx.fill();
+
+        ctx.font = "800 26px -apple-system, Segoe UI, sans-serif";
+        ctx.fillStyle = "#eaf3ec"; ctx.textAlign = "center";
+        ctx.fillText(vue.buts[i], bx + bw / 2, y0 - h - 14);
+      }
+
+      ctx.font = "600 17px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#7f9c8b"; ctx.textAlign = "center";
+      ctx.fillText("S" + (i + 1), bx + bw / 2, y0 + 28);
+    }
+
+    ctx.font = "700 18px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#7f9c8b"; ctx.textAlign = "left";
+    ctx.fillText("BUTS PAR SAISON", x0 - 20, y0 - hMax - 30);
+  }
+
+  /* ---------- boucle ---------- */
+  let modeRAF = true, secours = null, dernier = 0;
+  function suivant() {
+    if (modeRAF) {
+      const id = requestAnimationFrame(boucle);
+      secours = setTimeout(() => { modeRAF = false; cancelAnimationFrame(id); boucle(performance.now()); }, 250);
+    } else setTimeout(() => boucle(performance.now()), 16);
+  }
+
+  function boucle(ts) {
+    clearTimeout(secours);
+    const dt = Math.min(50, ts - dernier || 16);
+    dernier = ts; vue.t += dt;
+
+    const record = Math.max(12, ...vue.buts);
+    vue.buts.forEach((b, i) => {
+      const cible = (b / record) * 300;
+      if (vue.hauteurs[i] === undefined) vue.hauteurs[i] = 0;
+      vue.hauteurs[i] += (cible - vue.hauteurs[i]) * Math.min(1, dt / 190);
+    });
+    vue.niveauAff += (vue.niveau - vue.niveauAff) * Math.min(1, dt / 240);
+    vue.secousse *= Math.pow(.88, dt / 16);
+
+    vue.flottants = vue.flottants.filter((f) => { f.vie -= dt; f.y -= dt * .05; return f.vie > 0; });
+    vue.confettis = vue.confettis.filter((p) => {
+      p.vie -= dt; p.x += p.vx * dt / 16; p.y += p.vy * dt / 16;
+      p.vy += dt * .014; p.a += dt * .01; return p.vie > 0;
+    });
+    if (vue.banniere) { vue.banniere.vie -= dt; if (vue.banniere.vie <= 0) vue.banniere = null; }
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate((Math.random() - .5) * vue.secousse, (Math.random() - .5) * vue.secousse);
+
+    fond();
+
+    // en-tête : club et saison
+    ecusson(120, 116, 52, vue.teinte, vue.club || "?");
+    ctx.textAlign = "left";
+    ctx.font = "800 42px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#eaf3ec";
+    ctx.fillText(vue.club, 196, 106);
+    ctx.font = "600 22px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#7f9c8b";
+    ctx.fillText("Saison " + Math.min(vue.saison, vue.total) + " sur " + vue.total, 196, 140);
+
+    // niveau
+    ctx.textAlign = "right";
+    ctx.font = "700 18px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#7f9c8b";
+    ctx.fillText("NIVEAU", W - 96, 84);
+    ctx.font = "800 46px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#8ff0b8";
+    ctx.fillText(Math.round(vue.niveauAff), W - 96, 132);
+    jauge(W - 396, 148, 300, 18, vue.niveauAff, 40, 140);
+
+    // total de buts
+    const total = vue.buts.reduce((s, b) => s + b, 0);
+    ctx.textAlign = "center";
+    ctx.font = "800 30px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#eaf3ec";
+    ctx.fillText(total + " buts en carrière", W / 2, 116);
+
+    graphique();
+
+    vue.confettis.forEach((p) => {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
+      ctx.globalAlpha = Math.max(0, p.vie / 1400);
+      ctx.fillStyle = p.c; ctx.fillRect(-6, -3, 12, 6);
+      ctx.restore(); ctx.globalAlpha = 1;
+    });
+
+    vue.flottants.forEach((f) => {
+      ctx.globalAlpha = Math.min(1, f.vie / 420);
+      ctx.font = "800 " + f.taille + "px -apple-system, Segoe UI, sans-serif";
+      ctx.textAlign = "center"; ctx.lineWidth = 7;
+      ctx.strokeStyle = "rgba(4,10,7,.85)"; ctx.strokeText(f.txt, f.x, f.y);
+      ctx.fillStyle = f.c; ctx.fillText(f.txt, f.x, f.y);
+      ctx.globalAlpha = 1;
+    });
+
+    if (vue.banniere) {
+      const a = Math.min(1, vue.banniere.vie / 500);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = "rgba(6,14,10,.86)";
+      ctx.fillRect(-40, H * .34, W + 80, 168);
+      ctx.textAlign = "center";
+      ctx.font = "800 34px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#8ff0b8";
+      ctx.fillText("TRANSFERT", W / 2, H * .34 + 62);
+      ctx.font = "800 58px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#eaf3ec";
+      ctx.fillText(vue.banniere.club, W / 2, H * .34 + 126);
+      ctx.globalAlpha = 1;
+    }
+
+    if (vue.fini) {
+      ctx.fillStyle = "rgba(5,12,8,.8)"; ctx.fillRect(-40, -40, W + 80, H + 80);
+      ctx.textAlign = "center";
+      ctx.font = "800 58px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#8ff0b8";
+      ctx.fillText("FIN DE CARRIÈRE", W / 2, H / 2 - 76);
+      ctx.font = "800 92px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#eaf3ec";
+      ctx.fillText(total + " buts", W / 2, H / 2 + 12);
+      ctx.font = "600 30px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#a9c6b6";
+      ctx.fillText("Dernier club : " + vue.club, W / 2, H / 2 + 68);
+      ctx.fillText("Meilleure saison : " + Math.max(...vue.buts) + " buts", W / 2, H / 2 + 112);
+    }
+
+    suivant();
+  }
+
+  /* ---------- Python ---------- */
+  const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
+  const enJs = (nom) => { const v = py.globals.get(nom); return v && v.toJs ? v.toJs() : v; };
+  const enObjet = (m) => { const o = {}; m.forEach((v, k) => (o[k] = v)); return o; };
+
+  function lireEtat() {
+    const e = enObjet(enJs("etat"));
+    const clubs = Array.from(enJs("clubs"));
+    const coul = enJs("couleur");
+    vue.saison = e.saison; vue.niveau = e.niveau; vue.fini = e.fini;
+    vue.buts = e.buts ? Array.from(e.buts) : [];
+    vue.club = clubs[e.palier];
+    vue.teinte = coul.get(vue.club) || "#f2c200";
+    vue.total = py.globals.get("SAISONS");
+  }
+
+  function demarrerPartie() {
+    py.globals.get("nouvelle_partie")();
+    lireEtat();
+    vue.hauteurs = []; vue.niveauAff = vue.niveau;
+    vue.flottants = []; vue.confettis = []; vue.banniere = null;
+    majBoutons();
+  }
+
+  function majBoutons() {
+    const fin = !!vue.fini;
+    document.getElementById("b-saison").disabled = fin || enCours;
+    document.getElementById("b-rej").style.display = fin ? "" : "none";
+    document.getElementById("note").textContent = fin
+      ? "Carrière terminée."
+      : "Plus ton niveau est haut, plus tu marques.";
+  }
+
+  function confettis(teinte) {
+    for (let i = 0; i < 90; i++) {
+      vue.confettis.push({
+        x: W / 2 + (Math.random() - .5) * 600, y: H * .3,
+        vx: (Math.random() - .5) * 9, vy: -4 - Math.random() * 6,
+        a: Math.random() * 6.283, vie: 1400,
+        c: [teinte, "#ffffff", "#8ff0b8", "#ffd98a"][i % 4],
+      });
+    }
+  }
+
+  async function jouerSaison() {
+    if (!jeuPret || enCours || vue.fini) return;
+    enCours = true; majBoutons();
+
+    const d = JSON.parse(py.globals.get("jouer_saison")());
+    const buts = d[0], gain = d[1], transfert = d[2];
+
+    lireEtat();
+    vue.secousse = 10;
+    vue.flottants.push({
+      x: W / 2, y: H * .28, txt: buts + " buts", vie: 1200, taille: 62,
+      c: buts >= 15 ? "#ffd98a" : buts >= 8 ? "#8ff0b8" : "#c9d6cd",
+    });
+    await attendre(700);
+    vue.flottants.push({
+      x: W - 246, y: 210, txt: "+" + gain + " niveau", vie: 1100, taille: 34, c: "#8ff0b8",
+    });
+
+    if (transfert) {
+      await attendre(600);
+      vue.banniere = { club: transfert, vie: 2200 };
+      vue.secousse = 26;
+      confettis(vue.teinte);
+      await attendre(1400);
+    }
+
+    await attendre(600);
+    enCours = false; majBoutons();
+  }
+
+  /* ---------- mise en place ---------- */
+  window.addEventListener("DOMContentLoaded", () => {
+    const hote = document.getElementById("moteur");
+    const code = lireCode(hote);
+    hote.innerHTML = "";
+    editeur = CodeMirror(hote, {
+      value: code, mode: "python", theme: "material-darker",
+      lineNumbers: true, indentUnit: 4, viewportMargin: Infinity,
+      extraKeys: { Tab: (cm) => cm.replaceSelection("    ") },
+    });
+
+    document.getElementById("go").onclick = async () => {
+      document.getElementById("go").textContent = "…";
+      py = await demarrerPython();
+      py.runPython(editeur.getValue());
+      demarrerPartie();
+      jeuPret = true;
+      document.getElementById("lanceur").style.display = "none";
+      cv.style.display = "block";
+      document.getElementById("cmds").style.display = "flex";
+      suivant();
+    };
+
+    document.getElementById("b-saison").onclick = () => jouerSaison();
+    document.getElementById("b-rej").onclick = () => demarrerPartie();
+
+    document.getElementById("recharger").onclick = async () => {
+      if (!py) { document.getElementById("go").click(); return; }
+      try { py.runPython(editeur.getValue()); demarrerPartie(); }
+      catch (e) {
+        alert("Le moteur ne démarre pas :\n\n" +
+              String(e.message || e).split("\n").slice(-4).join("\n"));
+      }
+    };
+  });
+})();
+</script>
+
+</body>
+</html>

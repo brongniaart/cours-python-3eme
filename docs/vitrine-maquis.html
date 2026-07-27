@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chef de maquis - La vitrine</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="vitrine.html"><span class="brand-dot"></span> Python - La vitrine</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Bonus · jouable</div>
+    <h1>Chef de maquis</h1>
+    <p class="lede">Cinq clients dans la soirée. Chacun commande au hasard,
+    et c'est toi qui décides de servir ou de refuser. <strong>Attention au stock :
+    quand un plat est fini, il est fini.</strong></p>
+  </div>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🍲</div><div>
+      <h2>Le service du soir</h2>
+      <div class="etape-meta">à toi de jouer</div></div></div>
+
+    <div class="arene">
+      <div id="lanceur" class="lanceur">
+        <p>Le moteur Python est prêt.</p>
+        <button class="cmd cmd-att" id="go">🍽  Ouvrir le maquis</button>
+      </div>
+      <canvas id="jeu" width="1280" height="720" style="display:none"></canvas>
+      <div class="commandes" id="cmds" style="display:none">
+        <button class="cmd cmd-att" id="b-servir">Servir la commande</button>
+        <button class="cmd cmd-rej" id="b-refuser">Refuser</button>
+        <button class="cmd cmd-spe" id="b-rej" style="display:none">Nouvelle soirée</button>
+        <span class="cmd-note" id="note"></span>
+      </div>
+    </div>
+
+    <div class="moteur-tete">
+      <h3>Le moteur, en Python</h3>
+      <button class="btn-ghost" id="recharger">↻ Modifier et relancer</button>
+    </div>
+
+    <p class="hint" style="margin-top:0">Change les prix, le stock de départ, le nombre
+    de clients, puis clique sur <strong>Modifier et relancer</strong>.</p>
+
+    <div id="moteur"><script type="text/python">
+import json
+import random
+
+plats = ["attieke", "alloco", "poisson", "bissap"]
+
+menu = {"attieke": 1500, "alloco": 1000, "poisson": 2500, "bissap": 500}
+depart = {"attieke": 4, "alloco": 5, "poisson": 2, "bissap": 6}
+
+CLIENTS_DU_SOIR = 5
+
+stock = {}
+etat = {}
+
+
+def nouvelle_partie():
+    for plat in plats:
+        stock[plat] = depart[plat]
+
+    etat["caisse"] = 0
+    etat["client"] = 0
+    etat["servis"] = 0
+    etat["fini"] = ""
+    nouveau_client()
+
+
+def nouveau_client():
+    etat["client"] = etat["client"] + 1
+
+    commande = []
+    for i in range(random.randint(1, 3)):
+        commande.append(random.choice(plats))
+
+    etat["commande"] = commande
+
+
+def servir(action):
+    encaisse = 0
+    manquants = []
+
+    if action == "servir":
+        for plat in etat["commande"]:
+            if stock[plat] > 0:
+                stock[plat] = stock[plat] - 1
+                encaisse = encaisse + menu[plat]
+            else:
+                manquants.append(plat)
+
+        if encaisse > 0:
+            etat["caisse"] = etat["caisse"] + encaisse
+            etat["servis"] = etat["servis"] + 1
+
+    if etat["client"] >= CLIENTS_DU_SOIR:
+        etat["fini"] = "fin"
+    else:
+        nouveau_client()
+
+    return json.dumps([encaisse, manquants, etat, stock])
+    </script></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que tu peux écrire, et ce qui viendra plus tard</div>
+      <p><strong>Le moteur ci-dessus, tu sais déjà l'écrire.</strong> Trois dictionnaires,
+      une liste de plats, <code>random.choice</code>, une condition sur le stock.
+      C'est exactement le programme de la séance 9, avec les mêmes notions.</p>
+      <p><strong>Le dessin, pas encore</strong> : il est écrit dans le langage du navigateur.
+      Mais regarde bien : <strong>Python ne dessine rien</strong>. Il décide combien
+      on encaisse et ce qui manque, et il renvoie le résultat. L'écran se contente
+      de le montrer.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 À essayer tout de suite dans le moteur</div>
+      <ul style="margin-bottom:0">
+        <li>Mets <code>CLIENTS_DU_SOIR</code> à <code>12</code> : le stock ne tiendra pas</li>
+        <li>Mets tout le stock à <code>1</code> et essaie de finir la soirée</li>
+        <li>Ajoute un plat au menu, au stock, et à la liste <code>plats</code></li>
+        <li>Fais qu'un client sur trois commande <strong>cinq</strong> plats</li>
+      </ul>
+    </div>
+  </section>
+
+  <p style="margin-top:20px">
+    <a href="vitrine.html" style="color:var(--orange);font-weight:650">← Tous les jeux</a>
+    &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+  </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+(function () {
+  const cv = document.getElementById("jeu");
+  const ctx = cv.getContext("2d");
+  const W = 1280, H = 720;
+
+  const EMOJI = { attieke: "🍚", alloco: "🍌", poisson: "🐟", bissap: "🥤" };
+  const TEINTE = { attieke: "#e8c46a", alloco: "#f0a03a", poisson: "#6fb7d8", bissap: "#d3567f" };
+  const PEAUX = ["#8a5a3b", "#6f452c", "#a06a45", "#7b4f33", "#95603e"];
+  const HABITS = ["#e0553f", "#2fbe7a", "#f0a03a", "#5b8def", "#b05de0"];
+
+  let py = null, editeur = null, jeuPret = false, enCours = false;
+
+  const vue = {
+    caisse: 0, caisseAff: 0, client: 0, total: 5, servis: 0,
+    commande: [], stock: {}, plats: [], fini: "",
+    clientX: W + 240, cibleX: W * .62, phase: "attente",
+    pieces: [], flottants: [], croix: [], t: 0, secousse: 0,
+  };
+
+  /* ---------- outils ---------- */
+  function rrect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function fond() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#241a14"); g.addColorStop(.6, "#1a130f"); g.addColorStop(1, "#120d0a");
+    ctx.fillStyle = g; ctx.fillRect(-40, -40, W + 80, H + 80);
+
+    // guirlande d'ampoules
+    for (let i = 0; i < 14; i++) {
+      const x = 60 + i * 86, y = 34 + Math.sin(i * .9) * 10;
+      const a = .55 + .45 * Math.sin(vue.t / 500 + i);
+      const h = ctx.createRadialGradient(x, y, 1, x, y, 34);
+      h.addColorStop(0, "rgba(255,196,110," + (a * .5) + ")");
+      h.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = h; ctx.beginPath(); ctx.arc(x, y, 34, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "rgba(255,214,150," + a + ")";
+      ctx.beginPath(); ctx.arc(x, y, 6, 0, 6.283); ctx.fill();
+    }
+
+    // comptoir
+    const c = ctx.createLinearGradient(0, H * .74, 0, H);
+    c.addColorStop(0, "#5c3a24"); c.addColorStop(1, "#3a2416");
+    ctx.fillStyle = c; ctx.fillRect(-40, H * .74, W + 80, H);
+    ctx.fillStyle = "rgba(255,255,255,.07)";
+    ctx.fillRect(-40, H * .74, W + 80, 10);
+  }
+
+  function personnage(x, y, teintePeau, teinteHabit, ech) {
+    const bob = Math.sin(vue.t / 380) * 5;
+    ctx.save();
+    ctx.translate(x, y + bob);
+    ctx.scale(ech, ech);
+
+    ctx.fillStyle = "rgba(0,0,0,.3)";
+    ctx.beginPath(); ctx.ellipse(0, 130, 66, 16, 0, 0, 6.283); ctx.fill();
+
+    ctx.fillStyle = teinteHabit;
+    rrect(-52, 6, 104, 126, 30); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,.12)";
+    rrect(-52, 6, 104, 34, 26); ctx.fill();
+
+    ctx.fillStyle = teintePeau;
+    ctx.beginPath(); ctx.arc(0, -38, 46, 0, 6.283); ctx.fill();
+    ctx.fillStyle = "#20140e";
+    ctx.beginPath(); ctx.arc(0, -58, 46, Math.PI, 0); ctx.fill();
+
+    ctx.fillStyle = "#150d09";
+    [-1, 1].forEach((s) => { ctx.beginPath(); ctx.arc(s * 16, -38, 5.5, 0, 6.283); ctx.fill(); });
+    ctx.strokeStyle = "#150d09"; ctx.lineWidth = 4; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.arc(0, -26, 16, .3, Math.PI - .3); ctx.stroke();
+    ctx.restore();
+  }
+
+  function bulle(x, y, commande) {
+    const larg = Math.max(190, commande.length * 96 + 50), haut = 128;
+    ctx.fillStyle = "rgba(252,249,244,.97)";
+    rrect(x - larg / 2, y - haut, larg, haut, 22); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 16, y); ctx.lineTo(x + 54, y + 34); ctx.lineTo(x + 54, y);
+    ctx.closePath(); ctx.fill();
+
+    ctx.font = "700 20px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#8a7f70"; ctx.textAlign = "center";
+    ctx.fillText("SA COMMANDE", x, y - haut + 30);
+
+    const d = 96, x0 = x - (commande.length - 1) * d / 2;
+    commande.forEach((plat, i) => {
+      const px = x0 + i * d, py = y - 44;
+      ctx.fillStyle = TEINTE[plat] || "#ccc";
+      ctx.beginPath(); ctx.arc(px, py - 6, 32, 0, 6.283); ctx.fill();
+      ctx.font = "34px -apple-system, Segoe UI Emoji, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(EMOJI[plat] || "🍽", px, py - 6);
+      ctx.textBaseline = "alphabetic";
+      ctx.font = "600 15px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#6c6154";
+      ctx.fillText(plat, px, py + 44);
+
+      const cr = vue.croix.find((c) => c.i === i);
+      if (cr) {
+        ctx.globalAlpha = Math.min(1, cr.vie / 300);
+        ctx.strokeStyle = "#e0553f"; ctx.lineWidth = 8; ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(px - 24, py - 30); ctx.lineTo(px + 24, py + 18);
+        ctx.moveTo(px + 24, py - 30); ctx.lineTo(px - 24, py + 18);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    });
+  }
+
+  function tableau() {
+    // caisse
+    ctx.fillStyle = "rgba(255,255,255,.06)";
+    rrect(56, 60, 400, 108, 18); ctx.fill();
+    ctx.font = "700 20px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#a8927a"; ctx.textAlign = "left";
+    ctx.fillText("CAISSE DU SOIR", 82, 96);
+    ctx.font = "800 52px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#ffd98a";
+    ctx.fillText(Math.round(vue.caisseAff) + " FCFA", 82, 148);
+
+    // clients
+    ctx.font = "700 20px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#a8927a"; ctx.textAlign = "right";
+    ctx.fillText("CLIENT " + Math.min(vue.client, vue.total) + " / " + vue.total, W - 56, 96);
+    ctx.fillStyle = "#8fd8ab";
+    ctx.fillText(vue.servis + " servis", W - 56, 132);
+
+    // stock
+    const x0 = 56, y = 196;
+    vue.plats.forEach((plat, i) => {
+      const x = x0 + i * 150, n = vue.stock[plat] || 0;
+      ctx.fillStyle = n > 0 ? "rgba(255,255,255,.08)" : "rgba(224,85,63,.18)";
+      rrect(x, y, 132, 62, 14); ctx.fill();
+      ctx.font = "26px -apple-system, Segoe UI Emoji, sans-serif";
+      ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.fillText(EMOJI[plat] || "🍽", x + 14, y + 31);
+      ctx.textBaseline = "alphabetic";
+      ctx.font = "800 26px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = n > 0 ? "#efe3d2" : "#e0553f";
+      ctx.textAlign = "right";
+      ctx.fillText(n > 0 ? "x" + n : "fini", x + 116, y + 40);
+    });
+  }
+
+  /* ---------- boucle ---------- */
+  let modeRAF = true, secours = null, dernier = 0;
+  function suivant() {
+    if (modeRAF) {
+      const id = requestAnimationFrame(boucle);
+      secours = setTimeout(() => { modeRAF = false; cancelAnimationFrame(id); boucle(performance.now()); }, 250);
+    } else setTimeout(() => boucle(performance.now()), 16);
+  }
+
+  function boucle(ts) {
+    clearTimeout(secours);
+    const dt = Math.min(50, ts - dernier || 16);
+    dernier = ts; vue.t += dt;
+
+    vue.caisseAff += (vue.caisse - vue.caisseAff) * Math.min(1, dt / 200);
+    vue.clientX += (vue.cibleX - vue.clientX) * Math.min(1, dt / 260);
+    vue.secousse *= Math.pow(.88, dt / 16);
+
+    vue.pieces = vue.pieces.filter((p) => {
+      p.k = Math.min(1, p.k + dt / 620);
+      const e = 1 - Math.pow(1 - p.k, 3);
+      p.x = p.x0 + (p.x1 - p.x0) * e;
+      p.y = p.y0 + (p.y1 - p.y0) * e - Math.sin(p.k * Math.PI) * 190;
+      return p.k < 1;
+    });
+    vue.flottants = vue.flottants.filter((f) => { f.vie -= dt; f.y -= dt * .05; return f.vie > 0; });
+    vue.croix = vue.croix.filter((c) => { c.vie -= dt; return c.vie > 0; });
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate((Math.random() - .5) * vue.secousse, (Math.random() - .5) * vue.secousse);
+
+    fond();
+    tableau();
+
+    if (!vue.fini && vue.commande.length) {
+      const ip = (vue.client - 1) % PEAUX.length;
+      personnage(vue.clientX, H * .64, PEAUX[ip], HABITS[ip], 1);
+      bulle(vue.clientX - 210, H * .40, vue.commande);
+    }
+
+    vue.pieces.forEach((p) => {
+      ctx.fillStyle = "#ffd15c";
+      ctx.beginPath(); ctx.arc(p.x, p.y, 13, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.55)";
+      ctx.beginPath(); ctx.arc(p.x - 4, p.y - 4, 5, 0, 6.283); ctx.fill();
+    });
+
+    vue.flottants.forEach((f) => {
+      ctx.globalAlpha = Math.min(1, f.vie / 400);
+      ctx.font = "800 " + f.taille + "px -apple-system, Segoe UI, sans-serif";
+      ctx.textAlign = "center"; ctx.lineWidth = 7;
+      ctx.strokeStyle = "rgba(10,7,5,.85)"; ctx.strokeText(f.txt, f.x, f.y);
+      ctx.fillStyle = f.c; ctx.fillText(f.txt, f.x, f.y);
+      ctx.globalAlpha = 1;
+    });
+
+    if (vue.fini) {
+      ctx.fillStyle = "rgba(12,9,6,.78)"; ctx.fillRect(-40, -40, W + 80, H + 80);
+      ctx.textAlign = "center";
+      ctx.font = "800 62px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#ffd98a";
+      ctx.fillText("FERMETURE", W / 2, H / 2 - 70);
+      ctx.font = "800 86px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#8fd8ab";
+      ctx.fillText(vue.caisse + " FCFA", W / 2, H / 2 + 20);
+      ctx.font = "600 30px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#c9b49b";
+      ctx.fillText(vue.servis + " clients servis sur " + vue.total, W / 2, H / 2 + 76);
+      const ruptures = vue.plats.filter((p) => (vue.stock[p] || 0) === 0);
+      if (ruptures.length) {
+        ctx.font = "600 26px -apple-system, Segoe UI, sans-serif";
+        ctx.fillStyle = "#e0553f";
+        ctx.fillText("À racheter demain : " + ruptures.join(", "), W / 2, H / 2 + 126);
+      }
+    }
+
+    suivant();
+  }
+
+  /* ---------- Python ---------- */
+  const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
+  const enJs = (nom) => { const v = py.globals.get(nom); return v && v.toJs ? v.toJs() : v; };
+  const enObjet = (m) => { const o = {}; m.forEach((v, k) => (o[k] = v)); return o; };
+
+  function lireEtat() {
+    const e = enObjet(enJs("etat"));
+    vue.caisse = e.caisse; vue.client = e.client; vue.servis = e.servis;
+    vue.fini = e.fini; vue.commande = e.commande ? Array.from(e.commande) : [];
+    vue.stock = enObjet(enJs("stock"));
+    vue.plats = Array.from(enJs("plats"));
+    vue.total = py.globals.get("CLIENTS_DU_SOIR");
+  }
+
+  function nouveauClientVisuel() {
+    vue.clientX = W + 240;
+    vue.cibleX = W * .62;
+  }
+
+  function demarrerPartie() {
+    py.globals.get("nouvelle_partie")();
+    lireEtat();
+    vue.caisseAff = 0; vue.pieces = []; vue.flottants = []; vue.croix = [];
+    nouveauClientVisuel();
+    majBoutons();
+  }
+
+  function majBoutons() {
+    const fin = !!vue.fini;
+    document.getElementById("b-servir").disabled = fin || enCours;
+    document.getElementById("b-refuser").disabled = fin || enCours;
+    document.getElementById("b-rej").style.display = fin ? "" : "none";
+    document.getElementById("note").textContent = fin
+      ? "Le maquis est fermé."
+      : "Servir rapporte, mais entame le stock.";
+  }
+
+  async function agir(action) {
+    if (!jeuPret || enCours || vue.fini) return;
+    enCours = true; majBoutons();
+
+    const commandeAvant = vue.commande.slice();
+    const brut = py.globals.get("servir")(action);
+    const d = JSON.parse(brut);
+    const encaisse = d[0], manquants = d[1];
+
+    if (action === "servir") {
+      // les plats manquants se barrent d'une croix
+      const dejaVus = {};
+      manquants.forEach((plat) => {
+        const i = commandeAvant.findIndex((p, k) => p === plat && !dejaVus[k]);
+        if (i >= 0) { dejaVus[i] = true; vue.croix.push({ i: i, vie: 900 }); }
+      });
+
+      if (encaisse > 0) {
+        for (let i = 0; i < Math.min(9, Math.ceil(encaisse / 500)); i++) {
+          vue.pieces.push({
+            k: -i * .06, x0: vue.clientX - 210, y0: H * .40,
+            x1: 190, y1: 132, x: vue.clientX - 210, y: H * .40,
+          });
+        }
+        vue.flottants.push({
+          x: vue.clientX - 210, y: H * .30, txt: "+" + encaisse + " FCFA",
+          vie: 1100, taille: 52, c: "#ffd98a",
+        });
+        vue.secousse = 10;
+      }
+      if (manquants.length) {
+        vue.flottants.push({
+          x: vue.clientX - 210, y: H * .22, txt: "rupture !",
+          vie: 1100, taille: 42, c: "#e0553f",
+        });
+        vue.secousse = 20;
+      }
+    } else {
+      vue.flottants.push({
+        x: vue.clientX - 210, y: H * .30, txt: "refusé",
+        vie: 900, taille: 44, c: "#c9b49b",
+      });
+    }
+
+    await attendre(950);
+    vue.cibleX = -320;            // le client s'en va
+    await attendre(520);
+
+    lireEtat();
+    if (!vue.fini) nouveauClientVisuel();
+    enCours = false; majBoutons();
+  }
+
+  /* ---------- mise en place ---------- */
+  window.addEventListener("DOMContentLoaded", () => {
+    const hote = document.getElementById("moteur");
+    const code = lireCode(hote);
+    hote.innerHTML = "";
+    editeur = CodeMirror(hote, {
+      value: code, mode: "python", theme: "material-darker",
+      lineNumbers: true, indentUnit: 4, viewportMargin: Infinity,
+      extraKeys: { Tab: (cm) => cm.replaceSelection("    ") },
+    });
+
+    document.getElementById("go").onclick = async () => {
+      document.getElementById("go").textContent = "…";
+      py = await demarrerPython();
+      py.runPython(editeur.getValue());
+      demarrerPartie();
+      jeuPret = true;
+      document.getElementById("lanceur").style.display = "none";
+      cv.style.display = "block";
+      document.getElementById("cmds").style.display = "flex";
+      suivant();
+    };
+
+    document.getElementById("b-servir").onclick = () => agir("servir");
+    document.getElementById("b-refuser").onclick = () => agir("refuser");
+    document.getElementById("b-rej").onclick = () => demarrerPartie();
+
+    document.getElementById("recharger").onclick = async () => {
+      if (!py) { document.getElementById("go").click(); return; }
+      try { py.runPython(editeur.getValue()); demarrerPartie(); }
+      catch (e) {
+        alert("Le moteur ne démarre pas :\n\n" +
+              String(e.message || e).split("\n").slice(-4).join("\n"));
+      }
+    };
+  });
+})();
+</script>
+
+</body>
+</html>

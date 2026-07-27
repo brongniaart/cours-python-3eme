@@ -352,3 +352,49 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
 .avanc-d { margin-left: auto; font-size: 13.5px; color: var(--ink-soft); }
 
 .avanc-bar { display: flex; gap: 9px; flex-wrap: wrap; }
+
+/* ============================================================
+   Vitrine : jeux jouables
+   ============================================================ */
+.arene {
+    background: #10141d; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(16,20,29,.35), 0 2px 8px rgba(16,20,29,.2);
+  }
+  .arene canvas { display: block; width: 100%; height: auto; }
+  .commandes {
+    display: flex; gap: 10px; padding: 14px 16px; background: #171c27;
+    flex-wrap: wrap; align-items: center; border-top: 1px solid #232a38;
+  }
+  .cmd {
+    font-family: inherit; font-size: 14.5px; font-weight: 700; border: 0;
+    border-radius: 10px; padding: 11px 20px; cursor: pointer; color: #fff;
+    transition: transform .1s, filter .15s;
+  }
+  .cmd:hover:not(:disabled) { filter: brightness(1.12); }
+  .cmd:active:not(:disabled) { transform: translateY(1px); }
+  .cmd:disabled { opacity: .32; cursor: default; }
+  .cmd-att { background: linear-gradient(180deg, #f28a2e, #dd6a0c); }
+  .cmd-spe { background: linear-gradient(180deg, #b05de0, #8a3ec4); }
+  .cmd-rej { background: #2b3346; }
+  .cmd-note { color: #7f8ba3; font-size: 13.5px; margin-left: auto; }
+
+  .lanceur { text-align: center; padding: 56px 20px; }
+  .lanceur p { color: #8fa0bb; margin-bottom: 18px; }
+
+  .moteur-tete { display: flex; align-items: center; gap: 12px; margin: 32px 0 8px; flex-wrap: wrap; }
+  .moteur-tete h3 { margin: 0; }
+  .moteur-tete .btn-ghost { margin-left: auto; }
+
+.galerie { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px; margin-top: 30px; }
+.jeu-carte { background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; text-decoration: none; color: var(--ink); box-shadow: var(--shadow);
+  transition: transform .15s, border-color .15s; display: block; }
+.jeu-carte:hover { transform: translateY(-3px); border-color: var(--orange); }
+.jeu-carte.soon { opacity: .45; pointer-events: none; }
+.jeu-carte .ico { font-size: 30px; }
+.jeu-carte h3 { margin: 10px 0 7px; font-size: 19px; }
+.jeu-carte p { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+.jeu-carte .chip { display: inline-block; margin-top: 14px; font-size: 12.5px;
+  font-weight: 650; background: var(--bg-soft); border: 1px solid var(--line);
+  padding: 3px 10px; border-radius: 20px; color: var(--ink-soft); }
