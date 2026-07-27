@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La vitrine - Où tu peux aller</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - La vitrine</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Bonus</div>
+    <h1>Où tu peux aller</h1>
+    <p class="lede">Le même jeu que dans ton projet, mais avec des dessins qui bougent.
+    <strong>Tout est écrit en Python</strong>, avec les mêmes boucles, les mêmes conditions
+    et les mêmes dictionnaires que ceux que tu connais. Rien de magique.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎙️ À ouvrir seulement quand ton projet marche</div>
+    <p>Cette page n'est pas là pour te donner des idées avant de commencer, mais pour
+    te montrer la marche suivante une fois que ton programme tourne.</p>
+  </div>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🐉</div><div>
+      <h2>Duel de créatures, version animée</h2>
+      <div class="etape-meta">lance et regarde le combat se dérouler</div></div></div>
+
+    <p>Le combat est calculé exactement comme dans la version texte : des dictionnaires
+    pour les points de vie et la force, une boucle qui alterne les tours, du hasard
+    pour les dégâts. <strong>La seule différence, c'est qu'au lieu d'écrire le résultat,
+    on le dessine.</strong></p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Lance-le</div>
+      <div data-cellule data-tortue="oui"><script type="text/python">
+import turtle
+import random
+
+# ----- Les créatures : exactement les mêmes dictionnaires -----
+pv = {"Gnamien": 60, "Kolokolo": 75}
+force = {"Gnamien": 12, "Kolokolo": 9}
+couleur = {"Gnamien": "#f07818", "Kolokolo": "#12b5c4"}
+
+moi = "Gnamien"
+lui = "Kolokolo"
+
+# ----- Les outils de dessin -----
+c = turtle.Turtle()
+c.speed(10)
+c.hideturtle()
+
+
+def rectangle(x, y, larg, haut, remplissage):
+    c.penup()
+    c.goto(x, y)
+    c.pendown()
+    c.color(remplissage, remplissage)
+    c.begin_fill()
+    for i in range(2):
+        c.forward(larg)
+        c.right(90)
+        c.forward(haut)
+        c.right(90)
+    c.end_fill()
+
+
+def texte(x, y, message, couleur_texte, taille):
+    c.penup()
+    c.goto(x, y)
+    c.color(couleur_texte)
+    c.write(message, align="center", font=("Arial", taille, "normal"))
+
+
+def creature(x, y, teinte, taille):
+    c.penup()
+    c.goto(x, y)
+    c.setheading(0)
+    c.pendown()
+    c.color("#1f2430", teinte)
+    c.begin_fill()
+    c.circle(taille)
+    c.end_fill()
+    # les yeux
+    c.penup()
+    c.goto(x - taille // 2, y + taille + 8)
+    c.color("#1f2430")
+    c.dot(9)
+    c.goto(x + taille // 2, y + taille + 8)
+    c.dot(9)
+
+
+def barre_de_vie(x, restant, depart, teinte):
+    rectangle(x - 60, 60, 120, 14, "#3a4152")
+    largeur = int(120 * restant / depart)
+    if largeur > 0:
+        rectangle(x - 60, 60, largeur, 14, teinte)
+
+
+def scene(mes_pv, ses_pv, message):
+    rectangle(-260, 180, 520, 360, "#1f2430")
+
+    creature(-110, -60, couleur[moi], 34)
+    creature(110, -60, couleur[lui], 34)
+
+    texte(-110, 82, moi, "#cdd6e6", 13)
+    texte(110, 82, lui, "#cdd6e6", 13)
+
+    barre_de_vie(-110, mes_pv, pv[moi], "#0e8a55")
+    barre_de_vie(110, ses_pv, pv[lui], "#0e8a55")
+
+    texte(-110, 26, str(mes_pv) + " PV", "#8fa6c9", 11)
+    texte(110, 26, str(ses_pv) + " PV", "#8fa6c9", 11)
+
+    texte(0, -140, message, "#ffd9b3", 14)
+    turtle.pause(0.55)
+
+
+# ----- Le combat : la même boucle que dans ta version texte -----
+mes_pv = pv[moi]
+ses_pv = pv[lui]
+tour = 1
+
+scene(mes_pv, ses_pv, "Le combat commence !")
+
+while mes_pv > 0 and ses_pv > 0:
+    degats = force[moi] + random.randint(0, 6)
+    ses_pv = ses_pv - degats
+    if ses_pv < 0:
+        ses_pv = 0
+    scene(mes_pv, ses_pv, "Tour " + str(tour) + " : tu infliges " + str(degats))
+
+    if ses_pv == 0:
+        break
+
+    riposte = force[lui] + random.randint(0, 6)
+    mes_pv = mes_pv - riposte
+    if mes_pv < 0:
+        mes_pv = 0
+    scene(mes_pv, ses_pv, "Il riposte : " + str(riposte) + " degats")
+
+    tour = tour + 1
+
+if ses_pv == 0:
+    scene(mes_pv, ses_pv, "VICTOIRE en " + str(tour) + " tours !")
+else:
+    scene(mes_pv, ses_pv, "DEFAITE...")
+      </script></div></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce qui a changé, et ce qui n'a pas changé</div>
+      <p><strong>Rien n'a changé dans la logique.</strong> Les mêmes dictionnaires,
+      la même boucle <code>while</code>, le même <code>random.randint</code>,
+      les mêmes conditions.</p>
+      <p><strong>Ce qui a été ajouté</strong> : quatre fonctions de dessin
+      (<code>rectangle</code>, <code>texte</code>, <code>creature</code>,
+      <code>barre_de_vie</code>) et une fonction <code>scene</code> qui les assemble.
+      Elles n'utilisent que ce que tu connais depuis la séance 6.</p>
+      <p>C'est exactement comme ça que marche un vrai jeu : un moteur qui calcule,
+      et un affichage qui dessine ce que le moteur a décidé. Les deux sont séparés.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Ce que tu peux modifier tout de suite</div>
+      <ul style="margin-bottom:0">
+        <li>Les couleurs des créatures, leurs points de vie, leur force</li>
+        <li><code>turtle.pause(0.55)</code> : le temps d'affichage de chaque image</li>
+        <li>La taille des créatures dans <code>creature(-110, -60, ..., 34)</code></li>
+        <li>Ajoute une troisième créature et fais un tournoi</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🚀</div><div>
+      <h2>Et après, ça donne quoi ?</h2>
+      <div class="etape-meta">la vraie marche suivante</div></div></div>
+
+    <p>Cette page dessine avec <code>turtle</code>, qui est fait pour apprendre.
+    Pour un vrai jeu, on utilise <strong>pygame</strong> : de vraies images,
+    du son, le clavier et la souris en direct.</p>
+
+    <p>Mais le plus important : <strong>ta boucle de combat ne changerait pas d'une ligne.</strong>
+    Tu remplacerais seulement les fonctions de dessin. C'est pour ça qu'on a appris
+    à séparer le calcul et l'affichage.</p>
+
+    <p style="margin-top:26px">
+      <a href="seance-09.html" style="color:var(--orange);font-weight:650">← Retour à la séance 9</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+</body>
+</html>

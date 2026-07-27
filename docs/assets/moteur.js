@@ -329,6 +329,13 @@ def home(): _t().home()
 def position(): return _t().position()
 def heading(): return _t().heading()
 def bgcolor(c=None): _ecran.bgcolor(c)
+
+
+def pause(secondes):
+    """Marque une pause pendant l'animation : de quoi faire de vraies images."""
+    _ops.append(["pause", int(float(secondes) * 1000)])
+
+
 def done(): pass
 mainloop = done
 def exitonclick(): pass
@@ -454,21 +461,26 @@ class Toile {
     };
 
     const pas = () => {
-      // vitesse 0 = instantané, sinon plus le nombre est petit plus c'est lent
-      if (vitesse === 0) {
-        while (i < ops.length) dessiner(ops[i++]);
-        rendu();
-        return;
-      }
       const t0 = performance.now();
-      const budget = 4; // ms de dessin par image
-      do {
-        if (i >= ops.length) break;
-        dessiner(ops[i++]);
-      } while (performance.now() - t0 < budget && vitesse >= 9);
+      let attente = null;
+
+      while (i < ops.length) {
+        const op = ops[i];
+        // une pause explicite découpe l'animation en vraies images
+        if (op[0] === "pause") { i++; attente = op[1]; break; }
+        dessiner(op);
+        i++;
+        if (vitesse === 0) continue;                     // tout d'un coup
+        if (vitesse >= 9) {
+          if (performance.now() - t0 >= 4) break;        // par paquets
+        } else break;                                    // op par op
+      }
+
       rendu();
       if (i < ops.length) {
-        const delai = vitesse === 0 ? 0 : Math.max(8, 260 / (vitesse * vitesse));
+        const delai = attente !== null ? attente
+          : vitesse === 0 ? 0
+          : Math.max(8, 260 / (vitesse * vitesse));
         this.timer = setTimeout(pas, delai);
       }
     };
