@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qui veut gagner des millions - La vitrine</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="vitrine.html"><span class="brand-dot"></span> Python - La vitrine</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Bonus · jouable</div>
+    <h1>Qui veut gagner des millions</h1>
+    <p class="lede">Cinq questions, cinq paliers, un joker.
+    <strong>Une seule erreur et tu repars les mains vides</strong> — sauf si tu as
+    le courage de t'arrêter à temps. Clique directement sur ta réponse.</p>
+  </div>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">💰</div><div>
+      <h2>Sur le plateau</h2>
+      <div class="etape-meta">à toi de jouer</div></div></div>
+
+    <div class="arene">
+      <div id="lanceur" class="lanceur">
+        <p>Le moteur Python est prêt.</p>
+        <button class="cmd cmd-att" id="go">🎬  Entrer sur le plateau</button>
+      </div>
+      <canvas id="jeu" width="1280" height="720" style="display:none"></canvas>
+      <div class="commandes" id="cmds" style="display:none">
+        <button class="cmd cmd-spe" id="b-joker">Joker 50 / 50</button>
+        <button class="cmd cmd-rej" id="b-stop">M'arrêter là</button>
+        <button class="cmd cmd-att" id="b-rej" style="display:none">Rejouer</button>
+        <span class="cmd-note" id="note"></span>
+      </div>
+    </div>
+
+    <div class="moteur-tete">
+      <h3>Le moteur, en Python</h3>
+      <button class="btn-ghost" id="recharger">↻ Modifier et relancer</button>
+    </div>
+
+    <p class="hint" style="margin-top:0">Écris tes propres questions, change les gains,
+    puis clique sur <strong>Modifier et relancer</strong>. Le quiz devient le tien.</p>
+
+    <div id="moteur"><script type="text/python">
+import json
+import random
+
+# La BONNE reponse est toujours ecrite en premier dans la liste.
+questions = {
+    "Capitale politique de la Cote d'Ivoire ?":
+        ["Yamoussoukro", "Abidjan", "Bouake", "San Pedro"],
+    "Combien de continents sur Terre ?":
+        ["5", "3", "7", "9"],
+    "Qui a ecrit Une si longue lettre ?":
+        ["Mariama Ba", "Ahmadou Kourouma", "Camara Laye", "Bernard Dadie"],
+    "Le plus long fleuve d'Afrique ?":
+        ["Le Nil", "Le Congo", "Le Niger", "Le Senegal"],
+    "Combien de joueurs dans une equipe de foot ?":
+        ["11", "10", "12", "9"],
+}
+
+gains = [5000, 25000, 100000, 500000, 1000000]
+
+etat = {}
+
+
+def nouvelle_partie():
+    ordre = []
+    for q in questions:
+        ordre.append(q)
+    random.shuffle(ordre)
+
+    etat["ordre"] = ordre
+    etat["palier"] = 0
+    etat["acquis"] = 0
+    etat["joker"] = True
+    etat["fini"] = ""
+    poser()
+
+
+def poser():
+    question = etat["ordre"][etat["palier"]]
+
+    propositions = []
+    for reponse in questions[question]:
+        propositions.append(reponse)
+    random.shuffle(propositions)
+
+    etat["question"] = question
+    etat["propositions"] = propositions
+    etat["elimines"] = []
+
+
+def utiliser_joker():
+    if etat["joker"]:
+        etat["joker"] = False
+
+        bonne = questions[etat["question"]][0]
+        mauvaises = []
+        for reponse in etat["propositions"]:
+            if reponse != bonne:
+                mauvaises.append(reponse)
+
+        random.shuffle(mauvaises)
+        etat["elimines"] = [mauvaises[0], mauvaises[1]]
+
+    return json.dumps(etat)
+
+
+def repondre(reponse):
+    bonne = questions[etat["question"]][0]
+    juste = reponse == bonne
+
+    if juste:
+        etat["acquis"] = gains[etat["palier"]]
+        etat["palier"] = etat["palier"] + 1
+
+        if etat["palier"] >= len(gains):
+            etat["fini"] = "jackpot"
+        else:
+            poser()
+    else:
+        etat["acquis"] = 0
+        etat["fini"] = "perdu"
+
+    return json.dumps([juste, bonne, etat])
+
+
+def arreter():
+    etat["fini"] = "arrete"
+    return json.dumps(etat)
+    </script></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que tu peux écrire, et ce qui viendra plus tard</div>
+      <p><strong>Le moteur ci-dessus, tu sais déjà l'écrire.</strong> Un dictionnaire
+      question → réponses, une liste de gains, <code>random.shuffle</code>,
+      et des conditions. Le joker, c'est juste une liste de deux mauvaises réponses
+      à ne plus afficher.</p>
+      <p><strong>Une différence avec ta version texte :</strong> ici il faut quatre
+      réponses proposées, donc le dictionnaire contient une liste au lieu d'une seule
+      réponse. C'est la seule chose qui change.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 À essayer tout de suite dans le moteur</div>
+      <ul style="margin-bottom:0">
+        <li>Remplace les questions par des questions sur ta matière préférée</li>
+        <li>Ajoute une sixième question, et un sixième palier dans <code>gains</code></li>
+        <li>Donne <strong>deux</strong> jokers au lieu d'un</li>
+        <li>Fais que le joker n'élimine qu'<strong>une</strong> mauvaise réponse</li>
+      </ul>
+    </div>
+  </section>
+
+  <p style="margin-top:20px">
+    <a href="vitrine.html" style="color:var(--orange);font-weight:650">← Tous les jeux</a>
+    &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+  </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+(function () {
+  const cv = document.getElementById("jeu");
+  const ctx = cv.getContext("2d");
+  const W = 1280, H = 720;
+  const LETTRES = ["A", "B", "C", "D"];
+
+  let py = null, editeur = null, jeuPret = false, enCours = false;
+
+  const vue = {
+    question: "", propositions: [], elimines: [], palier: 0, gains: [],
+    acquis: 0, joker: true, fini: "", choisi: null, bonne: null,
+    survol: null, cases: [], flottants: [], confettis: [], secousse: 0, t: 0,
+  };
+
+  function rrect(x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function fond() {
+    const g = ctx.createRadialGradient(W / 2, H * .42, 60, W / 2, H * .42, W * .75);
+    g.addColorStop(0, "#16243f"); g.addColorStop(.55, "#0d1526"); g.addColorStop(1, "#070b14");
+    ctx.fillStyle = g; ctx.fillRect(-40, -40, W + 80, H + 80);
+
+    // faisceaux de projecteurs
+    for (let i = 0; i < 5; i++) {
+      const a = -Math.PI / 2 + (i - 2) * .42 + Math.sin(vue.t / 2600 + i) * .07;
+      ctx.save();
+      ctx.translate(W / 2, -60);
+      ctx.rotate(a + Math.PI / 2);
+      const f = ctx.createLinearGradient(0, 0, 0, 900);
+      f.addColorStop(0, "rgba(120,170,255,.13)");
+      f.addColorStop(1, "rgba(120,170,255,0)");
+      ctx.fillStyle = f;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-130, 900); ctx.lineTo(130, 900);
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function echelle() {
+    const x = W - 330, y0 = 96, h = 46;
+    ctx.font = "700 17px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#6e809f"; ctx.textAlign = "left";
+    ctx.fillText("L'ÉCHELLE DES GAINS", x, y0 - 18);
+
+    for (let i = vue.gains.length - 1, k = 0; i >= 0; i--, k++) {
+      const y = y0 + k * (h + 8);
+      const actuel = i === vue.palier && !vue.fini;
+      const acquis = i < vue.palier;
+
+      ctx.fillStyle = actuel ? "rgba(240,168,40,.24)"
+        : acquis ? "rgba(47,190,122,.16)" : "rgba(255,255,255,.05)";
+      rrect(x, y, 268, h, 12); ctx.fill();
+
+      if (actuel) {
+        ctx.strokeStyle = "rgba(240,168,40,.85)"; ctx.lineWidth = 3;
+        rrect(x, y, 268, h, 12); ctx.stroke();
+      }
+
+      ctx.font = "800 21px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = actuel ? "#ffd07a" : acquis ? "#7fe0ac" : "#8093b3";
+      ctx.textAlign = "left";
+      ctx.fillText((i + 1) + ".", x + 18, y + 31);
+      ctx.textAlign = "right";
+      ctx.fillText(vue.gains[i].toLocaleString("fr-FR") + " F", x + 248, y + 31);
+    }
+  }
+
+  function reponses() {
+    vue.cases = [];
+    const larg = 400, haut = 86, x0 = 78, y0 = H - 236;
+    vue.propositions.forEach((txt, i) => {
+      const cx = x0 + (i % 2) * (larg + 26);
+      const cy = y0 + Math.floor(i / 2) * (haut + 22);
+      const elimine = vue.elimines.indexOf(txt) >= 0;
+      vue.cases.push({ x: cx, y: cy, w: larg, h: haut, txt: txt, elimine: elimine });
+
+      if (elimine) {
+        ctx.globalAlpha = .18;
+        ctx.fillStyle = "rgba(255,255,255,.06)";
+        rrect(cx, cy, larg, haut, 16); ctx.fill();
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      let remplissage = "rgba(255,255,255,.07)", bord = "rgba(255,255,255,.2)", encre = "#dde6f5";
+      if (vue.bonne === txt && vue.choisi !== null) {
+        remplissage = "rgba(47,190,122,.35)"; bord = "#2fbe7a"; encre = "#c9ffe1";
+      } else if (vue.choisi === txt && vue.bonne !== txt) {
+        remplissage = vue.bonne ? "rgba(224,85,63,.35)" : "rgba(240,168,40,.32)";
+        bord = vue.bonne ? "#e0553f" : "#f0a828";
+        encre = "#ffe4dc";
+      } else if (vue.survol === i && !enCours && !vue.fini) {
+        remplissage = "rgba(255,255,255,.13)"; bord = "rgba(255,255,255,.4)";
+      }
+
+      ctx.fillStyle = remplissage;
+      rrect(cx, cy, larg, haut, 16); ctx.fill();
+      ctx.strokeStyle = bord; ctx.lineWidth = 3;
+      rrect(cx, cy, larg, haut, 16); ctx.stroke();
+
+      ctx.font = "800 30px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#f0a828"; ctx.textAlign = "left";
+      ctx.fillText(LETTRES[i], cx + 26, cy + 55);
+
+      ctx.font = "600 27px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = encre;
+      ctx.fillText(txt, cx + 74, cy + 54);
+    });
+  }
+
+  function questionBoite() {
+    const x = 78, y = H - 342, larg = 826, haut = 84;
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    rrect(x, y, larg, haut, 18); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.16)"; ctx.lineWidth = 2;
+    rrect(x, y, larg, haut, 18); ctx.stroke();
+
+    ctx.font = "700 27px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#eef3fb"; ctx.textAlign = "center";
+    ctx.fillText(vue.question, x + larg / 2, y + 52);
+  }
+
+  /* ---------- boucle ---------- */
+  let modeRAF = true, secours = null, dernier = 0;
+  function suivant() {
+    if (modeRAF) {
+      const id = requestAnimationFrame(boucle);
+      secours = setTimeout(() => { modeRAF = false; cancelAnimationFrame(id); boucle(performance.now()); }, 250);
+    } else setTimeout(() => boucle(performance.now()), 16);
+  }
+
+  function boucle(ts) {
+    clearTimeout(secours);
+    const dt = Math.min(50, ts - dernier || 16);
+    dernier = ts; vue.t += dt;
+
+    vue.secousse *= Math.pow(.88, dt / 16);
+    vue.flottants = vue.flottants.filter((f) => { f.vie -= dt; f.y -= dt * .05; return f.vie > 0; });
+    vue.confettis = vue.confettis.filter((p) => {
+      p.vie -= dt; p.x += p.vx * dt / 16; p.y += p.vy * dt / 16;
+      p.vy += dt * .014; p.a += dt * .01; return p.vie > 0;
+    });
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate((Math.random() - .5) * vue.secousse, (Math.random() - .5) * vue.secousse);
+
+    fond();
+    echelle();
+
+    ctx.textAlign = "left";
+    ctx.font = "700 18px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#6e809f";
+    ctx.fillText("DÉJÀ GAGNÉ", 78, 116);
+    ctx.font = "800 54px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#7fe0ac";
+    ctx.fillText(vue.acquis.toLocaleString("fr-FR") + " FCFA", 78, 170);
+
+    if (!vue.fini) {
+      ctx.font = "700 20px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#f0a828";
+      ctx.fillText("Question " + (vue.palier + 1) + " · pour " +
+        (vue.gains[vue.palier] || 0).toLocaleString("fr-FR") + " FCFA", 78, 222);
+      questionBoite();
+      reponses();
+    }
+
+    vue.confettis.forEach((p) => {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
+      ctx.globalAlpha = Math.max(0, p.vie / 1500);
+      ctx.fillStyle = p.c; ctx.fillRect(-7, -3, 14, 6);
+      ctx.restore(); ctx.globalAlpha = 1;
+    });
+
+    vue.flottants.forEach((f) => {
+      ctx.globalAlpha = Math.min(1, f.vie / 420);
+      ctx.font = "800 " + f.taille + "px -apple-system, Segoe UI, sans-serif";
+      ctx.textAlign = "center"; ctx.lineWidth = 7;
+      ctx.strokeStyle = "rgba(4,7,14,.85)"; ctx.strokeText(f.txt, f.x, f.y);
+      ctx.fillStyle = f.c; ctx.fillText(f.txt, f.x, f.y);
+      ctx.globalAlpha = 1;
+    });
+
+    if (vue.fini) {
+      ctx.fillStyle = "rgba(5,9,18,.82)"; ctx.fillRect(-40, -40, W + 80, H + 80);
+      ctx.textAlign = "center";
+      const titres = { jackpot: "LE MILLION !", perdu: "ÉLIMINÉ", arrete: "TU T'ARRÊTES" };
+      const teintes = { jackpot: "#ffd07a", perdu: "#e0553f", arrete: "#7fe0ac" };
+      ctx.font = "800 74px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = teintes[vue.fini] || "#fff";
+      ctx.fillText(titres[vue.fini] || "FIN", W / 2, H / 2 - 40);
+      ctx.font = "800 64px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#eef3fb";
+      ctx.fillText(vue.acquis.toLocaleString("fr-FR") + " FCFA", W / 2, H / 2 + 46);
+      if (vue.bonne && vue.fini === "perdu") {
+        ctx.font = "600 28px -apple-system, Segoe UI, sans-serif";
+        ctx.fillStyle = "#9fb0cc";
+        ctx.fillText("La bonne réponse était : " + vue.bonne, W / 2, H / 2 + 108);
+      }
+    }
+
+    suivant();
+  }
+
+  /* ---------- Python ---------- */
+  const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
+  const enJs = (nom) => { const v = py.globals.get(nom); return v && v.toJs ? v.toJs() : v; };
+  const enObjet = (m) => { const o = {}; m.forEach((v, k) => (o[k] = v)); return o; };
+
+  function lireEtat(e) {
+    const o = e || enObjet(enJs("etat"));
+    vue.question = o.question || "";
+    vue.propositions = o.propositions ? Array.from(o.propositions) : [];
+    vue.elimines = o.elimines ? Array.from(o.elimines) : [];
+    vue.palier = o.palier; vue.acquis = o.acquis;
+    vue.joker = o.joker; vue.fini = o.fini;
+    vue.gains = Array.from(enJs("gains"));
+  }
+
+  function demarrerPartie() {
+    py.globals.get("nouvelle_partie")();
+    lireEtat();
+    vue.choisi = null; vue.bonne = null; vue.survol = null;
+    vue.flottants = []; vue.confettis = [];
+    majBoutons();
+  }
+
+  function majBoutons() {
+    const fin = !!vue.fini;
+    document.getElementById("b-joker").disabled = fin || enCours || !vue.joker;
+    document.getElementById("b-stop").disabled = fin || enCours || vue.acquis === 0;
+    document.getElementById("b-rej").style.display = fin ? "" : "none";
+    document.getElementById("note").textContent = fin
+      ? "Partie terminée."
+      : "Clique sur la réponse de ton choix.";
+  }
+
+  function confettis() {
+    for (let i = 0; i < 110; i++) {
+      vue.confettis.push({
+        x: W / 2 + (Math.random() - .5) * 700, y: H * .3,
+        vx: (Math.random() - .5) * 10, vy: -5 - Math.random() * 7,
+        a: Math.random() * 6.283, vie: 1500,
+        c: ["#ffd07a", "#ffffff", "#7fe0ac", "#f0a828"][i % 4],
+      });
+    }
+  }
+
+  async function repondre(txt) {
+    if (!jeuPret || enCours || vue.fini) return;
+    enCours = true; vue.choisi = txt; vue.bonne = null;
+    majBoutons();
+
+    await attendre(1100);                      // suspense
+
+    const d = JSON.parse(py.globals.get("repondre")(txt));
+    const juste = d[0], bonne = d[1], e = enObjet(new Map(Object.entries(d[2])));
+    vue.bonne = bonne;
+
+    if (juste) {
+      vue.flottants.push({ x: W / 2, y: H * .3, txt: "BONNE RÉPONSE", vie: 1300, taille: 54, c: "#7fe0ac" });
+      confettis();
+      vue.secousse = 10;
+    } else {
+      vue.flottants.push({ x: W / 2, y: H * .3, txt: "RATÉ", vie: 1300, taille: 60, c: "#e0553f" });
+      vue.secousse = 30;
+    }
+
+    await attendre(1500);
+    lireEtat(e);
+    vue.choisi = null;
+    if (!vue.fini) vue.bonne = null;
+    enCours = false; majBoutons();
+  }
+
+  /* ---------- mise en place ---------- */
+  window.addEventListener("DOMContentLoaded", () => {
+    const hote = document.getElementById("moteur");
+    const code = lireCode(hote);
+    hote.innerHTML = "";
+    editeur = CodeMirror(hote, {
+      value: code, mode: "python", theme: "material-darker",
+      lineNumbers: true, indentUnit: 4, viewportMargin: Infinity,
+      extraKeys: { Tab: (cm) => cm.replaceSelection("    ") },
+    });
+
+    const coords = (e) => {
+      const r = cv.getBoundingClientRect();
+      return [(e.clientX - r.left) * (cv.width / r.width),
+              (e.clientY - r.top) * (cv.height / r.height)];
+    };
+    const touche = (x, y) => vue.cases.findIndex((c) =>
+      !c.elimine && x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h);
+
+    cv.addEventListener("mousemove", (e) => {
+      const [x, y] = coords(e);
+      const i = touche(x, y);
+      vue.survol = i >= 0 ? i : null;
+      cv.style.cursor = i >= 0 && !enCours && !vue.fini ? "pointer" : "default";
+    });
+    cv.addEventListener("click", (e) => {
+      const [x, y] = coords(e);
+      const i = touche(x, y);
+      if (i >= 0) repondre(vue.cases[i].txt);
+    });
+
+    document.getElementById("go").onclick = async () => {
+      document.getElementById("go").textContent = "…";
+      py = await demarrerPython();
+      py.runPython(editeur.getValue());
+      demarrerPartie();
+      jeuPret = true;
+      document.getElementById("lanceur").style.display = "none";
+      cv.style.display = "block";
+      document.getElementById("cmds").style.display = "flex";
+      suivant();
+    };
+
+    document.getElementById("b-joker").onclick = () => {
+      if (enCours || vue.fini) return;
+      lireEtat(enObjet(new Map(Object.entries(JSON.parse(py.globals.get("utiliser_joker")())))));
+      vue.flottants.push({ x: W / 2, y: H * .34, txt: "50 / 50", vie: 1100, taille: 48, c: "#d79bff" });
+      majBoutons();
+    };
+    document.getElementById("b-stop").onclick = () => {
+      if (enCours || vue.fini) return;
+      lireEtat(enObjet(new Map(Object.entries(JSON.parse(py.globals.get("arreter")())))));
+      majBoutons();
+    };
+    document.getElementById("b-rej").onclick = () => demarrerPartie();
+
+    document.getElementById("recharger").onclick = async () => {
+      if (!py) { document.getElementById("go").click(); return; }
+      try { py.runPython(editeur.getValue()); demarrerPartie(); }
+      catch (e) {
+        alert("Le moteur ne démarre pas :\n\n" +
+              String(e.message || e).split("\n").slice(-4).join("\n"));
+      }
+    };
+  });
+})();
+</script>
+
+</body>
+</html>

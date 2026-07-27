@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'évasion - La vitrine</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="vitrine.html"><span class="brand-dot"></span> Python - La vitrine</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Bonus · jouable</div>
+    <h1>L'évasion</h1>
+    <p class="lede">Tu te réveilles dans une cellule. La carte se dévoile au fur et à mesure
+    que tu explores. <strong>Trouve la clé et sors par la cour avant que les gardes
+    ne reviennent.</strong> Les flèches du clavier marchent aussi.</p>
+  </div>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🗝️</div><div>
+      <h2>Quatorze tours pour t'échapper</h2>
+      <div class="etape-meta">à toi de jouer</div></div></div>
+
+    <div class="arene">
+      <div id="lanceur" class="lanceur">
+        <p>Le moteur Python est prêt.</p>
+        <button class="cmd cmd-att" id="go">🔓  Tenter l'évasion</button>
+      </div>
+      <canvas id="jeu" width="1280" height="720" style="display:none"></canvas>
+      <div class="commandes" id="cmds" style="display:none">
+        <button class="cmd cmd-att" id="b-nord">↑ Nord</button>
+        <button class="cmd cmd-att" id="b-sud">↓ Sud</button>
+        <button class="cmd cmd-att" id="b-ouest">← Ouest</button>
+        <button class="cmd cmd-att" id="b-est">→ Est</button>
+        <button class="cmd cmd-spe" id="b-rej" style="display:none">Recommencer</button>
+        <span class="cmd-note" id="note"></span>
+      </div>
+    </div>
+
+    <div class="moteur-tete">
+      <h3>Le moteur, en Python</h3>
+      <button class="btn-ghost" id="recharger">↻ Modifier et relancer</button>
+    </div>
+
+    <p class="hint" style="margin-top:0">Ajoute des salles, des objets, des passages,
+    puis clique sur <strong>Modifier et relancer</strong>. La carte se redessine toute seule.</p>
+
+    <div id="moteur"><script type="text/python">
+import json
+
+salles = {
+    "cellule": "Une cellule sombre. Une porte a l'est.",
+    "couloir": "Un couloir humide. Des passages dans toutes les directions.",
+    "cuisine": "La cuisine des gardes. Quelque chose brille sur la table.",
+    "reserve": "Une reserve poussiereuse, pleine de caisses.",
+    "cour": "La cour. Un grand portail ferme.",
+}
+
+# les passages : "salle-direction" donne la salle d'arrivee
+sorties = {
+    "cellule-est": "couloir",
+    "couloir-ouest": "cellule",
+    "couloir-nord": "cuisine",
+    "couloir-sud": "reserve",
+    "couloir-est": "cour",
+    "cuisine-sud": "couloir",
+    "reserve-nord": "couloir",
+    "cour-ouest": "couloir",
+}
+
+# ou dessiner chaque salle : [colonne, ligne]
+positions = {
+    "cellule": [0, 1],
+    "couloir": [1, 1],
+    "cuisine": [1, 0],
+    "reserve": [1, 2],
+    "cour": [2, 1],
+}
+
+objets = {"cuisine": "cle", "reserve": "lampe"}
+
+TOURS = 14
+
+etat = {}
+
+
+def nouvelle_partie():
+    etat["salle"] = "cellule"
+    etat["sac"] = []
+    etat["vues"] = ["cellule"]
+    etat["tours"] = TOURS
+    etat["fini"] = ""
+    etat["message"] = "Tu te reveilles dans une cellule. La porte est a l'est."
+
+
+def aller(direction):
+    cible = sorties.get(etat["salle"] + "-" + direction, "")
+
+    if cible == "":
+        etat["message"] = "Pas de passage par la."
+    else:
+        etat["salle"] = cible
+        etat["message"] = salles[cible]
+
+        if cible not in etat["vues"]:
+            etat["vues"].append(cible)
+
+        if cible in objets:
+            objet = objets[cible]
+            if objet not in etat["sac"]:
+                etat["sac"].append(objet)
+                etat["message"] = "Tu ramasses : " + objet
+
+        if cible == "cour":
+            if "cle" in etat["sac"]:
+                etat["fini"] = "gagne"
+                etat["message"] = "Tu ouvres le portail. LIBRE !"
+            else:
+                etat["message"] = "Le portail est ferme a cle."
+
+    etat["tours"] = etat["tours"] - 1
+
+    if etat["tours"] <= 0 and etat["fini"] == "":
+        etat["fini"] = "perdu"
+        etat["message"] = "Les gardes reviennent. Tu es repris."
+
+    return json.dumps(etat)
+    </script></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que tu peux écrire, et ce qui viendra plus tard</div>
+      <p><strong>Le moteur ci-dessus, tu sais déjà l'écrire.</strong> Des dictionnaires
+      pour les salles et les passages, une liste pour l'inventaire, <code>.get()</code>
+      pour ne pas planter quand la direction n'existe pas, et un compteur qui descend.</p>
+      <p><strong>Le dessin, pas encore</strong> : mais remarque que la carte est dessinée
+      à partir du dictionnaire <code>positions</code>. <strong>Ajoute une salle dans
+      le Python, elle apparaît sur la carte.</strong> L'affichage ne connaît pas ton donjon,
+      il se contente de lire ce que Python lui donne.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 À essayer tout de suite dans le moteur</div>
+      <ul style="margin-bottom:0">
+        <li>Ajoute une salle « cachot » au sud de la réserve, avec un passage dans les deux sens</li>
+        <li>Mets <code>TOURS</code> à <code>6</code> : il faudra aller droit au but</li>
+        <li>Cache la clé dans la réserve au lieu de la cuisine</li>
+        <li>Ajoute un objet « corde » et exige la corde <strong>et</strong> la clé pour sortir</li>
+      </ul>
+    </div>
+  </section>
+
+  <p style="margin-top:20px">
+    <a href="vitrine.html" style="color:var(--orange);font-weight:650">← Tous les jeux</a>
+    &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+  </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+(function () {
+  const cv = document.getElementById("jeu");
+  const ctx = cv.getContext("2d");
+  const W = 1280, H = 720;
+  const EMOJI = { cle: "🔑", lampe: "🔦", corde: "🪢" };
+
+  let py = null, editeur = null, jeuPret = false, enCours = false;
+
+  const vue = {
+    salle: "", sac: [], vues: [], tours: 14, max: 14, fini: "", message: "",
+    positions: {}, sorties: {}, objets: {},
+    joueur: { x: 0, y: 0, cx: 0, cy: 0 },
+    flottants: [], secousse: 0, t: 0,
+  };
+
+  function rrect(x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* la carte se cadre toute seule sur les positions données par Python */
+  function cadre() {
+    const p = Object.values(vue.positions);
+    if (!p.length) return { cw: 150, x0: 0, y0: 0 };
+    const cols = p.map((a) => a[0]), lignes = p.map((a) => a[1]);
+    const nc = Math.max(...cols) + 1, nl = Math.max(...lignes) + 1;
+    const dispoW = 720, dispoH = 430;
+    const cw = Math.min(dispoW / nc, dispoH / nl, 190);
+    return { cw: cw, x0: 96 + (dispoW - cw * nc) / 2, y0: 190 + (dispoH - cw * nl) / 2 };
+  }
+
+  function centre(nom, c) {
+    const p = vue.positions[nom];
+    if (!p) return null;
+    return [c.x0 + p[0] * c.cw + c.cw / 2, c.y0 + p[1] * c.cw + c.cw / 2];
+  }
+
+  function fond() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#1a1620"); g.addColorStop(.6, "#121017"); g.addColorStop(1, "#0c0a10");
+    ctx.fillStyle = g; ctx.fillRect(-40, -40, W + 80, H + 80);
+    for (let i = 0; i < 60; i++) {
+      const x = (i * 271) % W, y = (i * 157) % H;
+      ctx.fillStyle = "rgba(255,255,255,.02)";
+      ctx.fillRect(x, y, 3, 3);
+    }
+  }
+
+  function carte() {
+    const c = cadre();
+
+    // les couloirs entre salles déjà vues
+    ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 10; ctx.lineCap = "round";
+    Object.keys(vue.sorties).forEach((k) => {
+      const depart = k.split("-")[0], arrivee = vue.sorties[k];
+      if (vue.vues.indexOf(depart) < 0 || vue.vues.indexOf(arrivee) < 0) return;
+      const a = centre(depart, c), b = centre(arrivee, c);
+      if (!a || !b) return;
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    });
+
+    Object.keys(vue.positions).forEach((nom) => {
+      const p = centre(nom, c);
+      if (!p) return;
+      const t = c.cw * .74;
+      const vu = vue.vues.indexOf(nom) >= 0;
+      const ici = nom === vue.salle;
+
+      if (!vu) {
+        ctx.setLineDash([9, 9]);
+        ctx.strokeStyle = "rgba(255,255,255,.1)"; ctx.lineWidth = 3;
+        rrect(p[0] - t / 2, p[1] - t / 2, t, t, 16); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = "700 34px -apple-system, Segoe UI, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,.14)"; ctx.textAlign = "center";
+        ctx.fillText("?", p[0], p[1] + 12);
+        return;
+      }
+
+      if (ici) {
+        const halo = ctx.createRadialGradient(p[0], p[1], t * .3, p[0], p[1], t * 1.15);
+        halo.addColorStop(0, "rgba(240,168,40,.3)"); halo.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath(); ctx.arc(p[0], p[1], t * 1.15, 0, 6.283); ctx.fill();
+      }
+
+      ctx.fillStyle = ici ? "rgba(240,168,40,.2)" : "rgba(255,255,255,.07)";
+      rrect(p[0] - t / 2, p[1] - t / 2, t, t, 16); ctx.fill();
+      ctx.strokeStyle = ici ? "#f0a828" : "rgba(255,255,255,.2)";
+      ctx.lineWidth = ici ? 4 : 2;
+      rrect(p[0] - t / 2, p[1] - t / 2, t, t, 16); ctx.stroke();
+
+      ctx.font = "700 19px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = ici ? "#ffd07a" : "#a297b3"; ctx.textAlign = "center";
+      ctx.fillText(nom, p[0], p[1] + t / 2 - 14);
+
+      const obj = vue.objets[nom];
+      if (obj && vue.sac.indexOf(obj) < 0) {
+        ctx.font = "30px -apple-system, Segoe UI Emoji, sans-serif";
+        ctx.fillText(EMOJI[obj] || "📦", p[0], p[1] - 4 + Math.sin(vue.t / 300) * 4);
+      }
+    });
+
+    // le joueur, qui glisse d'une salle à l'autre
+    const dest = centre(vue.salle, c);
+    if (dest) {
+      vue.joueur.cx = dest[0]; vue.joueur.cy = dest[1];
+      const x = vue.joueur.x, y = vue.joueur.y;
+      ctx.fillStyle = "rgba(0,0,0,.4)";
+      ctx.beginPath(); ctx.ellipse(x, y + 22, 18, 6, 0, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "#f0a828";
+      ctx.beginPath(); ctx.arc(x, y + Math.sin(vue.t / 320) * 3, 15, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.55)";
+      ctx.beginPath(); ctx.arc(x - 5, y - 5, 5, 0, 6.283); ctx.fill();
+    }
+  }
+
+  function panneau() {
+    // tours restants
+    const r = Math.max(0, vue.tours / vue.max);
+    ctx.font = "700 18px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#8b7f9c"; ctx.textAlign = "left";
+    ctx.fillText("TOURS AVANT LA RONDE", 96, 92);
+    ctx.fillStyle = "rgba(255,255,255,.08)"; rrect(96, 106, 420, 22, 11); ctx.fill();
+    const g = ctx.createLinearGradient(96, 0, 516, 0);
+    g.addColorStop(0, r > .3 ? "#2fbe7a" : "#e0553f");
+    g.addColorStop(1, r > .3 ? "#8ff0b8" : "#ff8f6e");
+    ctx.fillStyle = g; if (r > 0) { rrect(96, 106, 420 * r, 22, 11); ctx.fill(); }
+    ctx.font = "800 30px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = r > .3 ? "#8ff0b8" : "#ff8f6e"; ctx.textAlign = "left";
+    ctx.fillText(vue.tours, 534, 130);
+
+    // inventaire
+    ctx.font = "700 18px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#8b7f9c"; ctx.textAlign = "right";
+    ctx.fillText("TON SAC", W - 96, 92);
+    if (!vue.sac.length) {
+      ctx.font = "600 20px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#5c5468";
+      ctx.fillText("vide", W - 96, 128);
+    } else {
+      vue.sac.forEach((o, i) => {
+        const x = W - 96 - i * 92;
+        ctx.fillStyle = "rgba(255,255,255,.08)";
+        rrect(x - 72, 104, 72, 72, 14); ctx.fill();
+        ctx.font = "34px -apple-system, Segoe UI Emoji, sans-serif";
+        ctx.textAlign = "center"; ctx.fillText(EMOJI[o] || "📦", x - 36, 152);
+      });
+    }
+
+    // message
+    ctx.fillStyle = "rgba(255,255,255,.06)";
+    rrect(96, H - 118, W - 192, 76, 16); ctx.fill();
+    ctx.font = "600 26px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#e4dced"; ctx.textAlign = "center";
+    ctx.fillText(vue.message, W / 2, H - 70);
+  }
+
+  /* ---------- boucle ---------- */
+  let modeRAF = true, secours = null, dernier = 0;
+  function suivant() {
+    if (modeRAF) {
+      const id = requestAnimationFrame(boucle);
+      secours = setTimeout(() => { modeRAF = false; cancelAnimationFrame(id); boucle(performance.now()); }, 250);
+    } else setTimeout(() => boucle(performance.now()), 16);
+  }
+
+  function boucle(ts) {
+    clearTimeout(secours);
+    const dt = Math.min(50, ts - dernier || 16);
+    dernier = ts; vue.t += dt;
+
+    vue.joueur.x += (vue.joueur.cx - vue.joueur.x) * Math.min(1, dt / 130);
+    vue.joueur.y += (vue.joueur.cy - vue.joueur.y) * Math.min(1, dt / 130);
+    vue.secousse *= Math.pow(.88, dt / 16);
+    vue.flottants = vue.flottants.filter((f) => { f.vie -= dt; f.y -= dt * .05; return f.vie > 0; });
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate((Math.random() - .5) * vue.secousse, (Math.random() - .5) * vue.secousse);
+
+    fond();
+    carte();
+    panneau();
+
+    vue.flottants.forEach((f) => {
+      ctx.globalAlpha = Math.min(1, f.vie / 420);
+      ctx.font = "800 " + f.taille + "px -apple-system, Segoe UI, sans-serif";
+      ctx.textAlign = "center"; ctx.lineWidth = 7;
+      ctx.strokeStyle = "rgba(8,6,12,.85)"; ctx.strokeText(f.txt, f.x, f.y);
+      ctx.fillStyle = f.c; ctx.fillText(f.txt, f.x, f.y);
+      ctx.globalAlpha = 1;
+    });
+
+    if (vue.fini) {
+      ctx.fillStyle = "rgba(8,6,12,.82)"; ctx.fillRect(-40, -40, W + 80, H + 80);
+      ctx.textAlign = "center";
+      ctx.font = "800 80px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = vue.fini === "gagne" ? "#8ff0b8" : "#e0553f";
+      ctx.fillText(vue.fini === "gagne" ? "ÉVADÉ !" : "REPRIS", W / 2, H / 2 - 10);
+      ctx.font = "600 30px -apple-system, Segoe UI, sans-serif";
+      ctx.fillStyle = "#b9aec8";
+      ctx.fillText(vue.fini === "gagne"
+        ? "Il te restait " + vue.tours + " tours"
+        : "Il te fallait la clé de la cuisine", W / 2, H / 2 + 52);
+    }
+
+    suivant();
+  }
+
+  /* ---------- Python ---------- */
+  const enJs = (nom) => { const v = py.globals.get(nom); return v && v.toJs ? v.toJs() : v; };
+  const enObjet = (m) => { const o = {}; m.forEach((v, k) => (o[k] = v)); return o; };
+
+  function lireCarte() {
+    const pos = enJs("positions"), sor = enJs("sorties"), obj = enJs("objets");
+    vue.positions = {}; pos.forEach((v, k) => (vue.positions[k] = Array.from(v)));
+    vue.sorties = enObjet(sor);
+    vue.objets = enObjet(obj);
+    vue.max = py.globals.get("TOURS");
+  }
+
+  function lireEtat(o) {
+    const e = o || enObjet(enJs("etat"));
+    vue.salle = e.salle; vue.tours = e.tours; vue.fini = e.fini; vue.message = e.message;
+    vue.sac = e.sac ? Array.from(e.sac) : [];
+    vue.vues = e.vues ? Array.from(e.vues) : [];
+  }
+
+  function demarrerPartie() {
+    py.globals.get("nouvelle_partie")();
+    lireCarte(); lireEtat();
+    const c = cadre(), p = centre(vue.salle, c);
+    if (p) { vue.joueur.x = p[0]; vue.joueur.y = p[1]; vue.joueur.cx = p[0]; vue.joueur.cy = p[1]; }
+    vue.flottants = [];
+    majBoutons();
+  }
+
+  function majBoutons() {
+    const fin = !!vue.fini;
+    ["b-nord", "b-sud", "b-est", "b-ouest"].forEach((id) => {
+      document.getElementById(id).disabled = fin || enCours;
+    });
+    document.getElementById("b-rej").style.display = fin ? "" : "none";
+    document.getElementById("note").textContent = fin
+      ? "Partie terminée."
+      : "Flèches du clavier ou boutons.";
+  }
+
+  function aller(direction) {
+    if (!jeuPret || enCours || vue.fini) return;
+    const avant = vue.sac.length;
+    lireEtat(JSON.parse(py.globals.get("aller")(direction)));
+    if (vue.sac.length > avant) {
+      vue.flottants.push({
+        x: W / 2, y: H * .34, txt: "+ " + vue.sac[vue.sac.length - 1],
+        vie: 1100, taille: 44, c: "#ffd07a",
+      });
+      vue.secousse = 8;
+    }
+    if (vue.fini === "perdu") vue.secousse = 28;
+    majBoutons();
+  }
+
+  /* ---------- mise en place ---------- */
+  window.addEventListener("DOMContentLoaded", () => {
+    const hote = document.getElementById("moteur");
+    const code = lireCode(hote);
+    hote.innerHTML = "";
+    editeur = CodeMirror(hote, {
+      value: code, mode: "python", theme: "material-darker",
+      lineNumbers: true, indentUnit: 4, viewportMargin: Infinity,
+      extraKeys: { Tab: (cm) => cm.replaceSelection("    ") },
+    });
+
+    document.getElementById("go").onclick = async () => {
+      document.getElementById("go").textContent = "…";
+      py = await demarrerPython();
+      py.runPython(editeur.getValue());
+      demarrerPartie();
+      jeuPret = true;
+      document.getElementById("lanceur").style.display = "none";
+      cv.style.display = "block";
+      document.getElementById("cmds").style.display = "flex";
+      suivant();
+    };
+
+    const dirs = { "b-nord": "nord", "b-sud": "sud", "b-est": "est", "b-ouest": "ouest" };
+    Object.keys(dirs).forEach((id) => {
+      document.getElementById(id).onclick = () => aller(dirs[id]);
+    });
+    document.getElementById("b-rej").onclick = () => demarrerPartie();
+
+    window.addEventListener("keydown", (e) => {
+      if (!jeuPret || document.activeElement.tagName === "TEXTAREA") return;
+      const t = { ArrowUp: "nord", ArrowDown: "sud", ArrowLeft: "ouest", ArrowRight: "est" }[e.key];
+      if (t) { e.preventDefault(); aller(t); }
+    });
+
+    document.getElementById("recharger").onclick = async () => {
+      if (!py) { document.getElementById("go").click(); return; }
+      try { py.runPython(editeur.getValue()); demarrerPartie(); }
+      catch (e) {
+        alert("Le moteur ne démarre pas :\n\n" +
+              String(e.message || e).split("\n").slice(-4).join("\n"));
+      }
+    };
+  });
+})();
+</script>
+
+</body>
+</html>
