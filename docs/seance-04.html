@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 4 — Répéter sans se fatiguer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .tour { display: grid; grid-template-columns: 1fr 290px; gap: 24px; align-items: start; }
+  @media (max-width: 820px) { .tour { grid-template-columns: 1fr; } }
+  .tour-code { background: var(--code-bg); border-radius: 10px; padding: 14px 0;
+    font-family: var(--mono); font-size: 14px; line-height: 1.95; color: #7a8399; }
+  .tour-code .l { padding: 0 18px; display: block; white-space: pre; }
+  .tour-code .l.on { color: #cdd6e6; background: rgba(240,120,24,.18); }
+  .tour-etat { background: #fff; border: 1px solid var(--line); border-radius: 11px; padding: 18px; }
+  .tour-etat .ligne { display: flex; justify-content: space-between; padding: 7px 0;
+    border-bottom: 1px solid var(--line); font-size: 15px; }
+  .tour-etat .ligne:last-child { border: 0; }
+  .tour-etat .v { font-family: var(--mono); font-weight: 700; color: var(--orange); }
+  .tour-etat .v.oui { color: var(--green); }
+  .tour-etat .v.non { color: var(--red); }
+  .tour-sortie { background: var(--code-bg); color: #a9e5b8; border-radius: 9px;
+    padding: 11px 14px; margin-top: 12px; font-family: var(--mono); font-size: 14px;
+    min-height: 42px; white-space: pre-wrap; }
+  .tour-note { margin-top: 12px; font-size: 15px; color: var(--ink-soft); min-height: 44px; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 4</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#tour">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 4 · 1 h 30</div>
+    <h1>Répéter sans se fatiguer</h1>
+    <p class="lede">Tu te souviens des trois bandes du drapeau, écrites trois fois ?
+    Et de ta question à la dernière séance : « je copie dix fois pour dix questions ? »
+    <strong>La réponse, c'est aujourd'hui.</strong></p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Tant que…</h2>
+      <div class="etape-meta">15 minutes · while</div></div></div>
+
+    <p><code>while</code> veut dire <strong>« tant que »</strong>. Tant que la condition
+    est vraie, Python refait le bloc décalé. Encore, et encore. Il ne s'arrête que
+    lorsque la condition devient fausse.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+compteur = 1
+
+while compteur <= 5:
+    print(compteur)
+    compteur = compteur + 1
+
+print("Terminé.")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Trois choses indispensables, et si tu en oublies une ça ne marche pas :
+    <strong>de quoi partir</strong> (<code>compteur = 1</code>),
+    <strong>quand s'arrêter</strong> (<code>&lt;= 5</code>),
+    et <strong>de quoi avancer</strong> (<code>compteur = compteur + 1</code>).</p>
+
+    <div class="box bug">
+      <div class="box-title">🐛 La boucle infinie — à faire exprès une fois</div>
+      <p>Enlève la ligne <code>compteur = compteur + 1</code> et lance.
+      Le compteur reste à 1, la condition reste vraie, et Python affiche 1 pour toujours.</p>
+      <p><strong>Ça arrive à tout le monde, y compris aux professionnels.</strong>
+      Recharge la page pour arrêter. Et retiens la question à se poser :
+      <em>« qu'est-ce qui va rendre ma condition fausse un jour ? »</em></p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="tour">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Regarder la boucle tourner</h2>
+      <div class="etape-meta">un tour à la fois, en voyant tout</div></div></div>
+
+    <p>À chaque tour, Python fait toujours la même chose : il teste la condition,
+    et si elle est vraie il exécute le bloc. Clique et observe le compteur monter.</p>
+
+    <div class="widget">
+      <div class="tour">
+        <div>
+          <div class="tour-code" id="t-code"></div>
+          <div class="memo-bar" style="display:flex;gap:9px;margin-top:14px">
+            <button class="btn-run" id="t-next">Étape suivante →</button>
+            <button class="btn-ghost" id="t-reset">Recommencer</button>
+          </div>
+          <div class="tour-note" id="t-note">Clique pour démarrer.</div>
+        </div>
+        <div>
+          <div class="tour-etat">
+            <div class="ligne"><span>compteur</span><span class="v" id="t-c">—</span></div>
+            <div class="ligne"><span>compteur &lt;= 5 ?</span><span class="v" id="t-test">—</span></div>
+            <div class="ligne"><span>tours effectués</span><span class="v" id="t-n">0</span></div>
+          </div>
+          <div class="tour-sortie" id="t-out"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Une boucle, c'est ce qui fait tourner à peu près tout. Un <strong>jeu vidéo</strong>
+      redessine l'écran 60 fois par seconde : c'est une boucle. Ton <strong>application
+      de messagerie</strong> vérifie s'il y a du nouveau, en boucle. Un
+      <strong>distributeur de billets</strong> redemande le code tant qu'il est faux,
+      et s'arrête au bout de trois essais. Sans boucle, un programme fait une chose
+      une fois et meurt.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Quand on sait combien de fois</h2>
+      <div class="etape-meta">15 minutes · for et range</div></div></div>
+
+    <p>Quand tu sais d'avance combien de tours tu veux, <code>while</code> est trop
+    bavard. <code>for</code> fait la même chose en une ligne, et il gère le compteur
+    tout seul.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+for i in range(5):
+    print(i)
+
+print("---")
+
+for i in range(1, 6):
+    print(i)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Le truc qui surprend tout le monde</div>
+      <p><code>range(5)</code> donne <strong>0, 1, 2, 3, 4</strong>. Cinq nombres,
+      mais qui commencent à 0 et s'arrêtent <em>avant</em> 5.</p>
+      <p><code>range(1, 6)</code> donne <strong>1, 2, 3, 4, 5</strong>. Le premier nombre
+      est inclus, le dernier ne l'est jamais.</p>
+      <p>C'est bizarre au début, c'est comme ça dans presque tous les langages,
+      et tu t'y feras plus vite que tu ne crois.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le moment que j'attends depuis la séance 0</div>
+      <p>Souviens-toi : tu avais écrit trois fois le même bloc pour les trois bandes du
+      drapeau, et je t'avais dit de retenir cette sensation. Regarde :</p>
+      <p style="font-family:var(--mono);font-size:14px;background:var(--code-bg);color:#a9e5b8;padding:12px 15px;border-radius:8px;white-space:pre">couleurs = ["orange", "white", "green"]
+depart = -150
+
+for couleur in couleurs:
+    dessine_bande(depart, couleur)
+    depart = depart + 100</p>
+      <p><strong>Trente lignes deviennent six.</strong> Il manque encore une pièce —
+      la fonction <code>dessine_bande</code> — et c'est le sujet de la prochaine séance.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Sortir plus tôt</h2>
+      <div class="etape-meta">10 minutes · break, et le compteur d'essais</div></div></div>
+
+    <p><code>break</code> arrête la boucle immédiatement, sans finir le tour.
+    C'est ce qui te permet de dire « trois essais maximum ».</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+essais = 0
+
+while True:
+    code = input("Code secret ? ")
+    essais = essais + 1
+
+    if code == "1234":
+        print("Ouvert !")
+        break
+
+    if essais == 3:
+        print("Carte bloquée.")
+        break
+
+    print("Faux, réessaie.")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p><code>while True:</code> veut dire « tourne pour toujours ». C'est volontaire :
+    ici, ce n'est pas la condition qui arrête la boucle, ce sont les <code>break</code>.
+    Sans eux, ce serait une boucle infinie.</p>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : le nombre mystère</h2>
+      <div class="etape-meta">30 minutes · ton premier vrai jeu</div></div></div>
+
+    <p>L'ordinateur choisit un nombre entre 1 et 100. Tu proposes. Il te dit
+    « plus grand » ou « plus petit ». Quand tu trouves, il t'annonce en combien
+    de coups tu y es arrivé.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 La ligne magique pour tirer au hasard</div>
+      <p style="font-family:var(--mono);font-size:14px">import random
+
+secret = random.randint(1, 100)</p>
+      <p>Prends-la telle quelle pour aujourd'hui. On regardera comment ça marche
+      vraiment en séance 8.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import random
+
+secret = random.randint(1, 100)
+coups = 0
+
+# À toi : une boucle qui redemande tant que ce n'est pas trouvé
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Tu n'interviens pas avant <strong>20 minutes</strong>. Il va oublier
+      <code>int()</code> sur la proposition — laisse-le retrouver l'erreur de la séance 2 seul.</p>
+      <p>S'il finit vite : « fais en sorte qu'après 7 essais ratés, le jeu donne
+      la réponse et s'arrête. »</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : la table de multiplication</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Un programme qui demande un nombre et affiche sa table, de 1 à 10,
+    proprement présentée : <code>7 x 3 = 21</code>.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Pour aller plus loin</div>
+      <p>Affiche <strong>toutes</strong> les tables de 1 à 9, d'un coup.
+      <em>Indice : une boucle à l'intérieur d'une autre boucle. Décale de 8 espaces
+      pour le bloc du dedans.</em></p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, on te montre la réponse.</strong></p>
+    <p class="hint">Le décalage des lignes à l'intérieur des boucles est déjà mis pour toi.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>Le <strong>compte à rebours de la rentrée</strong> : le programme affiche
+      les nombres de 30 jusqu'à 1, puis <code>C'est la rentrée !</code></p>
+      <p class="hint" style="margin-top:8px">Indice : <code>range(30, 0, -1)</code>
+      compte à l'envers. Le troisième nombre est le pas.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-03.html" style="color:var(--orange);font-weight:650">← Séance 3</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-05.html" style="color:var(--orange);font-weight:650">Séance 5 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Compter jusqu'à 10",
+    contexte: "Une boucle while complète. Les trois ingrédients : partir, s'arrêter, avancer.",
+    lignes: [
+      { b:1, long:12, consigne:"Crée le compteur, qui vaut <code>1</code> au départ.",
+        ok:["compteur = 1"],
+        indices:["Une boîte et un nombre.","<code>compteur = 1</code>"],
+        pourquoi:"Sans point de départ, la boucle ne saurait pas d'où partir." },
+      { t:"" },
+      { b:1, long:22, consigne:"<strong>Tant que</strong> <code>compteur</code> est inférieur ou égal à 10.",
+        ok:["while compteur <= 10:"],
+        indices:["« Tant que » s'écrit <code>while</code>, et n'oublie pas les deux points.",
+                 "<code>while compteur &lt;= 10:</code>"],
+        pourquoi:"C'est la condition d'arrêt. Tant qu'elle est vraie, on refait le bloc." },
+      { b:1, indent:4, long:16, consigne:"Affiche le compteur.",
+        ok:["print(compteur)"],
+        indices:["Sans guillemets : on veut le contenu de la boîte.","<code>print(compteur)</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:24, consigne:"Ajoute 1 au compteur. <strong>Sans cette ligne, la boucle ne s'arrête jamais.</strong>",
+        ok:["compteur = compteur + 1","compteur += 1"],
+        indices:["Prends le compteur, ajoute 1, remets le tout dans la boîte.",
+                 "<code>compteur = compteur + 1</code>"],
+        pourquoi:"C'est cette ligne qui fait avancer vers la sortie. L'oublier, c'est la boucle infinie." },
+      { t:"" },
+      { t:'print("Fini !")' },
+    ],
+  },
+  {
+    titre: "La table de 7",
+    contexte: "Avec un for, plus besoin de gérer le compteur soi-même.",
+    lignes: [
+      { b:1, long:18, consigne:"Une boucle <code>for</code> qui fait défiler <code>i</code> de <strong>1 à 10 inclus</strong>. Attention au fonctionnement de <code>range</code>.",
+        ok:["for i in range(1, 11):"],
+        indices:["<code>range(1, 11)</code> donne 1, 2, … 10. Le dernier nombre n'est jamais atteint.",
+                 "<code>for i in range(1, 11):</code>"],
+        pourquoi:"Pour aller jusqu'à 10, on écrit 11. C'est déroutant deux jours, puis ça devient un réflexe." },
+      { b:1, indent:4, long:30, consigne:"Affiche <code>7 x 1 = 7</code>, puis <code>7 x 2 = 14</code>, etc. Fais calculer Python.",
+        ok:['print(f"7 x {i} = {7 * i}")'],
+        indices:["Une f-string, avec un calcul entre les accolades.",
+                 '<code>print(f"7 x {i} = {7 * i}")</code>'],
+        pourquoi:"À chaque tour, <code>i</code> vaut autre chose, donc la ligne affiche autre chose. Une seule ligne écrite, dix lignes affichées." },
+    ],
+  },
+  {
+    titre: "Le mot de passe, trois essais",
+    contexte: "Une boucle qui redemande, mais pas indéfiniment.",
+    lignes: [
+      { b:1, long:10, consigne:"Un compteur d'essais, à <code>0</code> au départ.",
+        ok:["essais = 0"],
+        indices:["Comme le score du quiz.","<code>essais = 0</code>"],
+        pourquoi:"" },
+      { t:"" },
+      { b:1, long:12, consigne:"Une boucle qui tourne <strong>pour toujours</strong>. C'est volontaire : on l'arrêtera nous-mêmes.",
+        ok:["while True:"],
+        indices:["La condition est simplement <code>True</code>, avec une majuscule.",
+                 "<code>while True:</code>"],
+        pourquoi:"Ici ce n'est pas la condition qui arrête la boucle, ce sont les <code>break</code>." },
+      { t:'    mdp = input("Mot de passe ? ")' },
+      { b:1, indent:4, long:22, consigne:"Ajoute 1 au nombre d'essais.",
+        ok:["essais = essais + 1","essais += 1"],
+        indices:["Même forme que le compteur de l'exercice 1.","<code>essais = essais + 1</code>"],
+        pourquoi:"" },
+      { t:"" },
+      { t:'    if mdp == "python":' },
+      { t:'        print("Bienvenue !")' },
+      { b:1, indent:8, long:8, consigne:"Sors de la boucle immédiatement. <em>(deux niveaux de décalage : on est dans le if, qui est dans le while)</em>",
+        ok:["break"],
+        indices:["Un seul mot, sans parenthèses.","<code>break</code>"],
+        pourquoi:"Sans <code>break</code>, il continuerait à demander le mot de passe même après l'avoir trouvé." },
+      { t:"" },
+      { t:"    if essais == 3:" },
+      { t:'        print("Bloqué.")' },
+      { b:1, indent:8, long:8, consigne:"Sors aussi de la boucle : trois essais, c'est fini.",
+        ok:["break"],
+        indices:["Le même mot que tout à l'heure.","<code>break</code>"],
+        pourquoi:"Deux sorties possibles : la bonne réponse, ou l'épuisement des essais. C'est exactement le fonctionnement d'un distributeur de billets." },
+    ],
+  },
+  {
+    titre: "Le nombre mystère",
+    contexte: "Ton premier vrai jeu. Toutes les notions de la séance dans un seul programme.",
+    lignes: [
+      { t:"import random" },
+      { t:"" },
+      { b:1, long:26, consigne:"Tire un nombre au hasard entre <code>1</code> et <code>100</code> et range-le dans <code>secret</code>.",
+        ok:["secret = random.randint(1, 100)"],
+        indices:["La recette est dans l'encadré du chantier : <code>random.randint(...)</code>",
+                 "<code>secret = random.randint(1, 100)</code>"],
+        pourquoi:"Contrairement à <code>range</code>, <code>randint</code> inclut bien les deux bornes : 1 et 100 sont possibles." },
+      { t:"coups = 0" },
+      { t:"" },
+      { b:1, long:12, consigne:"Une boucle qui tourne pour toujours — on sortira avec un <code>break</code>.",
+        ok:["while True:"],
+        indices:["Comme dans l'exercice précédent.","<code>while True:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:34, consigne:"Demande <code>Ton nombre ?</code> et convertis la réponse en entier.",
+        ok:['essai = int(input("Ton nombre ? "))','essai = int(input("Ton nombre ?"))'],
+        indices:["N'oublie pas le <code>int()</code> — sinon tu ne pourras pas comparer.",
+                 '<code>essai = int(input("Ton nombre ? "))</code>'],
+        pourquoi:"Sans <code>int()</code>, tu comparerais du texte à un nombre. Le piège de la séance 2." },
+      { t:"    coups = coups + 1" },
+      { t:"" },
+      { b:1, indent:4, long:20, consigne:"Si l'essai est <strong>plus petit</strong> que le secret…",
+        ok:["if essai < secret:"],
+        indices:["« Plus petit que » s'écrit <code>&lt;</code>","<code>if essai &lt; secret:</code>"],
+        pourquoi:"" },
+      { t:'        print("Plus grand !")' },
+      { b:1, indent:4, long:22, consigne:"<strong>Sinon si</strong> l'essai est plus grand que le secret…",
+        ok:["elif essai > secret:"],
+        indices:["« Sinon si » s'écrit <code>elif</code>","<code>elif essai &gt; secret:</code>"],
+        pourquoi:"" },
+      { t:'        print("Plus petit !")' },
+      { t:"    else:" },
+      { b:1, indent:8, long:36, consigne:"Annonce la victoire avec le nombre de coups, sous la forme <code>Trouvé en 6 coups !</code>",
+        ok:['print(f"Trouvé en {coups} coups !")'],
+        indices:["Une f-string avec la boîte <code>coups</code>.",
+                 '<code>print(f"Trouvé en {coups} coups !")</code>'],
+        pourquoi:"" },
+      { b:1, indent:8, long:8, consigne:"Et sors de la boucle : la partie est finie.",
+        ok:["break"],
+        indices:["Le mot qui arrête la boucle.","<code>break</code>"],
+        pourquoi:"Ton premier jeu est terminé. Fais-y jouer quelqu'un — c'est là que tu verras qu'il marche vraiment." },
+    ],
+  },
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Traceur de boucle ---------- */
+(function () {
+  const LIGNES = ["compteur = 1", "", "while compteur <= 5:", "    print(compteur)",
+                  "    compteur = compteur + 1", "", 'print("Terminé.")'];
+  // scénario : ligne active, valeur, test, sortie ajoutée, note
+  const PAS = [{ l: -1, c: null, t: null, note: "Rien encore. Clique pour lancer le programme." }];
+  PAS.push({ l: 0, c: 1, t: null, note: "Le compteur est créé et vaut 1." });
+  for (let v = 1; v <= 5; v++) {
+    PAS.push({ l: 2, c: v, t: true,
+      note: "Test : " + v + " ≤ 5 ? <strong>Oui</strong> → on entre dans le bloc." });
+    PAS.push({ l: 3, c: v, t: true, out: String(v), note: "On affiche " + v + "." });
+    PAS.push({ l: 4, c: v + 1, t: true,
+      note: "Le compteur passe à " + (v + 1) + ", puis on <strong>remonte au test</strong>." });
+  }
+  PAS.push({ l: 2, c: 6, t: false,
+    note: "Test : 6 ≤ 5 ? <strong>Non</strong> → la boucle s'arrête, on saute le bloc." });
+  PAS.push({ l: 6, c: 6, t: false, out: "Terminé.", fin: true,
+    note: "🎯 <strong>Cinq tours, une seule ligne <code>print</code> écrite.</strong> C'est tout l'intérêt d'une boucle." });
+
+  let i = 0;
+  const eC = document.getElementById("t-code"), eN = document.getElementById("t-note"),
+        eO = document.getElementById("t-out"), bN = document.getElementById("t-next");
+
+  function rendu() {
+    const p = PAS[i];
+    eC.innerHTML = LIGNES.map((l, k) =>
+      '<span class="l' + (k === p.l ? " on" : "") + '">' + (l || " ").replace(/</g, "&lt;") + "</span>"
+    ).join("");
+    document.getElementById("t-c").textContent = p.c === null ? "—" : p.c;
+    const t = document.getElementById("t-test");
+    t.textContent = p.t === null ? "—" : p.t ? "vrai" : "faux";
+    t.className = "v " + (p.t === null ? "" : p.t ? "oui" : "non");
+    document.getElementById("t-n").textContent = Math.min(5, Math.floor(Math.max(0, i - 1) / 3));
+    eO.textContent = PAS.slice(0, i + 1).filter(x => x.out).map(x => x.out).join("\n");
+    eN.innerHTML = p.note;
+    bN.textContent = i >= PAS.length - 1 ? "Terminé" : "Étape suivante →";
+    bN.disabled = i >= PAS.length - 1;
+  }
+  bN.onclick = () => { if (i < PAS.length - 1) { i++; rendu(); } };
+  document.getElementById("t-reset").onclick = () => { i = 0; rendu(); };
+  rendu();
+})();
+</script>
+
+</body>
+</html>

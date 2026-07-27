@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 5 — Ranger plusieurs choses</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .cases { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 18px; }
+  .case { border: 2px solid var(--line); border-radius: 10px; overflow: hidden;
+    min-width: 74px; cursor: pointer; transition: all .15s; background: #fff; }
+  .case:hover { border-color: var(--orange); transform: translateY(-2px); }
+  .case.sel { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+  .case .idx { background: var(--bg-soft); color: var(--ink-soft); font-family: var(--mono);
+    font-size: 12px; text-align: center; padding: 3px; font-weight: 700; }
+  .case.sel .idx { background: var(--orange); color: #fff; }
+  .case .val { padding: 13px 8px; text-align: center; font-family: var(--mono);
+    font-size: 18px; font-weight: 650; }
+  .case.hors { border-style: dashed; border-color: var(--red); opacity: .75; }
+  .case.hors .idx { background: var(--red-soft); color: var(--red); }
+  .case.hors .val { color: var(--red); }
+  .liste-res { background: var(--code-bg); color: #cdd6e6; border-radius: 10px;
+    padding: 15px 18px; font-family: var(--mono); font-size: 15px; white-space: pre-wrap; }
+  .liste-res.err { background: #2b1d1c; color: #ff8b7d; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 5</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 5 · 1 h 30</div>
+    <h1>Ranger plusieurs choses</h1>
+    <p class="lede">Jusqu'ici, une boîte = une valeur. Pour stocker les notes d'un trimestre,
+    il te faudrait quinze boîtes et quinze noms différents. Il y a beaucoup mieux :
+    <strong>une seule boîte avec des cases numérotées.</strong></p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Une boîte à compartiments</h2>
+      <div class="etape-meta">15 minutes · créer une liste, aller chercher une case</div></div></div>
+
+    <p>Une liste s'écrit entre <strong>crochets</strong>, les valeurs séparées par des virgules.
+    Pour aller chercher une case précise, on met son <strong>numéro entre crochets</strong>
+    juste après le nom de la liste.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+notes = [12, 15, 8, 17, 11]
+
+print(notes)
+print(notes[0])
+print(notes[3])
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 La numérotation commence à zéro</div>
+      <p>La <strong>première</strong> case est la case <code>0</code>. La deuxième est
+      la case <code>1</code>. Dans une liste de 5 notes, la dernière est la case <code>4</code>.</p>
+      <p>C'est déroutant, et c'est comme ça dans presque tous les langages de programmation.
+      Retiens juste : <strong>le numéro de la dernière case, c'est la taille moins un.</strong></p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Voir les cases</h2>
+      <div class="etape-meta">clique sur une case pour voir ce que Python répond</div></div></div>
+
+    <p>Voici la liste <code>notes = [12, 15, 8, 17, 11]</code>. Clique sur les cases.
+    <strong>Clique aussi sur la case grise à droite</strong>, celle qui n'existe pas.</p>
+
+    <div class="widget">
+      <div class="cases" id="v-cases"></div>
+      <div class="liste-res" id="v-res"></div>
+      <p class="hint" id="v-note" style="margin-top:12px"></p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Une liste, c'est le fil d'actualité d'Instagram, la file d'attente d'un serveur,
+      les articles de ton panier, la playlist de ton téléphone, les joueurs d'une équipe.
+      Dès qu'il y a « plusieurs choses du même genre », il y a une liste derrière.
+      Et l'erreur <code>IndexError</code> que tu viens de provoquer est l'une des
+      plus courantes au monde — elle a fait planter des fusées.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Parcourir toute la liste</h2>
+      <div class="etape-meta">15 minutes · for, sans compteur</div></div></div>
+
+    <p>Tu connais déjà <code>for</code>. Sur une liste, c'est encore plus simple :
+    pas besoin de <code>range</code> ni de numéros. Python te donne directement
+    <strong>les valeurs, une par une</strong>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+notes = [12, 15, 8, 17, 11]
+
+for note in notes:
+    print(note)
+
+print("---")
+
+for note in notes:
+    if note >= 10:
+        print(note, "c'est bon")
+    else:
+        print(note, "il faut remonter")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p><code>for note in notes:</code> se lit « pour chaque note dans notes ».
+    Le mot <code>note</code>, c'est toi qui le choisis : c'est le nom de la boîte
+    qui contiendra la valeur du tour en cours.</p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ L'essai révélateur</div>
+      <p>Remplace <code>for note in notes:</code> par <code>for truc in notes:</code>,
+      et <code>print(note)</code> par <code>print(truc)</code>. Ça marche pareil.</p>
+      <p>Le nom n'a aucune importance pour la machine — <strong>il en a une énorme
+      pour celui qui relira ton code</strong>, à commencer par toi dans deux semaines.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Les outils tout prêts</h2>
+      <div class="etape-meta">10 minutes · len, sum, max, min, append</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+notes = [12, 15, 8, 17, 11]
+
+print(len(notes))
+print(sum(notes))
+print(max(notes))
+print(min(notes))
+
+notes.append(14)
+print(notes)
+print(len(notes))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <ul>
+      <li><code>len(notes)</code> — combien il y a de cases</li>
+      <li><code>sum(notes)</code> — la somme de tout</li>
+      <li><code>max(notes)</code> / <code>min(notes)</code> — la plus grande, la plus petite</li>
+      <li><code>notes.append(14)</code> — ajoute une case à la fin</li>
+    </ul>
+
+    <p>Avec <code>sum</code> et <code>len</code>, tu as déjà tout pour calculer une moyenne.
+    <strong>Trouve comment avant de descendre.</strong></p>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : ta moyenne du trimestre</h2>
+      <div class="etape-meta">30 minutes · un outil que tu vas vraiment utiliser</div></div></div>
+
+    <p>Le programme demande combien tu as de notes, te les demande une par une,
+    puis affiche : le nombre de notes, la moyenne arrondie, la meilleure, la pire,
+    et ta mention (reprends celle de la séance 3).</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+notes = []
+
+# 1. Demande combien de notes
+
+
+# 2. Une boucle qui demande chaque note et l'ajoute à la liste
+
+
+# 3. Les résultats
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. La difficulté est de combiner
+      une boucle <code>for</code> avec un <code>append</code> — c'est nouveau.</p>
+      <p>La question à poser s'il bloque : <em>« au tour numéro 3 de ta boucle,
+      qu'est-ce qu'il y a dans ta liste ? »</em></p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : le classement de l'équipe</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Deux listes qui vont ensemble : les noms des joueurs, et les buts marqués.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+joueurs = ["Awa", "Koffi", "Fatou", "Yann"]
+buts = [3, 7, 5, 2]
+
+# Affiche chaque joueur avec son nombre de buts,
+# puis le meilleur buteur.
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 L'astuce à trouver</div>
+      <p>Pour lire les deux listes en même temps, il te faut le <strong>numéro</strong>
+      de la case, pas la valeur. Donc <code>for i in range(len(joueurs)):</code>,
+      puis <code>joueurs[i]</code> et <code>buts[i]</code>.</p>
+      <p>Pour le meilleur buteur : <code>buts.index(max(buts))</code> te donne
+      le numéro de la case qui contient le maximum. À toi de voir quoi en faire.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, on te montre la réponse.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>La <strong>liste de courses</strong> : le programme demande 5 articles un par un,
+      les range dans une liste, puis affiche la liste numérotée de 1 à 5 —
+      <strong>numérotée à partir de 1, pas de 0</strong>, parce qu'un humain lit la liste.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-04.html" style="color:var(--orange);font-weight:650">← Séance 4</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-06.html" style="color:var(--orange);font-weight:650">Séance 6 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Créer et lire une liste",
+    contexte: "Les crochets pour créer, les crochets pour aller chercher. Attention à la numérotation.",
+    lignes: [
+      { b:1, long:24, consigne:"Crée une liste <code>villes</code> contenant <code>Abidjan</code>, <code>Bouaké</code> et <code>Korhogo</code>.",
+        ok:['villes = ["Abidjan", "Bouaké", "Korhogo"]','villes = ["Abidjan", "Bouake", "Korhogo"]'],
+        indices:["Des crochets, et des virgules entre les valeurs.",
+                 '<code>villes = ["Abidjan", "Bouaké", "Korhogo"]</code>'],
+        pourquoi:"Une seule boîte, trois valeurs dedans. Sans liste, il t'aurait fallu trois boîtes." },
+      { t:"" },
+      { b:1, long:20, consigne:"Affiche la <strong>première</strong> ville. Réfléchis bien au numéro.",
+        ok:["print(villes[0])"],
+        indices:["La première case porte le numéro 0, pas 1.","<code>print(villes[0])</code>"],
+        pourquoi:"C'est l'erreur numéro un des débutants. La première case est la case 0." },
+      { b:1, long:20, consigne:"Affiche la <strong>dernière</strong> ville.",
+        ok:["print(villes[2])","print(villes[-1])"],
+        indices:["Trois cases numérotées 0, 1, 2. Laquelle est la dernière ?",
+                 "<code>print(villes[2])</code>"],
+        pourquoi:"Astuce bonus : <code>villes[-1]</code> marche aussi et donne toujours la dernière, quelle que soit la taille." },
+      { b:1, long:18, consigne:"Affiche <strong>combien</strong> il y a de villes.",
+        ok:["print(len(villes))"],
+        indices:["L'outil qui compte s'appelle <code>len</code>.","<code>print(len(villes))</code>"],
+        pourquoi:"3 cases, numérotées 0 à 2. La dernière case porte toujours le numéro <code>len - 1</code>." },
+    ],
+  },
+  {
+    titre: "Parcourir et trier le bon grain",
+    contexte: "Une boucle sur une liste, avec une condition à l'intérieur.",
+    lignes: [
+      { t:"notes = [12, 15, 8, 17, 11, 6]" },
+      { t:"" },
+      { b:1, long:20, consigne:"Une boucle qui parcourt <code>notes</code>, en appelant chaque valeur <code>note</code>.",
+        ok:["for note in notes:"],
+        indices:["« Pour chaque note dans notes ».","<code>for note in notes:</code>"],
+        pourquoi:"Pas besoin de <code>range</code> ici : Python te donne directement les valeurs." },
+      { b:1, indent:4, long:18, consigne:"Si la note est <strong>en dessous de 10</strong>…",
+        ok:["if note < 10:"],
+        indices:["« Plus petit que » s'écrit <code>&lt;</code>","<code>if note &lt; 10:</code>"],
+        pourquoi:"" },
+      { b:1, indent:8, long:32, consigne:"Affiche <code>12 : à remonter</code> (avec la vraie note).",
+        ok:['print(f"{note} : à remonter")','print(f"{note} : a remonter")'],
+        indices:["Une f-string, avec la boîte <code>note</code> entre accolades.",
+                 '<code>print(f"{note} : à remonter")</code>'],
+        pourquoi:"Deux niveaux de décalage : dans le <code>if</code>, qui est dans le <code>for</code>." },
+    ],
+  },
+  {
+    titre: "La moyenne",
+    contexte: "Deux outils suffisent : la somme, et le nombre de valeurs.",
+    lignes: [
+      { t:"notes = [12, 15, 8, 17, 11]" },
+      { t:"" },
+      { b:1, long:26, consigne:"Calcule la moyenne : la <strong>somme</strong> des notes divisée par leur <strong>nombre</strong>.",
+        ok:["moyenne = sum(notes) / len(notes)"],
+        indices:["<code>sum</code> pour la somme, <code>len</code> pour le nombre de cases.",
+                 "<code>moyenne = sum(notes) / len(notes)</code>"],
+        pourquoi:"Cette ligne marche pour 5 notes comme pour 500. Tu n'as rien à changer." },
+      { b:1, long:34, consigne:"Affiche <code>Moyenne : 12.6</code>, arrondie à <strong>1</strong> décimale.",
+        ok:['print(f"Moyenne : {round(moyenne, 1)}")'],
+        indices:["<code>round(moyenne, 1)</code> arrondit à une décimale.",
+                 '<code>print(f"Moyenne : {round(moyenne, 1)}")</code>'],
+        pourquoi:"Sans arrondi tu obtiendrais 12.6 exactement ici, mais 12.666666667 avec d'autres notes." },
+      { b:1, long:36, consigne:"Affiche la meilleure et la pire note : <code>Meilleure : 17 — Pire : 8</code>",
+        ok:['print(f"Meilleure : {max(notes)} — Pire : {min(notes)}")',
+            'print(f"Meilleure : {max(notes)} - Pire : {min(notes)}")'],
+        indices:["<code>max</code> et <code>min</code>, directement entre les accolades.",
+                 '<code>print(f"Meilleure : {max(notes)} — Pire : {min(notes)}")</code>'],
+        pourquoi:"On peut appeler un outil directement à l'intérieur d'une f-string. Ça évite deux boîtes inutiles." },
+    ],
+  },
+  {
+    titre: "Remplir une liste vide",
+    contexte: "Le vrai mécanisme : partir de rien, et ajouter au fur et à mesure.",
+    lignes: [
+      { b:1, long:12, consigne:"Crée une liste <code>notes</code> <strong>vide</strong>.",
+        ok:["notes = []"],
+        indices:["Des crochets, et rien entre les deux.","<code>notes = []</code>"],
+        pourquoi:"On part d'une liste vide, exactement comme on partait d'un score à 0." },
+      { t:"" },
+      { b:1, long:18, consigne:"Une boucle qui tourne <strong>3 fois</strong>.",
+        ok:["for i in range(3):"],
+        indices:["<code>range(3)</code> donne 0, 1, 2 — trois tours.","<code>for i in range(3):</code>"],
+        pourquoi:"Ici on ne se sert pas de <code>i</code> : on veut juste répéter trois fois." },
+      { b:1, indent:4, long:32, consigne:"Demande <code>Une note ?</code> et convertis en entier.",
+        ok:['note = int(input("Une note ? "))','note = int(input("Une note ?"))'],
+        indices:["Le <code>int()</code> est obligatoire pour pouvoir calculer ensuite.",
+                 '<code>note = int(input("Une note ? "))</code>'],
+        pourquoi:"" },
+      { b:1, indent:4, long:22, consigne:"<strong>Ajoute</strong> cette note à la fin de la liste.",
+        ok:["notes.append(note)"],
+        indices:["L'outil qui ajoute s'appelle <code>append</code>, et il s'écrit après le nom de la liste.",
+                 "<code>notes.append(note)</code>"],
+        pourquoi:"À chaque tour la liste grandit d'une case. Après trois tours, elle en a trois." },
+      { t:"" },
+      { b:1, long:32, consigne:"Affiche <code>3 notes, moyenne 12.0</code> — le nombre de notes et la moyenne arrondie à 1 décimale.",
+        ok:['print(f"{len(notes)} notes, moyenne {round(sum(notes) / len(notes), 1)}")'],
+        indices:["Tout peut tenir dans une f-string : <code>len</code>, <code>sum</code>, <code>round</code>.",
+                 '<code>print(f"{len(notes)} notes, moyenne {round(sum(notes) / len(notes), 1)}")</code>'],
+        pourquoi:"Ce programme marche avec 3 notes comme avec 30 : il suffit de changer le nombre dans le <code>range</code>." },
+    ],
+  },
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Les cases d'une liste ---------- */
+(function () {
+  const NOTES = [12, 15, 8, 17, 11];
+  const eC = document.getElementById("v-cases"),
+        eR = document.getElementById("v-res"),
+        eN = document.getElementById("v-note");
+
+  function rendu(sel) {
+    eC.innerHTML = NOTES.map((v, i) =>
+      '<div class="case' + (i === sel ? " sel" : "") + '" data-i="' + i + '">' +
+      '<div class="idx">[' + i + "]</div><div class=\"val\">" + v + "</div></div>"
+    ).join("") +
+    '<div class="case hors' + (sel === 5 ? " sel" : "") + '" data-i="5">' +
+    '<div class="idx">[5]</div><div class="val">?</div></div>';
+
+    eC.querySelectorAll(".case").forEach((c) => {
+      c.onclick = () => rendu(+c.dataset.i);
+    });
+
+    if (sel === undefined) {
+      eR.className = "liste-res";
+      eR.textContent = "notes = [12, 15, 8, 17, 11]\n\n(clique sur une case)";
+      eN.textContent = "";
+    } else if (sel === 5) {
+      eR.className = "liste-res err";
+      eR.textContent = "print(notes[5])\n\nIndexError: list index out of range";
+      eN.innerHTML = "🎯 <strong>La case 5 n'existe pas.</strong> Il y a bien 5 notes, " +
+        "mais elles sont numérotées de <strong>0 à 4</strong>. Le dernier numéro valable, " +
+        "c'est toujours <code>len(notes) - 1</code>.";
+    } else {
+      eR.className = "liste-res";
+      eR.textContent = "print(notes[" + sel + "])\n\n" + NOTES[sel];
+      const rang = ["première", "deuxième", "troisième", "quatrième", "cinquième"][sel];
+      eN.innerHTML = "La case <code>[" + sel + "]</code> contient la <strong>" + rang +
+        "</strong> note. Le numéro est toujours en retard d'un cran sur le rang.";
+    }
+  }
+  rendu();
+})();
+</script>
+
+</body>
+</html>

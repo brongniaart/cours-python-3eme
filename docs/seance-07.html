@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 7 — Retenir et sauvegarder</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .rep { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+  @media (max-width: 800px) { .rep { grid-template-columns: 1fr; } }
+  .fiches { display: flex; flex-direction: column; gap: 8px; }
+  .fiche { display: flex; border: 2px solid var(--line); border-radius: 9px;
+    overflow: hidden; background: #fff; transition: all .15s; }
+  .fiche.trouve { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+  .fiche .cle { background: var(--bg-soft); font-family: var(--mono); font-size: 14px;
+    padding: 9px 13px; font-weight: 700; min-width: 130px; }
+  .fiche.trouve .cle { background: var(--green); color: #fff; }
+  .fiche .val { padding: 9px 13px; font-family: var(--mono); font-size: 14px; }
+  .rep-champ { display: flex; gap: 8px; margin-bottom: 14px; }
+  .rep-champ input { flex: 1; font-family: var(--mono); font-size: 15px;
+    padding: 9px 12px; border: 2px solid var(--line); border-radius: 9px; outline: none; }
+  .rep-champ input:focus { border-color: var(--orange); }
+  .rep-res { background: var(--code-bg); color: #cdd6e6; border-radius: 9px;
+    padding: 13px 15px; font-family: var(--mono); font-size: 14px; white-space: pre-wrap;
+    min-height: 78px; }
+  .rep-res.err { background: #2b1d1c; color: #ff8b7d; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 7</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 7 · 1 h 30</div>
+    <h1>Retenir et sauvegarder</h1>
+    <p class="lede">Deux manques à combler. D'abord ranger par <strong>nom</strong> plutôt que
+    par numéro de case. Ensuite : jusqu'ici, tout ce que ton programme calcule
+    <strong>disparaît quand il s'arrête</strong>. Plus après aujourd'hui.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Ranger par étiquette</h2>
+      <div class="etape-meta">15 minutes · le dictionnaire</div></div></div>
+
+    <p>Dans une liste, tu cherches la case <code>[2]</code>. Mais qui se souvient
+    que la case 2 est le prix de l'attiéké ? Un <strong>dictionnaire</strong> range
+    par <strong>nom</strong> : tu demandes <code>["attiéké"]</code> et tu obtiens le prix.</p>
+
+    <p>Accolades au lieu de crochets, et chaque entrée s'écrit
+    <strong>clé : valeur</strong>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+menu = {
+    "attiéké": 1500,
+    "alloco": 1000,
+    "poisson": 2500,
+    "bissap": 500,
+}
+
+print(menu)
+print(menu["attiéké"])
+print(menu["bissap"])
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Liste ou dictionnaire ?</div>
+      <p><strong>Liste</strong> quand l'ordre compte et que les éléments sont
+      interchangeables : des notes, des joueurs, une file d'attente.</p>
+      <p><strong>Dictionnaire</strong> quand chaque valeur a une identité :
+      un prix par plat, un numéro par contact, un score par joueur.</p>
+      <p>Test simple : si tu as envie de dire « le truc de Untel », c'est un dictionnaire.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Chercher dans le dictionnaire</h2>
+      <div class="etape-meta">tape une clé et regarde ce que Python répond</div></div></div>
+
+    <p>Écris une clé et valide. Essaie <code>alloco</code>. Puis essaie
+    <strong>une clé qui n'existe pas</strong>, ou <code>Alloco</code> avec une majuscule.</p>
+
+    <div class="widget">
+      <div class="rep">
+        <div class="fiches" id="r-fiches"></div>
+        <div>
+          <div class="rep-champ">
+            <input id="r-cle" placeholder="attiéké" autocomplete="off">
+            <button class="btn-run" id="r-go">Chercher</button>
+          </div>
+          <div class="rep-res" id="r-res">menu["…"]</div>
+          <p class="hint" id="r-note" style="margin-top:12px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Un dictionnaire, c'est la structure la plus utilisée de toute l'informatique.
+      Ton <strong>profil sur une appli</strong> en est un : nom, âge, photo, solde.
+      Quand un site te renvoie tes informations, il envoie un dictionnaire.
+      Les <strong>réglages</strong> de ton téléphone, le <strong>panier</strong>
+      d'une boutique en ligne : des dictionnaires.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Ajouter, modifier, parcourir</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+menu = {"attiéké": 1500, "alloco": 1000}
+
+menu["poisson"] = 2500
+menu["alloco"] = 1200
+
+print(menu)
+print(len(menu))
+
+for plat in menu:
+    print(plat, "coûte", menu[plat], "FCFA")
+
+print(menu.get("pizza", "pas au menu"))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <ul>
+      <li><code>menu["poisson"] = 2500</code> — si la clé n'existe pas, elle est créée ;
+      si elle existe, la valeur est remplacée. <strong>Une seule écriture pour les deux.</strong></li>
+      <li><code>for plat in menu:</code> — parcourt les <strong>clés</strong>, pas les valeurs</li>
+      <li><code>menu.get("pizza", "pas au menu")</code> — cherche sans planter,
+      et rend une valeur de secours</li>
+    </ul>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La subtilité à faire remarquer</div>
+      <p>Dans <code>for plat in menu:</code>, la variable <code>plat</code> contient
+      la <strong>clé</strong>, pas le prix. Pour avoir le prix, il faut redemander
+      <code>menu[plat]</code>.</p>
+      <p>Fais-lui essayer <code>print(plat)</code> seul : il verra les noms défiler,
+      sans les prix. C'est plus parlant qu'une explication.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Écrire dans un fichier</h2>
+      <div class="etape-meta">20 minutes · enfin quelque chose qui reste</div></div></div>
+
+    <p>Depuis sept séances, tout ce que ton programme fabrique meurt avec lui.
+    Un fichier, c'est la mémoire qui survit.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Écrire</div>
+        <div data-ref><script type="text/python">
+fichier = open("ventes.txt", "w")
+
+fichier.write("attiéké 1500\n")
+fichier.write("alloco 1000\n")
+
+fichier.close()
+
+print("C'est enregistré.")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> Lire</div>
+        <div data-cellule><script type="text/python">
+fichier = open("ventes.txt", "w")
+fichier.write("attiéké 1500\n")
+fichier.write("alloco 1000\n")
+fichier.close()
+
+# Maintenant on relit ce qu'on vient d'écrire
+fichier = open("ventes.txt", "r")
+contenu = fichier.read()
+fichier.close()
+
+print(contenu)
+        </script></div></div>
+    </div>
+
+    <p>Trois temps, toujours les mêmes : <strong>ouvrir</strong>, <strong>faire</strong>,
+    <strong>fermer</strong>. Et trois modes :</p>
+
+    <ul>
+      <li><code>"w"</code> — écrire en <strong>écrasant</strong> tout ce qu'il y avait</li>
+      <li><code>"a"</code> — <strong>ajouter</strong> à la fin, sans rien effacer</li>
+      <li><code>"r"</code> — lire seulement</li>
+    </ul>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Les deux pièges</div>
+      <p><strong>Le <code>\n</code> oublié.</strong> C'est le retour à la ligne.
+      Sans lui, tout s'écrit collé sur une seule ligne interminable. Essaie sans, pour voir.</p>
+      <p><strong>Le mode <code>"w"</code> pris pour <code>"a"</code>.</strong>
+      Tu crois enregistrer une vente de plus, et tu effaces toutes les précédentes.
+      C'est une erreur qui a fait perdre de vraies données à de vraies entreprises.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ici, sur le site</div>
+      <p>Le fichier est créé dans la mémoire de ton navigateur : il existe tant que
+      tu ne recharges pas la page. Dans Thonny, sur ton ordinateur, il apparaîtrait
+      <strong>vraiment</strong> à côté de ton programme, et tu pourrais l'ouvrir
+      avec le Bloc-notes. C'est exactement le même code.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la caisse du maquis</h2>
+      <div class="etape-meta">30 minutes · ton programme le plus complet</div></div></div>
+
+    <p>Une vraie caisse. Le programme affiche le menu, prend les commandes en boucle,
+    calcule le total, et <strong>enregistre la vente dans un fichier</strong>.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le cahier des charges</div>
+      <ol>
+        <li>Afficher le menu avec les prix, à partir du dictionnaire</li>
+        <li>Demander un plat, en boucle, jusqu'à ce que le client tape <code>fin</code></li>
+        <li>Si le plat n'est pas au menu, le dire et redemander</li>
+        <li>Afficher le total, demander ce que le client donne, calculer la monnaie</li>
+        <li>Enregistrer le total du jour dans <code>ventes.txt</code>, en mode ajout</li>
+      </ol>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+menu = {
+    "attiéké": 1500,
+    "alloco": 1000,
+    "poisson": 2500,
+    "bissap": 500,
+}
+
+total = 0
+
+# 1. Affiche le menu
+
+
+# 2. La boucle de commande
+
+
+# 3. Le total, la monnaie, la sauvegarde
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>C'est le programme le plus long qu'il ait écrit. <strong>Fais-lui découper
+      avant de coder</strong> : « écris d'abord les cinq étapes en français, en commentaires.
+      Ensuite tu remplis. »</p>
+      <p>Cette habitude — découper puis remplir — est ce qui lui servira le plus
+      pour son projet final. Insiste dessus aujourd'hui.</p>
+      <p>Pas d'aide avant 20 minutes. Question si blocage : <em>« quelle étape de
+      ta liste est en train de coincer ? »</em></p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, on te montre la réponse.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>Un <strong>répertoire téléphonique</strong> : un dictionnaire nom → numéro.
+      Le programme demande un nom et affiche le numéro, ou <code>Contact inconnu</code>
+      si le nom n'y est pas.</p>
+      <p class="hint" style="margin-top:8px">Contrainte : le programme ne doit
+      <strong>jamais planter</strong>, quel que soit le nom tapé. Cherche du côté
+      de <code>.get()</code>.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🎯 À préparer pour la séance 9</div>
+      <p>Commence à réfléchir à <strong>ton projet final</strong>. Un jeu ? Un outil qui
+      te sert vraiment ? Viens avec deux ou trois idées à la prochaine séance.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-06.html" style="color:var(--orange);font-weight:650">← Séance 6</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-08.html" style="color:var(--orange);font-weight:650">Séance 8 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Créer et lire un dictionnaire",
+    contexte: "Des accolades, et des paires clé : valeur.",
+    lignes: [
+      { b:1, long:34, consigne:"Crée un dictionnaire <code>prix</code> avec <code>alloco</code> à <code>1000</code> et <code>bissap</code> à <code>500</code>.",
+        ok:['prix = {"alloco": 1000, "bissap": 500}'],
+        indices:["Des accolades, et deux points entre la clé et la valeur.",
+                 '<code>prix = {"alloco": 1000, "bissap": 500}</code>'],
+        pourquoi:"Les clés sont du texte, donc entre guillemets. Les prix sont des nombres, donc sans." },
+      { t:"" },
+      { b:1, long:24, consigne:"Affiche le prix de l'<code>alloco</code>.",
+        ok:['print(prix["alloco"])'],
+        indices:["On demande une clé entre crochets, comme pour une liste.",
+                 '<code>print(prix["alloco"])</code>'],
+        pourquoi:"Ici pas de numéro à retenir : on demande directement ce qu'on veut par son nom." },
+      { b:1, long:26, consigne:"Ajoute <code>poisson</code> à <code>2500</code> dans le dictionnaire.",
+        ok:['prix["poisson"] = 2500'],
+        indices:["Comme si la clé existait déjà : on lui range une valeur.",
+                 '<code>prix["poisson"] = 2500</code>'],
+        pourquoi:"Si la clé n'existe pas, elle est créée. Si elle existe, la valeur est remplacée. Une seule écriture pour les deux cas." },
+      { b:1, long:16, consigne:"Affiche <strong>combien</strong> il y a de plats au menu.",
+        ok:["print(len(prix))"],
+        indices:["Le même outil que pour les listes.","<code>print(len(prix))</code>"],
+        pourquoi:"3 — l'ajout a bien été pris en compte." },
+    ],
+  },
+  {
+    titre: "Parcourir le menu",
+    contexte: "Une boucle sur un dictionnaire donne les CLÉS. Le piège classique.",
+    lignes: [
+      { t:'menu = {"attiéké": 1500, "alloco": 1000, "bissap": 500}' },
+      { t:"" },
+      { b:1, long:20, consigne:"Une boucle qui parcourt <code>menu</code>, en appelant chaque élément <code>plat</code>.",
+        ok:["for plat in menu:"],
+        indices:["Comme sur une liste : <code>for … in …:</code>","<code>for plat in menu:</code>"],
+        pourquoi:"Attention : <code>plat</code> contient le NOM du plat, pas son prix." },
+      { b:1, indent:4, long:34, consigne:"Affiche <code>attiéké : 1500 FCFA</code>. Il te faut le nom <strong>et</strong> le prix.",
+        ok:['print(f"{plat} : {menu[plat]} FCFA")'],
+        indices:["Le nom, c'est <code>plat</code>. Le prix, il faut aller le chercher : <code>menu[plat]</code>",
+                 '<code>print(f"{plat} : {menu[plat]} FCFA")</code>'],
+        pourquoi:"C'est LE piège du dictionnaire : la boucle donne les clés, jamais les valeurs. Il faut redemander." },
+      { t:"" },
+      { b:1, long:36, consigne:"Affiche le prix de la <code>pizza</code> <strong>sans faire planter</strong> le programme. Affiche <code>pas au menu</code> si elle n'y est pas.",
+        ok:['print(menu.get("pizza", "pas au menu"))'],
+        indices:["L'outil qui cherche sans planter s'appelle <code>.get()</code>, avec une valeur de secours en deuxième réglage.",
+                 '<code>print(menu.get("pizza", "pas au menu"))</code>'],
+        pourquoi:"Avec <code>menu[\"pizza\"]</code>, le programme plante sur un <code>KeyError</code>. Avec <code>.get()</code>, il continue." },
+    ],
+  },
+  {
+    titre: "Écrire dans un fichier",
+    contexte: "Ouvrir, écrire, fermer. Toujours dans cet ordre.",
+    lignes: [
+      { b:1, long:34, consigne:"Ouvre le fichier <code>notes.txt</code> en mode <strong>écriture</strong>, et range-le dans <code>fichier</code>.",
+        ok:['fichier = open("notes.txt", "w")'],
+        indices:["L'outil s'appelle <code>open</code>, et le mode écriture c'est <code>\"w\"</code>",
+                 '<code>fichier = open("notes.txt", "w")</code>'],
+        pourquoi:"Le mode <code>\"w\"</code> efface tout ce qu'il y avait avant. À manier avec précaution." },
+      { b:1, long:26, consigne:"Écris <code>15</code> suivi d'un retour à la ligne.",
+        ok:['fichier.write("15\\n")'],
+        indices:["L'outil s'appelle <code>.write()</code>, et le retour à la ligne s'écrit <code>\\n</code>",
+                 '<code>fichier.write("15\\n")</code>'],
+        pourquoi:"Sans le <code>\\n</code>, tout se collerait sur une seule ligne." },
+      { b:1, long:26, consigne:"Écris <code>12</code> et son retour à la ligne.",
+        ok:['fichier.write("12\\n")'],
+        indices:["Exactement la même ligne, autre valeur.",'<code>fichier.write("12\\n")</code>'],
+        pourquoi:"" },
+      { b:1, long:18, consigne:"<strong>Ferme</strong> le fichier. Sans ça, rien n'est vraiment enregistré.",
+        ok:["fichier.close()"],
+        indices:["« Fermer » s'écrit <code>close</code>, avec des parenthèses vides.",
+                 "<code>fichier.close()</code>"],
+        pourquoi:"Tant que le fichier n'est pas fermé, Python garde tout en attente. Fermer, c'est valider." },
+      { t:"" },
+      { t:'fichier = open("notes.txt", "r")' },
+      { b:1, long:26, consigne:"Lis <strong>tout</strong> le contenu du fichier et range-le dans <code>contenu</code>.",
+        ok:["contenu = fichier.read()"],
+        indices:["L'outil qui lit tout s'appelle <code>.read()</code>",
+                 "<code>contenu = fichier.read()</code>"],
+        pourquoi:"" },
+      { t:"fichier.close()" },
+      { t:"print(contenu)" },
+    ],
+  },
+  {
+    titre: "Le mini-caissier",
+    contexte: "Dictionnaire, boucle, condition et fichier : tout ensemble.",
+    lignes: [
+      { t:'menu = {"attiéké": 1500, "alloco": 1000, "bissap": 500}' },
+      { t:"total = 0" },
+      { t:"" },
+      { b:1, long:18, consigne:"Une boucle qui tourne <strong>2 fois</strong> — deux plats commandés.",
+        ok:["for i in range(2):"],
+        indices:["<code>range(2)</code> donne deux tours.","<code>for i in range(2):</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:32, consigne:"Demande <code>Quel plat ?</code> et range la réponse dans <code>plat</code>.",
+        ok:['plat = input("Quel plat ? ")','plat = input("Quel plat ?")'],
+        indices:["Pas de <code>int()</code> ici : un nom de plat, c'est du texte.",
+                 '<code>plat = input("Quel plat ? ")</code>'],
+        pourquoi:"On ne convertit que ce qu'on veut calculer. Ici, on veut juste chercher dans le menu." },
+      { t:"" },
+      { b:1, indent:4, long:20, consigne:"Si le plat <strong>est</strong> dans le menu…",
+        ok:["if plat in menu:"],
+        indices:["Le mot pour « est dans » est <code>in</code>","<code>if plat in menu:</code>"],
+        pourquoi:"Vérifier avant de demander, c'est ce qui empêche le <code>KeyError</code>." },
+      { b:1, indent:8, long:26, consigne:"Ajoute le prix du plat au total.",
+        ok:["total = total + menu[plat]","total += menu[plat]"],
+        indices:["Le prix se trouve avec <code>menu[plat]</code>, et on l'ajoute au total comme un score.",
+                 "<code>total = total + menu[plat]</code>"],
+        pourquoi:"Même mécanisme que le score du quiz : prends, ajoute, remets." },
+      { t:"    else:" },
+      { t:'        print("Pas au menu.")' },
+      { t:"" },
+      { b:1, long:30, consigne:"Affiche <code>Total : 2500 FCFA</code>.",
+        ok:['print(f"Total : {total} FCFA")'],
+        indices:["Une f-string avec la boîte <code>total</code>.",
+                 '<code>print(f"Total : {total} FCFA")</code>'],
+        pourquoi:"" },
+      { t:"" },
+      { b:1, long:34, consigne:"Ouvre <code>ventes.txt</code> en mode <strong>ajout</strong> — pour ne pas effacer les ventes précédentes.",
+        ok:['fichier = open("ventes.txt", "a")'],
+        indices:["Le mode ajout, c'est <code>\"a\"</code> et pas <code>\"w\"</code>",
+                 '<code>fichier = open("ventes.txt", "a")</code>'],
+        pourquoi:"Avec <code>\"w\"</code>, chaque nouvelle vente effacerait toutes les précédentes. C'est LE piège de la séance." },
+      { b:1, long:32, consigne:"Écris le total suivi d'un retour à la ligne, avec une f-string.",
+        ok:['fichier.write(f"{total}\\n")'],
+        indices:["Une f-string dans un <code>.write()</code>, avec <code>\\n</code> à la fin.",
+                 '<code>fichier.write(f"{total}\\n")</code>'],
+        pourquoi:"" },
+      { b:1, long:18, consigne:"Ferme le fichier.",
+        ok:["fichier.close()"],
+        indices:["Toujours fermer ce qu'on a ouvert.","<code>fichier.close()</code>"],
+        pourquoi:"Ton programme garde maintenant une trace de ce qu'il a fait, même après s'être arrêté. C'est un vrai logiciel." },
+    ],
+  },
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Le répertoire ---------- */
+(function () {
+  const MENU = { "attiéké": 1500, "alloco": 1000, "poisson": 2500, "bissap": 500 };
+  const eF = document.getElementById("r-fiches"),
+        eR = document.getElementById("r-res"),
+        eN = document.getElementById("r-note"),
+        eI = document.getElementById("r-cle");
+
+  function rendu(trouve) {
+    eF.innerHTML = Object.entries(MENU).map(([k, v]) =>
+      '<div class="fiche' + (k === trouve ? " trouve" : "") + '">' +
+      '<div class="cle">"' + k + '"</div><div class="val">' + v + "</div></div>"
+    ).join("");
+  }
+
+  function chercher() {
+    const c = eI.value.trim();
+    if (!c) return;
+    if (Object.prototype.hasOwnProperty.call(MENU, c)) {
+      eR.className = "rep-res";
+      eR.textContent = 'print(menu["' + c + '"])\n\n' + MENU[c];
+      eN.innerHTML = "Trouvé directement, sans parcourir les autres. " +
+        "Un dictionnaire va chercher au bon endroit du premier coup, " +
+        "même s'il contient un million d'entrées.";
+      rendu(c);
+    } else {
+      eR.className = "rep-res err";
+      eR.textContent = 'print(menu["' + c + '"])\n\nKeyError: \'' + c + "'";
+      const proche = Object.keys(MENU).find(k => k.toLowerCase() === c.toLowerCase());
+      eN.innerHTML = proche
+        ? "🎯 <strong>La clé existe pourtant… mais pas avec cette casse.</strong> " +
+          "Python distingue « " + proche + " » et « " + c + " ». " +
+          "Pour un dictionnaire, ce sont deux clés totalement différentes."
+        : "🎯 <strong>Cette clé n'existe pas, et le programme plante.</strong> " +
+          "Pour éviter ça, on utilise <code>menu.get(\"" + c + "\", \"pas au menu\")</code> — " +
+          "qui rend une valeur de secours au lieu de tout arrêter.";
+      rendu(null);
+    }
+  }
+  document.getElementById("r-go").onclick = chercher;
+  eI.addEventListener("keydown", (e) => { if (e.key === "Enter") chercher(); });
+  rendu(null);
+  eN.textContent = "Tape une clé et valide.";
+})();
+</script>
+
+</body>
+</html>

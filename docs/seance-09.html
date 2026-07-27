@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 9 — Ton projet à toi</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .projets { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 20px 0; }
+  .projet { border: 2px solid var(--line); border-radius: 12px; padding: 20px; cursor: pointer;
+    background: #fff; transition: all .15s; }
+  .projet:hover { border-color: var(--orange); transform: translateY(-2px); }
+  .projet.on { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+  .projet .ico { font-size: 26px; }
+  .projet h3 { margin: 8px 0 6px; font-size: 18px; }
+  .projet p { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+  .projet .niv { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; }
+  .niv.f { background: var(--green-soft); color: var(--green); }
+  .niv.m { background: var(--orange-soft); color: #b8560c; }
+  .niv.d { background: var(--red-soft); color: var(--red); }
+
+  .etapes-liste { counter-reset: et; }
+  .et {
+    display: flex; gap: 14px; align-items: flex-start; padding: 14px 0;
+    border-bottom: 1px solid var(--line); cursor: pointer;
+  }
+  .et:last-child { border: 0; }
+  .et .coche {
+    flex: none; width: 26px; height: 26px; border: 2px solid var(--line);
+    border-radius: 8px; display: grid; place-items: center; font-size: 15px;
+    color: #fff; transition: all .15s; margin-top: 1px;
+  }
+  .et.ok .coche { background: var(--green); border-color: var(--green); }
+  .et.ok .txt { text-decoration: line-through; color: var(--ink-soft); }
+  .et .txt strong { display: block; }
+  .et .txt span { font-size: 14.5px; color: var(--ink-soft); }
+  .barre { height: 9px; background: var(--bg-soft); border-radius: 20px; overflow: hidden; margin: 6px 0 20px; }
+  .barre i { display: block; height: 100%; background: var(--green); width: 0; transition: width .3s; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 9</a>
+  <nav class="steps"><a href="#choix">1</a><a href="#plan">2</a><a href="#exos">✍</a>
+    <a href="#atelier">3</a><a href="#oral">4</a><a href="#apres">→</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 9 · 1 h 30 · dernière séance</div>
+    <h1>Ton projet à toi</h1>
+    <p class="lede">Neuf séances, et tu sais tout ce qu'il faut : variables, conditions,
+    boucles, listes, dictionnaires, fonctions, fichiers, gestion d'erreurs.
+    <strong>Aujourd'hui, personne ne te dit quoi écrire.</strong></p>
+  </div>
+
+  <!-- CHOIX -->
+  <section class="etape" id="choix">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Choisis ton projet</h2>
+      <div class="etape-meta">10 minutes · et on ne change plus d'avis après</div></div></div>
+
+    <p>Trois propositions, ou la tienne si tu as mieux. Clique pour voir le plan de bataille.</p>
+
+    <div class="projets" id="p-cartes"></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p><strong>Dix minutes de choix maximum.</strong> Un projet trop ambitieux
+      qui n'aboutit pas laisse un goût d'échec ; un projet modeste et fini laisse
+      un programme qu'il montre à sa famille. En cas d'hésitation, choisis le plus petit.</p>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="etape" id="plan">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Le plan de bataille</h2>
+      <div class="etape-meta">coche au fur et à mesure</div></div></div>
+
+    <p id="p-titre" style="font-size:20px;font-weight:700"></p>
+    <div class="barre"><i id="p-barre"></i></div>
+    <p class="hint" id="p-avance"></p>
+
+    <div class="widget">
+      <div class="etapes-liste" id="p-etapes"></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🎯 La règle d'or du projet</div>
+      <p><strong>Une brique à la fois, et on lance après chaque brique.</strong></p>
+      <p>Ne jamais écrire quarante lignes avant de tester. Si tu écris tout d'un coup
+      et que ça plante, tu n'as aucune idée d'où chercher. Si tu testes après chaque étape,
+      le bug est forcément dans les cinq lignes que tu viens d'écrire.</p>
+      <p>C'est la méthode de tous les programmeurs professionnels, sans exception.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 briques réutilisables</h2>
+      <div class="etape-meta">15 minutes · à recopier dans ton projet</div></div></div>
+
+    <p>Ces quatre morceaux servent dans <strong>n'importe quel</strong> projet.
+    Écris-les une fois ici, puis reprends-les dans le tien.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- ATELIER -->
+  <section class="etape" id="atelier">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Atelier</h2>
+      <div class="etape-meta">45 minutes · tu codes, je regarde</div></div></div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton projet</div>
+      <div data-cellule data-tortue="oui"><script type="text/python">
+# Étape 1 :
+# Étape 2 :
+# Étape 3 :
+# Étape 4 :
+# Étape 5 :
+
+# Écris d'abord tes étapes en commentaires, au-dessus.
+# Puis remplis-les une par une, en lançant après chacune.
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Ton rôle pendant l'atelier</div>
+      <p><strong>Tu n'écris rien. Tu ne dictes rien.</strong> Tu poses trois questions,
+      toujours les mêmes :</p>
+      <ul style="margin-bottom:0">
+        <li>« Tu en es à quelle étape de ton plan ? »</li>
+        <li>« Est-ce que tu as lancé depuis la dernière fois que ça marchait ? »</li>
+        <li>« Montre-moi la ligne exacte où ça coince. »</li>
+      </ul>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Si rien ne marche et qu'il panique</div>
+      <p>La méthode à lui apprendre : <strong>revenir à la dernière version qui marchait</strong>,
+      et réavancer d'une seule ligne. Ce n'est pas reculer, c'est la seule façon fiable
+      de retrouver le fautif.</p>
+    </div>
+  </section>
+
+  <!-- ORAL -->
+  <section class="etape" id="oral">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>La présentation</h2>
+      <div class="etape-meta">15 minutes · la dernière épreuve</div></div></div>
+
+    <p>Tu présentes ton programme comme si je ne l'avais jamais vu. Quatre temps :</p>
+
+    <ol>
+      <li><strong>Ce que ça fait</strong> — en une phrase, sans vocabulaire technique</li>
+      <li><strong>La démonstration</strong> — tu l'utilises devant moi, en vrai</li>
+      <li><strong>Le morceau dont tu es le plus fier</strong> — et tu expliques comment il marche</li>
+      <li><strong>Ce qui a été le plus dur</strong> — et comment tu t'en es sorti</li>
+    </ol>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi cette étape existe</div>
+      <p>Savoir expliquer son travail vaut autant que le travail lui-même.
+      Dans n'importe quel métier, celui qui sait expliquer ce qu'il a fait
+      va plus loin que celui qui sait seulement le faire.</p>
+      <p>Et le point 4 est le plus important : raconter une difficulté surmontée,
+      c'est ce qu'on te demandera dans tous les entretiens de ta vie.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🏆 Le vrai test final</div>
+      <p><strong>Fais-le utiliser par quelqu'un de ta famille, sans lui expliquer.</strong></p>
+      <p>Si cette personne y arrive toute seule, ton programme est fini.
+      Si elle est bloquée, ce n'est pas elle le problème : c'est ton programme
+      qui n'est pas assez clair. Va corriger.</p>
+    </div>
+  </section>
+
+  <!-- APRÈS -->
+  <section class="etape" id="apres">
+    <div class="etape-head"><div class="etape-num">🚀</div><div>
+      <h2>Et maintenant ?</h2>
+      <div class="etape-meta">ce qui vient après ces dix séances</div></div></div>
+
+    <p>Tu sais programmer. Pas « un peu » — vraiment. Tu peux prendre un problème,
+    le découper, l'écrire en Python, le tester et le réparer. C'est exactement
+    ce que fait un développeur, avec plus d'expérience et de plus gros programmes.</p>
+
+    <h3>Trois directions, selon ce qui te plaît</h3>
+    <ul>
+      <li><strong>Faire des jeux</strong> — la bibliothèque <code>pygame</code>
+      te donne des images, du son et des manettes. Tes boucles et tes conditions
+      marchent exactement pareil.</li>
+      <li><strong>Faire des sites</strong> — il faut ajouter HTML et CSS,
+      puis <code>Flask</code> côté Python. Ton dictionnaire devient une page web.</li>
+      <li><strong>Traiter des données</strong> — <code>matplotlib</code> transforme
+      tes listes en graphiques. Tes notes du trimestre en courbe, en trois lignes.</li>
+    </ul>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le dernier conseil</div>
+      <p class="dialogue">« Ne t'arrête pas maintenant. Pas besoin de cours :
+      choisis un truc qui t'énerve dans ta vie quotidienne, et écris le programme
+      qui le règle. C'est comme ça que tout le monde progresse. »</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🤖 Et l'IA, dans tout ça</div>
+      <p>Tu as vu en séance 8 qu'elle se trompe, et que tu sais le repérer.
+      Le jour où tu auras l'âge de l'utiliser, souviens-toi de tes quatre règles.</p>
+      <p><strong>La plus importante : ne jamais garder du code que tu ne peux pas
+      expliquer ligne par ligne.</strong> Ce n'est pas une question de morale,
+      c'est une question de survie — le jour où ça plantera, et ça plantera,
+      il faudra bien que quelqu'un comprenne.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-08.html" style="color:var(--orange);font-weight:650">← Séance 8</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Brique 1 — La saisie qui ne plante jamais",
+    contexte: "À recopier dans tout programme qui demande un nombre.",
+    lignes: [
+      { b:1, long:26, consigne:"Définis une fonction <code>demander_nombre</code> avec un réglage <code>question</code>.",
+        ok:["def demander_nombre(question):"],
+        indices:["<code>def</code>, le nom, le réglage, deux points.",
+                 "<code>def demander_nombre(question):</code>"],
+        pourquoi:"En faire une fonction, c'est pouvoir la réutiliser dix fois dans le projet." },
+      { b:1, indent:4, long:12, consigne:"Une boucle qui tourne pour toujours.",
+        ok:["while True:"],
+        indices:["Comme en séance 4.","<code>while True:</code>"],
+        pourquoi:"" },
+      { b:1, indent:8, long:6, consigne:"Ouvre le bloc « essaie ».",
+        ok:["try:"],
+        indices:["Un mot, deux points.","<code>try:</code>"],
+        pourquoi:"" },
+      { b:1, indent:12, long:28, consigne:"<strong>Rends</strong> directement la réponse convertie en entier.",
+        ok:["return int(input(question))"],
+        indices:["On peut mettre <code>return</code> devant tout le calcul d'un coup.",
+                 "<code>return int(input(question))</code>"],
+        pourquoi:"Le <code>return</code> sort de la fonction ET de la boucle. Si la conversion rate, on n'y arrive jamais." },
+      { b:1, indent:8, long:20, consigne:"Attrape l'erreur <code>ValueError</code>.",
+        ok:["except ValueError:"],
+        indices:["Aligné avec le <code>try</code>.","<code>except ValueError:</code>"],
+        pourquoi:"" },
+      { b:1, indent:12, long:26, consigne:"Affiche <code>Un nombre, s'il te plaît.</code>",
+        ok:['print("Un nombre, s\'il te plaît.")','print("Un nombre, s\'il te plait.")'],
+        indices:["Un print dans le bloc de secours.",
+                 '<code>print("Un nombre, s\'il te plaît.")</code>'],
+        pourquoi:"Et la boucle recommence. Cette fonction ne rend JAMAIS autre chose qu'un entier valable." },
+      { t:"" },
+      { t:'age = demander_nombre("Ton âge ? ")' },
+      { t:'print(f"Merci, {age} ans.")' },
+    ],
+  },
+  {
+    titre: "Brique 2 — Le menu",
+    contexte: "Tout programme un peu sérieux commence par un menu.",
+    lignes: [
+      { b:1, long:12, consigne:"Une boucle qui tourne pour toujours — le menu revient après chaque action.",
+        ok:["while True:"],
+        indices:["<code>while True:</code>","<code>while True:</code>"],
+        pourquoi:"" },
+      { t:'    print("1. Ajouter")' },
+      { t:'    print("2. Afficher")' },
+      { t:'    print("3. Quitter")' },
+      { b:1, indent:4, long:30, consigne:"Demande <code>Ton choix ? </code> et range la réponse dans <code>choix</code>. Pas besoin de convertir.",
+        ok:['choix = input("Ton choix ? ")','choix = input("Ton choix ?")'],
+        indices:["On comparera à du texte, donc pas de <code>int()</code>.",
+                 '<code>choix = input("Ton choix ? ")</code>'],
+        pourquoi:"Comparer du texte à du texte évite un plantage si l'utilisateur tape « a »." },
+      { t:"" },
+      { b:1, indent:4, long:18, consigne:"Si le choix vaut <code>1</code> (en texte)…",
+        ok:['if choix == "1":'],
+        indices:["Des guillemets autour du 1, puisque c'est du texte.",'<code>if choix == "1":</code>'],
+        pourquoi:"" },
+      { t:'        print("→ ajout")' },
+      { b:1, indent:4, long:20, consigne:"<strong>Sinon si</strong> le choix vaut <code>3</code>…",
+        ok:['elif choix == "3":'],
+        indices:["<code>elif</code> et des guillemets.",'<code>elif choix == "3":</code>'],
+        pourquoi:"" },
+      { b:1, indent:8, long:8, consigne:"Sors de la boucle : on quitte le programme.",
+        ok:["break"],
+        indices:["Le mot qui arrête une boucle.","<code>break</code>"],
+        pourquoi:"Sans une option pour quitter, l'utilisateur est prisonnier de ton menu." },
+      { t:"    else:" },
+      { t:'        print("Choix inconnu.")' },
+    ],
+  },
+  {
+    titre: "Brique 3 — Sauvegarder et relire",
+    contexte: "Pour que ton programme se souvienne d'une fois sur l'autre.",
+    lignes: [
+      { b:1, long:26, consigne:"Définis <code>sauver</code> avec un réglage <code>ligne</code>.",
+        ok:["def sauver(ligne):"],
+        indices:["<code>def sauver(ligne):</code>","<code>def sauver(ligne):</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:34, consigne:"Ouvre <code>donnees.txt</code> en mode <strong>ajout</strong>.",
+        ok:['fichier = open("donnees.txt", "a")'],
+        indices:["Le mode ajout, c'est <code>\"a\"</code> — surtout pas <code>\"w\"</code>.",
+                 '<code>fichier = open("donnees.txt", "a")</code>'],
+        pourquoi:"Avec <code>\"w\"</code>, chaque sauvegarde effacerait toutes les précédentes." },
+      { b:1, indent:4, long:30, consigne:"Écris la ligne, suivie d'un retour à la ligne.",
+        ok:['fichier.write(f"{ligne}\\n")'],
+        indices:["Une f-string avec <code>\\n</code> à la fin.",'<code>fichier.write(f"{ligne}\\n")</code>'],
+        pourquoi:"" },
+      { b:1, indent:4, long:18, consigne:"Ferme le fichier.",
+        ok:["fichier.close()"],
+        indices:["<code>fichier.close()</code>","<code>fichier.close()</code>"],
+        pourquoi:"Tant qu'il n'est pas fermé, rien n'est vraiment écrit sur le disque." },
+      { t:"" },
+      { t:'sauver("première vente : 3000")' },
+      { t:'sauver("deuxième vente : 4500")' },
+      { t:"" },
+      { t:'fichier = open("donnees.txt", "r")' },
+      { t:"print(fichier.read())" },
+      { t:"fichier.close()" },
+    ],
+  },
+  {
+    titre: "Brique 4 — La boucle de jeu",
+    contexte: "Jouer, compter les points, et proposer de recommencer. Le squelette de tout jeu.",
+    lignes: [
+      { t:"import random" },
+      { t:"" },
+      { b:1, long:12, consigne:"Un compteur de <code>parties</code>, à zéro.",
+        ok:["parties = 0"],
+        indices:["Comme le score du quiz.","<code>parties = 0</code>"],
+        pourquoi:"" },
+      { b:1, long:12, consigne:"Un compteur de <code>victoires</code>, à zéro aussi.",
+        ok:["victoires = 0"],
+        indices:["Même forme.","<code>victoires = 0</code>"],
+        pourquoi:"" },
+      { t:"" },
+      { b:1, long:12, consigne:"La boucle principale du jeu, qui tourne pour toujours.",
+        ok:["while True:"],
+        indices:["<code>while True:</code>","<code>while True:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:24, consigne:"Tire un dé au hasard entre 1 et 6, dans <code>de</code>.",
+        ok:["de = random.randint(1, 6)"],
+        indices:["<code>random.randint(1, 6)</code>","<code>de = random.randint(1, 6)</code>"],
+        pourquoi:"" },
+      { t:'    pari = input("Pair ou impair ? ")' },
+      { t:"    parties = parties + 1" },
+      { t:"" },
+      { b:1, indent:4, long:36, consigne:"Si le dé est pair <strong>et</strong> que le pari est <code>pair</code>…",
+        ok:['if de % 2 == 0 and pari == "pair":'],
+        indices:["Le reste par 2, et <code>and</code> pour relier les deux conditions.",
+                 '<code>if de % 2 == 0 and pari == "pair":</code>'],
+        pourquoi:"Deux conditions dans un seul <code>if</code>, comme en séance 3." },
+      { b:1, indent:8, long:28, consigne:"Ajoute 1 aux victoires.",
+        ok:["victoires = victoires + 1","victoires += 1"],
+        indices:["Prends, ajoute, remets.","<code>victoires = victoires + 1</code>"],
+        pourquoi:"" },
+      { t:"" },
+      { t:'    print(f"Le dé fait {de} — {victoires}/{parties}")' },
+      { t:'    encore = input("Rejouer ? (o/n) ")' },
+      { b:1, indent:4, long:24, consigne:"Si la réponse <strong>n'est pas</strong> <code>o</code>, sors de la boucle. Écris d'abord la condition.",
+        ok:['if encore != "o":'],
+        indices:["« Est différent de » s'écrit <code>!=</code>",'<code>if encore != "o":</code>'],
+        pourquoi:"Tout ce qui n'est pas « o » arrête le jeu — c'est plus sûr que de tester tous les cas de « non »." },
+      { b:1, indent:8, long:8, consigne:"Sors de la boucle.",
+        ok:["break"],
+        indices:["<code>break</code>","<code>break</code>"],
+        pourquoi:"Tu as maintenant les quatre briques. Assemble-les, ajoute ton idée, et ton projet est fait." },
+    ],
+  },
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Choix du projet et plan de bataille ---------- */
+(function () {
+  const PROJETS = [
+    { id: "pendu", ico: "🔤", nom: "Le pendu", niv: "f", nivTxt: "abordable",
+      desc: "L'ordinateur choisit un mot, tu proposes des lettres, tu as 7 vies.",
+      etapes: [
+        ["Une liste de mots et un tirage au hasard", "random.choice sur une liste de 10 mots"],
+        ["Afficher le mot masqué", "des tirets, autant que de lettres"],
+        ["Demander une lettre et vérifier si elle y est", "le mot-clé in te dit si elle est dedans"],
+        ["Révéler les lettres trouvées", "reconstruire le mot masqué à chaque tour"],
+        ["Compter les vies et détecter la fin", "gagné si plus de tirets, perdu si 0 vie"],
+        ["Blinder les saisies", "une seule lettre, pas un chiffre, pas vide"],
+      ] },
+    { id: "budget", ico: "💰", nom: "Le gestionnaire de budget", niv: "m", nivTxt: "moyen",
+      desc: "Tu notes tes dépenses en FCFA, il calcule les totaux et les garde en mémoire.",
+      etapes: [
+        ["Le menu principal", "ajouter, afficher, total, quitter — brique 2"],
+        ["Ajouter une dépense", "un dictionnaire catégorie → montant"],
+        ["Afficher toutes les dépenses", "une boucle sur le dictionnaire"],
+        ["Calculer le total et la plus grosse dépense", "sum, max — séance 5"],
+        ["Sauvegarder dans un fichier", "mode ajout — brique 3"],
+        ["Relire le fichier au démarrage", "pour retrouver ses données"],
+      ] },
+    { id: "quiz", ico: "🎓", nom: "Le quiz de révision", niv: "f", nivTxt: "abordable",
+      desc: "Un quiz sur une matière de ton choix, avec score, corrections et record.",
+      etapes: [
+        ["Les questions dans un dictionnaire", "question → bonne réponse"],
+        ["Poser les questions dans un ordre aléatoire", "random.shuffle sur les clés"],
+        ["Compter le score", "et accepter les majuscules avec .lower()"],
+        ["Afficher la correction des erreurs", "garder les ratées dans une liste"],
+        ["Donner une mention finale", "l'escalier de conditions de la séance 3"],
+        ["Enregistrer le record", "lire le fichier, comparer, réécrire si mieux"],
+      ] },
+    { id: "libre", ico: "💡", nom: "Ton idée", niv: "d", nivTxt: "à cadrer ensemble",
+      desc: "Tu as mieux ? Parfait. On découpe ton idée en étapes ensemble.",
+      etapes: [
+        ["Décris en une phrase ce que fait le programme", "sans aucun mot technique"],
+        ["Liste ce que l'utilisateur doit saisir", "et de quel type : nombre ou texte"],
+        ["Liste ce que le programme doit afficher", "précisément, avec un exemple"],
+        ["Découpe en 5 étapes maximum", "chacune testable toute seule"],
+        ["Code la première étape et lance-la", "rien d'autre tant qu'elle ne marche pas"],
+        ["Ajoute les suivantes, une par une", "en lançant après chacune"],
+      ] },
+  ];
+
+  let sel = 0;
+  const faits = {};
+
+  const eC = document.getElementById("p-cartes");
+  eC.innerHTML = PROJETS.map((p, i) =>
+    '<div class="projet' + (i === 0 ? " on" : "") + '" data-i="' + i + '">' +
+    '<div class="ico">' + p.ico + "</div><h3>" + p.nom + "</h3><p>" + p.desc + "</p>" +
+    '<span class="niv ' + p.niv + '">' + p.nivTxt + "</span></div>"
+  ).join("");
+
+  function plan() {
+    const p = PROJETS[sel];
+    if (!faits[p.id]) faits[p.id] = {};
+    document.getElementById("p-titre").textContent = p.ico + "  " + p.nom;
+    document.getElementById("p-etapes").innerHTML = p.etapes.map((e, i) =>
+      '<div class="et' + (faits[p.id][i] ? " ok" : "") + '" data-i="' + i + '">' +
+      '<div class="coche">✓</div><div class="txt"><strong>' + (i + 1) + ". " + e[0] +
+      "</strong><span>" + e[1] + "</span></div></div>"
+    ).join("");
+    document.querySelectorAll("#p-etapes .et").forEach(el => {
+      el.onclick = () => { faits[p.id][el.dataset.i] = !faits[p.id][el.dataset.i]; plan(); };
+    });
+    const n = Object.values(faits[p.id]).filter(Boolean).length;
+    document.getElementById("p-barre").style.width = (n / p.etapes.length * 100) + "%";
+    document.getElementById("p-avance").innerHTML = n === p.etapes.length
+      ? "🎉 <strong>Toutes les étapes sont faites.</strong> Ton projet est terminé — passe à la présentation."
+      : n + " étape" + (n > 1 ? "s" : "") + " sur " + p.etapes.length +
+        ". <strong>Lance ton programme après chaque étape cochée.</strong>";
+  }
+
+  eC.querySelectorAll(".projet").forEach(el => {
+    el.onclick = () => {
+      sel = +el.dataset.i;
+      eC.querySelectorAll(".projet").forEach(x => x.classList.remove("on"));
+      el.classList.add("on");
+      plan();
+    };
+  });
+  plan();
+})();
+</script>
+
+</body>
+</html>

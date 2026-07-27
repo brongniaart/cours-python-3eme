@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 6 — Fabriquer tes propres outils</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .bascule-gd { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 9px;
+    overflow: hidden; margin-bottom: 16px; width: fit-content; }
+  .bascule-gd button { border: 0; border-radius: 0; background: #fff; color: var(--ink-soft);
+    padding: 9px 20px; font-weight: 650; font-size: 14.5px; }
+  .bascule-gd button.on { background: var(--orange); color: #fff; }
+  .avant-apres { background: var(--code-bg); border-radius: 10px; padding: 16px 0;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.75; color: #cdd6e6;
+    max-height: 430px; overflow-y: auto; }
+  .avant-apres .l { padding: 0 18px; display: block; white-space: pre; }
+  .avant-apres .l .n { color: #4c5468; display: inline-block; width: 26px; font-size: 11.5px; }
+  .avant-apres .l.neuf { background: rgba(14,138,85,.16); }
+  .compteur-l { display: flex; gap: 26px; margin-top: 16px; align-items: baseline; }
+  .compteur-l .gros { font-size: 34px; font-weight: 750; letter-spacing: -.02em; }
+  .compteur-l .gros.rouge { color: var(--red); }
+  .compteur-l .gros.vert { color: var(--green); }
+  .compteur-l span { font-size: 14px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 6</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#viz">👁</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 6 · 1 h 30</div>
+    <h1>Fabriquer tes propres outils</h1>
+    <p class="lede">Depuis la première séance, tu utilises des outils que d'autres ont écrits :
+    <code>print</code>, <code>input</code>, <code>len</code>, <code>round</code>.
+    <strong>Aujourd'hui, tu fabriques les tiens.</strong></p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Donner un nom à un bout de programme</h2>
+      <div class="etape-meta">15 minutes · def</div></div></div>
+
+    <p><code>def</code> veut dire « définis ». Tu donnes un nom à un bloc de code,
+    et ce bloc ne s'exécute pas tout de suite : il attend qu'on l'appelle.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+def dire_bonjour():
+    print("Bonjour !")
+    print("Comment ça va ?")
+
+print("--- avant ---")
+
+dire_bonjour()
+dire_bonjour()
+
+print("--- après ---")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Deux temps bien séparés : <strong>définir</strong> (le bloc <code>def</code>,
+    qui ne fait rien tout seul) et <strong>appeler</strong>
+    (<code>dire_bonjour()</code>, avec les parenthèses, qui déclenche l'exécution).</p>
+
+    <div class="box bug">
+      <div class="box-title">🐛 L'oubli garanti</div>
+      <p>Écris <code>dire_bonjour</code> sans les parenthèses. Aucune erreur…
+      et rien ne s'affiche.</p>
+      <p>Sans parenthèses, tu <em>désignes</em> l'outil. Avec parenthèses, tu
+      <em>t'en sers</em>. C'est exactement la différence entre montrer un marteau
+      et taper avec.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Un outil réglable</h2>
+      <div class="etape-meta">15 minutes · les paramètres</div></div></div>
+
+    <p>Un outil qui fait toujours exactement la même chose sert rarement.
+    Ce qui est entre les parenthèses du <code>def</code>, ce sont les
+    <strong>réglages</strong> — comme le 100 dans <code>forward(100)</code>
+    à la toute première séance.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+def saluer(prenom):
+    print(f"Bonjour {prenom} !")
+
+saluer("Awa")
+saluer("Koffi")
+saluer("Fatou")
+
+
+def presenter(prenom, ville, age):
+    print(f"{prenom}, {age} ans, habite à {ville}.")
+
+presenter("Yann", "Abidjan", 15)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Une seule définition, trois usages différents. <strong>C'est ça, un outil.</strong></p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le mot juste</div>
+      <p>Dans le <code>def</code>, <code>prenom</code> est une <strong>case vide</strong>
+      qui attend qu'on la remplisse. Au moment de l'appel, <code>"Awa"</code> vient
+      s'y installer, le temps de l'exécution seulement.</p>
+      <p>Analogie : <code>def</code>, c'est le formulaire vierge.
+      L'appel, c'est le formulaire rempli.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Le drapeau, six séances plus tard</h2>
+      <div class="etape-meta">la promesse de la séance 0</div></div></div>
+
+    <p>Souviens-toi de la toute première séance. Tu avais écrit trois fois le même bloc,
+    ça t'avait soulé, et je t'avais dit de retenir cette sensation.
+    <strong>Regarde.</strong></p>
+
+    <div class="widget">
+      <div class="bascule-gd">
+        <button class="on" data-v="avant">Séance 0</button>
+        <button data-v="apres">Aujourd'hui</button>
+      </div>
+      <div class="avant-apres" id="ap-code"></div>
+      <div class="compteur-l">
+        <div><span class="gros" id="ap-n"></span> <span id="ap-lab"></span></div>
+        <div id="ap-mot" style="font-size:15px;color:var(--ink-soft)"></div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi c'est le sujet le plus important du cours</div>
+      <p>Ce n'est pas une question d'élégance. Dans la version de gauche, si tu veux
+      changer la hauteur des bandes, tu dois modifier <strong>six lignes</strong>
+      et tu en oublieras une. Dans celle de droite, tu changes <strong>un seul chiffre</strong>.</p>
+      <p>Un vrai logiciel fait des centaines de milliers de lignes. Personne ne pourrait
+      le maintenir sans découper en outils réutilisables. C'est la compétence qui sépare
+      quelqu'un qui bricole de quelqu'un qui construit.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Un outil qui rend un résultat</h2>
+      <div class="etape-meta">15 minutes · return</div></div></div>
+
+    <p>Jusqu'ici tes outils <em>affichaient</em>. Souvent, on préfère qu'ils
+    <strong>rendent une valeur</strong>, pour pouvoir s'en resservir.
+    C'est ce que fait <code>return</code>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+def moyenne(notes):
+    return sum(notes) / len(notes)
+
+
+trimestre1 = [12, 15, 8]
+trimestre2 = [14, 16, 11, 9]
+
+m1 = moyenne(trimestre1)
+m2 = moyenne(trimestre2)
+
+print(round(m1, 1))
+print(round(m2, 1))
+print(round((m1 + m2) / 2, 1))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 print ou return ?</div>
+      <p><code>print</code> <strong>montre</strong> à l'utilisateur. La valeur part
+      à l'écran et disparaît, on ne peut plus rien en faire.</p>
+      <p><code>return</code> <strong>rend</strong> au programme. On peut la ranger dans
+      une boîte, la recalculer, la comparer — comme <code>m1 + m2</code> ci-dessus.</p>
+      <p><strong>Règle simple :</strong> un outil qui calcule doit <code>return</code>.
+      Un outil qui affiche peut <code>print</code>. Mélanger les deux, c'est se limiter.</p>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 À tester</div>
+      <p>Remplace <code>return</code> par <code>print</code> dans la fonction,
+      puis essaie de calculer <code>(m1 + m2) / 2</code>.
+      <br><code>TypeError: unsupported operand type(s) for +: 'NoneType' and 'NoneType'</code></p>
+      <p>Une fonction sans <code>return</code> ne rend rien du tout — littéralement
+      « rien », qui s'appelle <code>None</code> en Python. Et on ne peut pas additionner
+      deux riens.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : réécris ton drapeau</h2>
+      <div class="etape-meta">30 minutes · la boucle est bouclée</div></div></div>
+
+    <p>Reprends le drapeau de la séance 0 et réécris-le avec <strong>une fonction
+    et une boucle</strong>. Ton objectif : moins de quinze lignes en tout.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule data-tortue="oui"><script type="text/python">
+import turtle
+
+crayon = turtle.Turtle()
+crayon.speed(0)
+
+
+def bande(x, couleur):
+    # à toi d'écrire l'intérieur
+
+
+# puis la boucle qui appelle bande() trois fois
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. La difficulté n'est pas technique :
+      c'est de <em>repérer ce qui change</em> entre les trois bandes.
+      Réponse : la position de départ et la couleur. Donc deux paramètres.</p>
+      <p>La question à poser s'il bloque : <em>« entre la bande orange et la bande verte,
+      qu'est-ce qui change exactement ? Rien d'autre ? »</em></p>
+      <p>S'il finit vite : « fais une fonction <code>drapeau(x, y, c1, c2, c3)</code>
+      et dessine trois drapeaux différents sur le même écran. »</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : ta boîte à outils</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Écris trois outils que tu pourras réutiliser dans ton projet final :</p>
+    <ul>
+      <li><code>moyenne(notes)</code> — rend la moyenne d'une liste</li>
+      <li><code>mention(note)</code> — rend « Très bien », « Bien »… (reprends la séance 3)</li>
+      <li><code>bulletin(nom, notes)</code> — affiche un bulletin complet en utilisant les deux autres</li>
+    </ul>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Le vrai apprentissage est là</div>
+      <p><code>bulletin</code> appelle <code>moyenne</code>, qui appelle <code>sum</code>.
+      <strong>Des outils qui utilisent d'autres outils</strong> : c'est comme ça
+      que sont construits tous les logiciels que tu utilises.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, on te montre la réponse.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>Reprends ton <strong>convertisseur FCFA de la séance 2</strong> et transforme-le
+      en deux fonctions : <code>vers_euros(fcfa)</code> et <code>vers_fcfa(euros)</code>,
+      qui <strong>rendent</strong> le résultat au lieu de l'afficher.</p>
+      <p class="hint" style="margin-top:8px">Puis vérifie que
+      <code>vers_fcfa(vers_euros(10000))</code> te redonne bien 10000.
+      Si oui, tes deux outils sont justes.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-05.html" style="color:var(--orange);font-weight:650">← Séance 5</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-07.html" style="color:var(--orange);font-weight:650">Séance 7 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Ton premier outil",
+    contexte: "Définir, puis appeler. Deux temps bien distincts.",
+    lignes: [
+      { b:1, long:18, consigne:"Définis un outil appelé <code>saluer</code>, sans réglage. N'oublie ni les parenthèses vides ni les deux points.",
+        ok:["def saluer():"],
+        indices:["« Définis » s'écrit <code>def</code>.","<code>def saluer():</code>"],
+        pourquoi:"Les parenthèses sont vides parce que cet outil n'a aucun réglage. Elles restent obligatoires." },
+      { b:1, indent:4, long:24, consigne:"À l'intérieur, affiche <code>Salut la classe !</code>",
+        ok:['print("Salut la classe !")'],
+        indices:["Un print décalé de 4 espaces.",'<code>print("Salut la classe !")</code>'],
+        pourquoi:"Ce qui est décalé appartient à l'outil. Rien ne s'exécute encore." },
+      { t:"" },
+      { b:1, long:12, consigne:"Maintenant <strong>sers-toi</strong> de ton outil. Attention aux parenthèses.",
+        ok:["saluer()"],
+        indices:["Le nom, suivi des parenthèses.","<code>saluer()</code>"],
+        pourquoi:"Sans les parenthèses, rien ne se passerait — et sans message d'erreur." },
+      { b:1, long:12, consigne:"Sers-t'en une deuxième fois.",
+        ok:["saluer()"],
+        indices:["Exactement la même ligne.","<code>saluer()</code>"],
+        pourquoi:"Écrit une fois, utilisé autant de fois que tu veux. C'est tout l'intérêt." },
+    ],
+  },
+  {
+    titre: "Un outil réglable",
+    contexte: "Un paramètre, c'est une case vide qu'on remplit au moment de l'appel.",
+    lignes: [
+      { b:1, long:22, consigne:"Définis <code>saluer</code> avec un réglage appelé <code>prenom</code>.",
+        ok:["def saluer(prenom):"],
+        indices:["Le nom du réglage se met entre les parenthèses.","<code>def saluer(prenom):</code>"],
+        pourquoi:"<code>prenom</code> n'existe pas encore : c'est une case qui attend une valeur." },
+      { b:1, indent:4, long:26, consigne:"Affiche <code>Bonjour Awa !</code> — en utilisant le réglage, pas un nom écrit en dur.",
+        ok:['print(f"Bonjour {prenom} !")'],
+        indices:["Une f-string avec <code>{prenom}</code> entre accolades.",
+                 '<code>print(f"Bonjour {prenom} !")</code>'],
+        pourquoi:"Si tu avais écrit « Awa » directement, ton outil ne saurait saluer qu'une seule personne." },
+      { t:"" },
+      { b:1, long:16, consigne:"Utilise-le pour saluer <code>Awa</code>.",
+        ok:['saluer("Awa")'],
+        indices:["La valeur va entre les parenthèses de l'appel.",'<code>saluer("Awa")</code>'],
+        pourquoi:"« Awa » vient s'installer dans la case <code>prenom</code>, le temps de l'exécution." },
+      { b:1, long:18, consigne:"Puis pour saluer <code>Koffi</code>.",
+        ok:['saluer("Koffi")'],
+        indices:["Même ligne, autre valeur.",'<code>saluer("Koffi")</code>'],
+        pourquoi:"Une définition, deux usages. Ajoute-en dix, ça ne change rien à l'outil." },
+    ],
+  },
+  {
+    titre: "Un outil qui calcule",
+    contexte: "return rend une valeur au programme. print ne fait que la montrer.",
+    lignes: [
+      { b:1, long:24, consigne:"Définis <code>moyenne</code> avec un réglage appelé <code>notes</code>.",
+        ok:["def moyenne(notes):"],
+        indices:["Comme l'exercice précédent, en changeant les noms.","<code>def moyenne(notes):</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:28, consigne:"<strong>Rends</strong> la somme divisée par le nombre de notes. Ne l'affiche pas — rends-la.",
+        ok:["return sum(notes) / len(notes)"],
+        indices:["Le mot pour rendre une valeur est <code>return</code>.",
+                 "<code>return sum(notes) / len(notes)</code>"],
+        pourquoi:"Avec <code>return</code>, le résultat revient au programme et reste utilisable." },
+      { t:"" },
+      { t:"trimestre = [12, 15, 8, 17]" },
+      { b:1, long:24, consigne:"Utilise ton outil sur <code>trimestre</code> et range le résultat dans <code>m</code>.",
+        ok:["m = moyenne(trimestre)"],
+        indices:["Le résultat d'un <code>return</code> se range comme n'importe quelle valeur.",
+                 "<code>m = moyenne(trimestre)</code>"],
+        pourquoi:"C'est impossible si la fonction faisait un <code>print</code> : il n'y aurait rien à ranger." },
+      { b:1, long:30, consigne:"Affiche <code>Moyenne : 13.0</code>, arrondie à 1 décimale.",
+        ok:['print(f"Moyenne : {round(m, 1)}")'],
+        indices:["Une f-string avec <code>round(m, 1)</code>.",
+                 '<code>print(f"Moyenne : {round(m, 1)}")</code>'],
+        pourquoi:"Ton outil est réutilisable : donne-lui n'importe quelle liste de notes, il fonctionne." },
+    ],
+  },
+  {
+    titre: "Des outils qui s'appellent entre eux",
+    contexte: "Le vrai saut : une fonction qui se sert d'une autre fonction.",
+    lignes: [
+      { t:"def moyenne(notes):" },
+      { t:"    return sum(notes) / len(notes)" },
+      { t:"" },
+      { b:1, long:20, consigne:"Définis <code>mention</code> avec un réglage <code>note</code>.",
+        ok:["def mention(note):"],
+        indices:["<code>def</code>, le nom, le réglage entre parenthèses, deux points.",
+                 "<code>def mention(note):</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:18, consigne:"Si la note est supérieure ou égale à 14…",
+        ok:["if note >= 14:"],
+        indices:["Un <code>if</code> classique, décalé dans la fonction.","<code>if note &gt;= 14:</code>"],
+        pourquoi:"" },
+      { b:1, indent:8, long:16, consigne:"Rends le texte <code>Bien</code>. <em>(deux niveaux de décalage)</em>",
+        ok:['return "Bien"'],
+        indices:["<code>return</code> suivi du texte entre guillemets.",'<code>return "Bien"</code>'],
+        pourquoi:"Une fonction peut avoir plusieurs <code>return</code> : le premier atteint arrête tout." },
+      { t:"    else:" },
+      { t:'        return "Peut mieux faire"' },
+      { t:"" },
+      { t:"notes = [15, 16, 13]" },
+      { b:1, long:26, consigne:"Calcule la moyenne de <code>notes</code> et range-la dans <code>m</code>.",
+        ok:["m = moyenne(notes)"],
+        indices:["Utilise l'outil défini tout en haut.","<code>m = moyenne(notes)</code>"],
+        pourquoi:"" },
+      { b:1, long:36, consigne:"Affiche <code>14.7 — Bien</code> : la moyenne arrondie à 1 décimale, puis la mention.",
+        ok:['print(f"{round(m, 1)} — {mention(m)}")','print(f"{round(m, 1)} - {mention(m)}")'],
+        indices:["Tu peux appeler <code>mention(m)</code> directement entre les accolades.",
+                 '<code>print(f"{round(m, 1)} — {mention(m)}")</code>'],
+        pourquoi:"Trois outils empilés dans une seule ligne lisible. C'est exactement comme ça qu'on construit un vrai programme." },
+    ],
+  },
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Avant / après ---------- */
+(function () {
+  const bloc = (x, c) => [
+    "crayon.penup()", "crayon.goto(" + x + ", 100)", "crayon.pendown()",
+    'crayon.color("black", "' + c + '")', "crayon.begin_fill()",
+    "crayon.forward(100)", "crayon.right(90)", "crayon.forward(200)", "crayon.right(90)",
+    "crayon.forward(100)", "crayon.right(90)", "crayon.forward(200)", "crayon.right(90)",
+    "crayon.end_fill()", "",
+  ];
+  const AVANT = ["import turtle", "", "crayon = turtle.Turtle()", ""]
+    .concat(bloc(-150, "orange"), bloc(-50, "white"), bloc(50, "green"), ["crayon.hideturtle()"]);
+
+  const APRES = [
+    "import turtle", "", "crayon = turtle.Turtle()", "",
+    "def bande(x, couleur):",
+    "    crayon.penup()",
+    "    crayon.goto(x, 100)",
+    "    crayon.pendown()",
+    '    crayon.color("black", couleur)',
+    "    crayon.begin_fill()",
+    "    for i in range(2):",
+    "        crayon.forward(100)",
+    "        crayon.right(90)",
+    "        crayon.forward(200)",
+    "        crayon.right(90)",
+    "    crayon.end_fill()",
+    "",
+    'for x, c in [(-150, "orange"), (-50, "white"), (50, "green")]:',
+    "    bande(x, c)",
+    "",
+    "crayon.hideturtle()",
+  ];
+
+  const eC = document.getElementById("ap-code");
+  function montre(v) {
+    const L = v === "avant" ? AVANT : APRES;
+    eC.innerHTML = L.map((l, i) =>
+      '<span class="l' + (v === "apres" && i >= 4 && i <= 18 ? " neuf" : "") + '">' +
+      '<span class="n">' + (i + 1) + "</span>" + (l || " ") + "</span>"
+    ).join("");
+    const utiles = L.filter(l => l.trim()).length;
+    const g = document.getElementById("ap-n");
+    g.textContent = utiles;
+    g.className = "gros " + (v === "avant" ? "rouge" : "vert");
+    document.getElementById("ap-lab").textContent = "lignes de code";
+    document.getElementById("ap-mot").innerHTML = v === "avant"
+      ? "Trois fois le même bloc, copié-collé. Pour changer la hauteur des bandes, il faut modifier <strong>six lignes</strong> — et en oublier une."
+      : "Le bloc n'est écrit <strong>qu'une seule fois</strong>. Pour changer la hauteur, tu modifies <strong>un seul chiffre</strong>. Et pour ajouter une quatrième bande, une seule ligne suffit.";
+    document.querySelectorAll(".bascule-gd button").forEach(b =>
+      b.classList.toggle("on", b.dataset.v === v));
+  }
+  document.querySelectorAll(".bascule-gd button").forEach(b =>
+    b.onclick = () => montre(b.dataset.v));
+  montre("avant");
+})();
+</script>
+
+</body>
+</html>

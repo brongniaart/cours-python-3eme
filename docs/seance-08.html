@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 8 — Que ça ne plante jamais</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .chasse-code { background: var(--code-bg); border-radius: 10px; padding: 14px 0;
+    font-family: var(--mono); font-size: 14px; line-height: 1.95; color: #cdd6e6; }
+  .chasse-code .l { padding: 2px 18px; display: block; white-space: pre; cursor: pointer;
+    border-left: 3px solid transparent; transition: background .12s; }
+  .chasse-code .l:hover { background: rgba(240,120,24,.14); border-left-color: var(--orange); }
+  .chasse-code .l .n { color: #5f6b83; display: inline-block; width: 24px; font-size: 12px; }
+  .chasse-code .l.bonne { background: rgba(14,138,85,.26); border-left-color: #0e8a55; }
+  .chasse-code .l.ratee { background: rgba(209,58,44,.2); border-left-color: #d13a2c; }
+  .chasse-code.fini .l { cursor: default; }
+  .chasse-code.fini .l:hover { background: transparent; border-left-color: transparent; }
+  .chasse-code.fini .l.bonne:hover { background: rgba(14,138,85,.26); }
+  .ia-bulle { background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    border-top-left-radius: 3px; padding: 14px 17px; margin-bottom: 14px;
+    font-size: 15px; box-shadow: var(--shadow); }
+  .ia-bulle .qui { font-size: 12px; font-weight: 750; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 5px; }
+  .chasse-nav { display: flex; gap: 9px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .chasse-score { margin-left: auto; font-size: 14px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 8</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+    <a href="#ia">🤖</a><a href="#e4">4</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 8 · 1 h 30</div>
+    <h1>Que ça ne plante jamais</h1>
+    <p class="lede">Tes programmes marchent — quand on s'en sert correctement.
+    Aujourd'hui, on les rend <strong>incassables</strong>. Et en deuxième partie,
+    on ouvre une intelligence artificielle. Pas pour lui demander du code :
+    <strong>pour chercher ses erreurs.</strong></p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Le hasard, pour de vrai</h2>
+      <div class="etape-meta">10 minutes · random</div></div></div>
+
+    <p>Tu as utilisé <code>random.randint</code> en séance 4 sans savoir ce qu'il y avait
+    derrière. Voilà la boîte à outils complète.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import random
+
+print(random.randint(1, 6))
+
+equipe = ["Awa", "Koffi", "Fatou", "Yann"]
+print(random.choice(equipe))
+
+random.shuffle(equipe)
+print(equipe)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <ul>
+      <li><code>random.randint(1, 6)</code> — un entier au hasard, bornes comprises</li>
+      <li><code>random.choice(liste)</code> — un élément au hasard dans une liste</li>
+      <li><code>random.shuffle(liste)</code> — mélange la liste sur place</li>
+    </ul>
+
+    <p><strong>Relance plusieurs fois.</strong> Le résultat change à chaque exécution :
+    c'est bien tout l'intérêt.</p>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Rattraper une erreur au vol</h2>
+      <div class="etape-meta">20 minutes · try / except</div></div></div>
+
+    <p>Ton convertisseur FCFA plante si l'utilisateur tape « bonjour » au lieu d'un montant.
+    Ce n'est pas la faute de l'utilisateur : <strong>c'est au programme de prévoir</strong>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+try:
+    age = int(input("Ton âge ? "))
+    print(f"Tu auras {age + 1} ans l'an prochain.")
+except ValueError:
+    print("Ce n'est pas un nombre.")
+
+print("Le programme continue.")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p><code>try</code> veut dire <strong>« essaie »</strong>. <code>except</code> veut dire
+    <strong>« et si ça rate, fais plutôt ça »</strong>. Le programme ne s'arrête plus :
+    il rattrape et il continue.</p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ L'essai à faire deux fois</div>
+      <p>Lance et tape <code>15</code>. Puis relance et tape <code>bonjour</code>.
+      Dans les deux cas, la dernière ligne s'affiche. <strong>Le programme survit.</strong></p>
+      <p>Puis enlève le <code>try/except</code> et retape <code>bonjour</code> :
+      tout s'arrête, la dernière ligne ne s'affiche jamais.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 La combinaison la plus utile de Python</div>
+      <p><code>try/except</code> dans une boucle <code>while</code> : le programme
+      <strong>redemande jusqu'à obtenir quelque chose de valable</strong>.</p>
+      <p style="font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:12px 15px;border-radius:8px;white-space:pre">while True:
+    try:
+        age = int(input("Ton âge ? "))
+        break
+    except ValueError:
+        print("Un nombre, s'il te plaît.")</p>
+      <p>Retiens ce motif. Tu le remettras dans tous tes programmes.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Chantier : rends ton jeu incassable</h2>
+      <div class="etape-meta">25 minutes</div></div></div>
+
+    <p>Reprends le <strong>nombre mystère</strong> de la séance 4 et blinde-le.
+    Quoi que tape le joueur, le programme ne doit jamais s'arrêter tout seul.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le cahier des charges</div>
+      <ol>
+        <li>Si le joueur tape du texte, redemander sans planter</li>
+        <li>Si le nombre est en dehors de 1–100, le dire et redemander</li>
+        <li>Compter les coups, et au 8<sup>e</sup> essai raté, donner la réponse</li>
+        <li>À la fin, proposer de rejouer</li>
+      </ol>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import random
+
+secret = random.randint(1, 100)
+coups = 0
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Fais-lui d'abord <strong>attaquer son propre programme</strong> : « essaie de le
+      faire planter, tu as trois minutes ». Il tapera du texte, des nombres négatifs,
+      des virgules, rien du tout. C'est ce qu'on appelle tester, et c'est un vrai métier.</p>
+      <p>Ensuite seulement, il répare ce qu'il a cassé.</p>
+    </div>
+  </section>
+
+  <!-- ============ PARTIE IA ============ -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Comment se faire avoir par une IA</h2>
+      <div class="etape-meta">30 minutes · la deuxième moitié de la séance</div></div></div>
+
+    <p>Une intelligence artificielle écrit du code en trois secondes. Le code a l'air
+    parfait : bien présenté, bien nommé, sûr de lui. <strong>Et il est parfois faux.</strong>
+    Pas de message d'erreur, pas de plantage — juste un résultat qui ne veut rien dire.</p>
+
+    <p>Voici trois programmes produits par une IA. <strong>Un seul bug dans chacun.</strong>
+    Clique sur la ligne que tu crois fausse.</p>
+
+    <div class="widget">
+      <div class="ia-bulle">
+        <div class="qui">🤖 L'IA a répondu</div>
+        <div id="c-intro"></div>
+      </div>
+      <div class="chasse-code" id="c-code"></div>
+      <div id="c-retour" style="margin-top:14px"></div>
+      <div class="chasse-nav">
+        <button class="btn-ghost" id="c-next" style="display:none">Programme suivant →</button>
+        <span class="chasse-score" id="c-score"></span>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Ce que tu dis après le troisième</div>
+      <p class="dialogue">« Ces trois programmes, tu les aurais copiés sans rien voir
+      il y a huit semaines. Aujourd'hui tu les as corrigés. »</p>
+      <p>Puis la question qui compte, et il faut le laisser répondre :
+      <em>« à ton avis, pour repérer ces erreurs, qu'est-ce qu'il fallait savoir faire ? »</em></p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce qu'il faut retenir de tout ça</div>
+      <p>Une IA ne comprend pas ton problème. Elle produit ce qui <em>ressemble</em>
+      à une bonne réponse — et elle le fait avec un aplomb total. Elle ne dit jamais
+      « je ne suis pas sûre ».</p>
+      <p><strong>Le seul moyen de repérer ses erreurs, c'est de savoir coder soi-même.</strong>
+      C'est exactement ce que tu as passé huit semaines à apprendre. Ce n'était pas
+      pour rien : c'était pour ça.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">📋 Tes règles, à écrire toi-même</div>
+      <p>Le jour où tu auras l'âge d'utiliser ces outils, voilà les quatre règles
+      que je te propose. Discutes-en, modifie-les, et garde-les :</p>
+      <ol>
+        <li><strong>Vingt minutes avant de demander.</strong> Et avant d'ouvrir l'IA,
+        j'écris : quel est mon problème exact, et qu'est-ce que j'ai déjà essayé.</li>
+        <li><strong>Je ne colle jamais du code que je ne peux pas expliquer</strong>
+        ligne par ligne. Si je ne peux pas, je l'efface.</li>
+        <li><strong>Je lui demande des questions, pas des solutions.</strong>
+        « Explique-moi pourquoi ça plante », pas « corrige-moi ça ».</li>
+        <li><strong>Je teste toujours son code moi-même.</strong> Avec des valeurs
+        normales, et surtout avec des valeurs absurdes.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, on te montre la réponse.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — et c'est important</div>
+      <p><strong>Choisis ton projet final</strong> et écris son cahier des charges
+      en français : ce que le programme fait, ce qu'il demande à l'utilisateur,
+      ce qu'il affiche. Une demi-page suffit.</p>
+      <p class="hint" style="margin-top:8px">Pas une ligne de code. Juste des phrases.
+      Savoir décrire précisément ce qu'on veut avant de coder, c'est la moitié du travail.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-07.html" style="color:var(--orange);font-weight:650">← Séance 7</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-09.html" style="color:var(--orange);font-weight:650">Séance 9 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Le dé à six faces",
+    contexte: "Trois outils de hasard, à connaître par cœur.",
+    lignes: [
+      { t:"import random" },
+      { t:"" },
+      { b:1, long:26, consigne:"Tire un nombre au hasard entre <code>1</code> et <code>6</code> et range-le dans <code>de</code>.",
+        ok:["de = random.randint(1, 6)"],
+        indices:["L'outil s'appelle <code>random.randint</code>, avec les deux bornes.",
+                 "<code>de = random.randint(1, 6)</code>"],
+        pourquoi:"Contrairement à <code>range</code>, les deux bornes sont incluses : 1 et 6 sont possibles." },
+      { b:1, long:28, consigne:"Affiche <code>Le dé fait 4</code>.",
+        ok:['print(f"Le dé fait {de}")','print(f"Le de fait {de}")'],
+        indices:["Une f-string avec la boîte <code>de</code>.",'<code>print(f"Le dé fait {de}")</code>'],
+        pourquoi:"" },
+      { t:"" },
+      { t:'equipe = ["Awa", "Koffi", "Fatou"]' },
+      { b:1, long:30, consigne:"Choisis un capitaine au hasard dans <code>equipe</code>.",
+        ok:["capitaine = random.choice(equipe)"],
+        indices:["L'outil qui pioche dans une liste s'appelle <code>random.choice</code>",
+                 "<code>capitaine = random.choice(equipe)</code>"],
+        pourquoi:"<code>choice</code> travaille sur une liste, <code>randint</code> sur des nombres. Deux outils, deux usages." },
+    ],
+  },
+  {
+    titre: "Attraper l'erreur",
+    contexte: "Essaie… et si ça rate, fais plutôt ça.",
+    lignes: [
+      { b:1, long:6, consigne:"Ouvre un bloc <strong>« essaie »</strong>. Un seul mot et deux points.",
+        ok:["try:"],
+        indices:["« Essaie » se dit <code>try</code>.","<code>try:</code>"],
+        pourquoi:"Tout ce qui est décalé en dessous sera tenté. Si ça plante, on saute au <code>except</code>." },
+      { b:1, indent:4, long:32, consigne:"Demande <code>Un nombre ?</code> et convertis-le en entier.",
+        ok:['n = int(input("Un nombre ? "))','n = int(input("Un nombre ?"))'],
+        indices:["C'est cette ligne qui peut planter si l'utilisateur tape du texte.",
+                 '<code>n = int(input("Un nombre ? "))</code>'],
+        pourquoi:"C'est précisément la ligne risquée qu'on met dans le <code>try</code>." },
+      { b:1, indent:4, long:28, consigne:"Affiche le double du nombre : <code>Le double fait 30</code>.",
+        ok:['print(f"Le double fait {n * 2}")'],
+        indices:["Une f-string avec un calcul entre accolades.",
+                 '<code>print(f"Le double fait {n * 2}")</code>'],
+        pourquoi:"" },
+      { b:1, long:20, consigne:"Ouvre le bloc de secours, pour l'erreur de type <code>ValueError</code>.",
+        ok:["except ValueError:"],
+        indices:["« Sauf si » se dit <code>except</code>, suivi du nom de l'erreur.",
+                 "<code>except ValueError:</code>"],
+        pourquoi:"<code>ValueError</code>, c'est exactement l'erreur que produit <code>int(\"bonjour\")</code>." },
+      { b:1, indent:4, long:30, consigne:"Affiche <code>Ce n'est pas un nombre.</code>",
+        ok:['print("Ce n\'est pas un nombre.")'],
+        indices:["Un print décalé dans le bloc de secours.",
+                 '<code>print("Ce n\'est pas un nombre.")</code>'],
+        pourquoi:"" },
+      { t:"" },
+      { t:'print("Le programme continue.")' },
+    ],
+  },
+  {
+    titre: "Redemander jusqu'à ce que ce soit bon",
+    contexte: "Le motif le plus utile de Python : try/except dans une boucle.",
+    lignes: [
+      { b:1, long:12, consigne:"Une boucle qui tourne pour toujours.",
+        ok:["while True:"],
+        indices:["Comme en séance 4.","<code>while True:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:6, consigne:"Ouvre le bloc « essaie ».",
+        ok:["try:"],
+        indices:["Un seul mot et deux points.","<code>try:</code>"],
+        pourquoi:"Deux niveaux : le <code>try</code> est dans le <code>while</code>." },
+      { b:1, indent:8, long:32, consigne:"Demande <code>Ton âge ?</code> et convertis en entier.",
+        ok:['age = int(input("Ton âge ? "))','age = int(input("Ton âge ?"))'],
+        indices:["Trois niveaux de décalage, mais c'est mis pour toi.",
+                 '<code>age = int(input("Ton âge ? "))</code>'],
+        pourquoi:"" },
+      { b:1, indent:8, long:8, consigne:"Si on arrive ici, c'est que la conversion a marché : <strong>sors de la boucle</strong>.",
+        ok:["break"],
+        indices:["Le mot qui arrête une boucle.","<code>break</code>"],
+        pourquoi:"Cette ligne n'est jamais atteinte si la ligne du dessus a planté. C'est toute l'astuce du motif." },
+      { b:1, indent:4, long:20, consigne:"Sinon, attrape l'erreur <code>ValueError</code>.",
+        ok:["except ValueError:"],
+        indices:["Aligné avec le <code>try</code>, pas avec le <code>break</code>.",
+                 "<code>except ValueError:</code>"],
+        pourquoi:"" },
+      { b:1, indent:8, long:32, consigne:"Affiche <code>Un nombre, s'il te plaît.</code>",
+        ok:['print("Un nombre, s\'il te plaît.")','print("Un nombre, s\'il te plait.")'],
+        indices:["Un print, dans le bloc de secours.",
+                 '<code>print("Un nombre, s\'il te plaît.")</code>'],
+        pourquoi:"Puis la boucle recommence : on redemande. Le programme ne plante jamais et n'abandonne jamais." },
+      { t:"" },
+      { t:'print(f"Merci ! Tu as {age} ans.")' },
+    ],
+  },
+  {
+    titre: "Le jeu incassable",
+    contexte: "Hasard, boucle, erreur rattrapée, bornes vérifiées. Tout ce que tu sais faire.",
+    lignes: [
+      { t:"import random" },
+      { t:"" },
+      { b:1, long:26, consigne:"Tire le nombre secret entre 1 et 100.",
+        ok:["secret = random.randint(1, 100)"],
+        indices:["Comme dans l'exercice 1, avec d'autres bornes.",
+                 "<code>secret = random.randint(1, 100)</code>"],
+        pourquoi:"" },
+      { t:"" },
+      { t:"while True:" },
+      { t:"    try:" },
+      { b:1, indent:8, long:34, consigne:"Demande <code>Ton nombre ?</code> et convertis en entier.",
+        ok:['essai = int(input("Ton nombre ? "))','essai = int(input("Ton nombre ?"))'],
+        indices:["La ligne risquée, dans le <code>try</code>.",
+                 '<code>essai = int(input("Ton nombre ? "))</code>'],
+        pourquoi:"" },
+      { t:"    except ValueError:" },
+      { t:'        print("Un nombre !")' },
+      { b:1, indent:8, long:10, consigne:"Après le message d'erreur, <strong>repars au début de la boucle</strong> sans exécuter la suite. Le mot est <code>continue</code>.",
+        ok:["continue"],
+        indices:["Un seul mot, comme <code>break</code> mais qui relance au lieu d'arrêter.",
+                 "<code>continue</code>"],
+        pourquoi:"<code>break</code> sort de la boucle, <code>continue</code> saute au tour suivant. Deux outils différents." },
+      { t:"" },
+      { b:1, indent:4, long:34, consigne:"Si l'essai est en dehors de 1 à 100 — c'est-à-dire <strong>plus petit que 1 ou plus grand que 100</strong>…",
+        ok:["if essai < 1 or essai > 100:"],
+        indices:["Deux conditions reliées par <code>or</code>.",
+                 "<code>if essai &lt; 1 or essai &gt; 100:</code>"],
+        pourquoi:"Le programme est correct sans cette ligne, mais un bon programme aide l'utilisateur au lieu de le laisser deviner." },
+      { t:'        print("Entre 1 et 100 !")' },
+      { t:"        continue" },
+      { t:"" },
+      { t:"    if essai == secret:" },
+      { b:1, indent:8, long:24, consigne:"Annonce la victoire, puis sors de la boucle. Écris d'abord le message <code>Trouvé !</code>",
+        ok:['print("Trouvé !")','print("Trouve !")'],
+        indices:["Un simple print.",'<code>print("Trouvé !")</code>'],
+        pourquoi:"" },
+      { b:1, indent:8, long:8, consigne:"Et maintenant, sors de la boucle pour de bon.",
+        ok:["break"],
+        indices:["Le mot qui arrête la boucle.","<code>break</code>"],
+        pourquoi:"Ton programme résiste maintenant à n'importe quelle saisie. Tu peux le donner à quelqu'un sans surveiller par-dessus son épaule." },
+    ],
+  },
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Chasse aux bugs de l'IA ---------- */
+(function () {
+  const CAS = [
+    {
+      intro: 'Écris-moi une fonction qui calcule la moyenne d\'une liste de notes.',
+      lignes: [
+        "def moyenne(notes):",
+        "    total = 0",
+        "    for note in notes:",
+        "        total = total + note",
+        "    return total / len(notes)",
+        "",
+        "print(moyenne([12, 15, 8]))",
+      ],
+      bug: 4,
+      explique: "Le calcul est juste… tant que la liste n'est pas vide. Avec " +
+        "<code>moyenne([])</code>, <code>len(notes)</code> vaut 0 et Python plante sur " +
+        "<code>ZeroDivisionError</code>. L'IA n'a pas pensé au cas limite — elle ne " +
+        "pense jamais aux cas limites qu'on ne lui a pas décrits.",
+      reparation: "if len(notes) == 0:\n        return 0",
+    },
+    {
+      intro: 'Fais-moi un convertisseur qui transforme des francs CFA en euros. Le taux est 655,957.',
+      lignes: [
+        "TAUX = 655.957",
+        "",
+        'fcfa = float(input("Montant en FCFA : "))',
+        "euros = fcfa * TAUX",
+        "",
+        'print(f"{fcfa} FCFA = {round(euros, 2)} euros")',
+      ],
+      bug: 3,
+      explique: "Elle multiplie au lieu de diviser. 1 000 FCFA deviennent " +
+        "655 957 euros. Aucun message d'erreur : le programme tourne parfaitement " +
+        "et affiche une absurdité. <strong>Ce sont les pires bugs, ceux qui ne crient pas.</strong>",
+      reparation: "euros = fcfa / TAUX",
+    },
+    {
+      intro: 'Calcule-moi le total des notes de cette liste, puis la moyenne.',
+      lignes: [
+        "notes = [12, 15, 8, 17]",
+        "total = 0",
+        "",
+        "for i in range(1, len(notes)):",
+        "    total = total + notes[i]",
+        "",
+        "print(total / len(notes))",
+      ],
+      bug: 3,
+      explique: "Le <code>range(1, ...)</code> démarre à la case 1 : " +
+        "<strong>la première note est oubliée</strong>. Le résultat est faux de peu — " +
+        "10 au lieu de 13 — donc parfaitement crédible. C'est le genre d'erreur " +
+        "qu'on ne remarque jamais si on ne vérifie pas soi-même.",
+      reparation: "for i in range(len(notes)):",
+    },
+  ];
+
+  let k = 0, trouves = 0, fini = false;
+  const eI = document.getElementById("c-intro"),
+        eC = document.getElementById("c-code"),
+        eR = document.getElementById("c-retour"),
+        eN = document.getElementById("c-next"),
+        eS = document.getElementById("c-score");
+
+  function rendu(clique) {
+    const c = CAS[k];
+    eI.innerHTML = "« " + c.intro + " »<br><span style='color:var(--ink-soft);font-size:13.5px'>" +
+      "Voici un programme qui fait exactement ça :</span>";
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = c.lignes.map((l, i) => {
+      let cls = "l";
+      if (fini && i === c.bug) cls += " bonne";
+      else if (clique === i && i !== c.bug) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" + (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+
+    if (!fini) {
+      eC.querySelectorAll(".l").forEach(el => el.onclick = () => choisir(+el.dataset.i));
+    }
+    eS.textContent = "Programme " + (k + 1) + " sur " + CAS.length +
+      (trouves ? " · " + trouves + " bug" + (trouves > 1 ? "s" : "") + " trouvé" + (trouves > 1 ? "s" : "") : "");
+  }
+
+  function choisir(i) {
+    const c = CAS[k];
+    if (i === c.bug) {
+      fini = true; trouves++;
+      eR.innerHTML = '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé — ligne ' +
+        (c.bug + 1) + "</div><p>" + c.explique + "</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:10px 13px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        c.reparation + "</p></div>";
+      eN.style.display = k < CAS.length - 1 ? "" : "none";
+      if (k === CAS.length - 1) {
+        eR.innerHTML += '<div class="box reel" style="margin-top:14px"><div class="box-title">🎯 Trois sur trois</div>' +
+          "<p>Trois programmes qui avaient l'air impeccables. Trois erreurs que tu as trouvées " +
+          "<strong>parce que tu sais lire du code</strong>. Il y a huit semaines, tu les aurais copiés " +
+          "sans rien voir.</p></div>";
+      }
+    } else {
+      eR.innerHTML = '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Relis le programme en te demandant : " +
+        "<em>si je l'exécute avec des valeurs bizarres, qu'est-ce qui se passe ?</em></p></div>";
+    }
+    rendu(i);
+  }
+
+  eN.onclick = () => { k++; fini = false; eR.innerHTML = ""; eN.style.display = "none"; rendu(); };
+  rendu();
+})();
+</script>
+
+</body>
+</html>
