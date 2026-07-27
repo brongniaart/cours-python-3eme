@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Séance 7 — Retenir et sauvegarder</title>
+<title>Séance 7 - Retenir et sauvegarder</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -34,7 +34,7 @@
   <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
 
 <div class="topbar"><div class="topbar-inner">
-  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 7</a>
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 7</a>
   <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
     <a href="#e3">3</a><a href="#e4">4</a><a href="#exos">✍</a></nav>
 </div></div>
@@ -152,10 +152,10 @@ print(menu.get("pizza", "pas au menu"))
     </div>
 
     <ul>
-      <li><code>menu["poisson"] = 2500</code> — si la clé n'existe pas, elle est créée ;
+      <li><code>menu["poisson"] = 2500</code> - si la clé n'existe pas, elle est créée ;
       si elle existe, la valeur est remplacée. <strong>Une seule écriture pour les deux.</strong></li>
-      <li><code>for plat in menu:</code> — parcourt les <strong>clés</strong>, pas les valeurs</li>
-      <li><code>menu.get("pizza", "pas au menu")</code> — cherche sans planter,
+      <li><code>for plat in menu:</code> - parcourt les <strong>clés</strong>, pas les valeurs</li>
+      <li><code>menu.get("pizza", "pas au menu")</code> - cherche sans planter,
       et rend une valeur de secours</li>
     </ul>
 
@@ -210,9 +210,9 @@ print(contenu)
     <strong>fermer</strong>. Et trois modes :</p>
 
     <ul>
-      <li><code>"w"</code> — écrire en <strong>écrasant</strong> tout ce qu'il y avait</li>
-      <li><code>"a"</code> — <strong>ajouter</strong> à la fin, sans rien effacer</li>
-      <li><code>"r"</code> — lire seulement</li>
+      <li><code>"w"</code> - écrire en <strong>écrasant</strong> tout ce qu'il y avait</li>
+      <li><code>"a"</code> - <strong>ajouter</strong> à la fin, sans rien effacer</li>
+      <li><code>"r"</code> - lire seulement</li>
     </ul>
 
     <div class="box bug">
@@ -279,7 +279,7 @@ total = 0
       <p>C'est le programme le plus long qu'il ait écrit. <strong>Fais-lui découper
       avant de coder</strong> : « écris d'abord les cinq étapes en français, en commentaires.
       Ensuite tu remplis. »</p>
-      <p>Cette habitude — découper puis remplir — est ce qui lui servira le plus
+      <p>Cette habitude - découper puis remplir - est ce qui lui servira le plus
       pour son projet final. Insiste dessus aujourd'hui.</p>
       <p>Pas d'aide avant 20 minutes. Question si blocage : <em>« quelle étape de
       ta liste est en train de coincer ? »</em></p>
@@ -303,7 +303,7 @@ total = 0
       <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
 
     <div class="box prof">
-      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <div class="box-title">🏠 Mission maison - 15 minutes, pas plus</div>
       <p>Un <strong>répertoire téléphonique</strong> : un dictionnaire nom → numéro.
       Le programme demande un nom et affiche le numéro, ou <code>Contact inconnu</code>
       si le nom n'y est pas.</p>
@@ -357,7 +357,7 @@ window.EXERCICES = [
       { b:1, long:16, consigne:"Affiche <strong>combien</strong> il y a de plats au menu.",
         ok:["print(len(prix))"],
         indices:["Le même outil que pour les listes.","<code>print(len(prix))</code>"],
-        pourquoi:"3 — l'ajout a bien été pris en compte." },
+        pourquoi:"3 - l'ajout a bien été pris en compte." },
     ],
   },
   {
@@ -424,7 +424,7 @@ window.EXERCICES = [
       { t:'menu = {"attiéké": 1500, "alloco": 1000, "bissap": 500}' },
       { t:"total = 0" },
       { t:"" },
-      { b:1, long:18, consigne:"Une boucle qui tourne <strong>2 fois</strong> — deux plats commandés.",
+      { b:1, long:18, consigne:"Une boucle qui tourne <strong>2 fois</strong> - deux plats commandés.",
         ok:["for i in range(2):"],
         indices:["<code>range(2)</code> donne deux tours.","<code>for i in range(2):</code>"],
         pourquoi:"" },
@@ -452,7 +452,7 @@ window.EXERCICES = [
                  '<code>print(f"Total : {total} FCFA")</code>'],
         pourquoi:"" },
       { t:"" },
-      { b:1, long:34, consigne:"Ouvre <code>ventes.txt</code> en mode <strong>ajout</strong> — pour ne pas effacer les ventes précédentes.",
+      { b:1, long:34, consigne:"Ouvre <code>ventes.txt</code> en mode <strong>ajout</strong> - pour ne pas effacer les ventes précédentes.",
         ok:['fichier = open("ventes.txt", "a")'],
         indices:["Le mode ajout, c'est <code>\"a\"</code> et pas <code>\"w\"</code>",
                  '<code>fichier = open("ventes.txt", "a")</code>'],
@@ -507,7 +507,7 @@ window.EXERCICES = [
           "Python distingue « " + proche + " » et « " + c + " ». " +
           "Pour un dictionnaire, ce sont deux clés totalement différentes."
         : "🎯 <strong>Cette clé n'existe pas, et le programme plante.</strong> " +
-          "Pour éviter ça, on utilise <code>menu.get(\"" + c + "\", \"pas au menu\")</code> — " +
+          "Pour éviter ça, on utilise <code>menu.get(\"" + c + "\", \"pas au menu\")</code> - " +
           "qui rend une valeur de secours au lieu de tout arrêter.";
       rendu(null);
     }

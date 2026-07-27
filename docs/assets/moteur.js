@@ -1,5 +1,5 @@
 /* ============================================================
-   Moteur du cours — Python dans le navigateur (Pyodide)
+   Moteur du cours - Python dans le navigateur (Pyodide)
    + une implémentation maison du module `turtle` qui dessine
      sur un <canvas> et rejoue le tracé en animation.
    ============================================================ */

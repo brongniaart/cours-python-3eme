@@ -1,5 +1,5 @@
 /* ============================================================
-   Cours Python 3ème — feuille de style
+   Cours Python 3ème - feuille de style
    ============================================================ */
 
 :root {
@@ -248,7 +248,7 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
 }
 
 /* ============================================================
-   Exerciseur guidé — remplir le code ligne par ligne
+   Exerciseur guidé - remplir le code ligne par ligne
    ============================================================ */
 .exo-zone {
   background: #fff; border: 2px solid var(--orange);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Séance 8 — Que ça ne plante jamais</title>
+<title>Séance 8 - Que ça ne plante jamais</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -34,7 +34,7 @@
   <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
 
 <div class="topbar"><div class="topbar-inner">
-  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 8</a>
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 8</a>
   <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
     <a href="#ia">🤖</a><a href="#e4">4</a><a href="#exos">✍</a></nav>
 </div></div>
@@ -44,7 +44,7 @@
   <div class="hero">
     <div class="eyebrow">Séance 8 · 1 h 30</div>
     <h1>Que ça ne plante jamais</h1>
-    <p class="lede">Tes programmes marchent — quand on s'en sert correctement.
+    <p class="lede">Tes programmes marchent - quand on s'en sert correctement.
     Aujourd'hui, on les rend <strong>incassables</strong>. Et en deuxième partie,
     on ouvre une intelligence artificielle. Pas pour lui demander du code :
     <strong>pour chercher ses erreurs.</strong></p>
@@ -78,9 +78,9 @@ print(equipe)
     </div>
 
     <ul>
-      <li><code>random.randint(1, 6)</code> — un entier au hasard, bornes comprises</li>
-      <li><code>random.choice(liste)</code> — un élément au hasard dans une liste</li>
-      <li><code>random.shuffle(liste)</code> — mélange la liste sur place</li>
+      <li><code>random.randint(1, 6)</code> - un entier au hasard, bornes comprises</li>
+      <li><code>random.choice(liste)</code> - un élément au hasard dans une liste</li>
+      <li><code>random.shuffle(liste)</code> - mélange la liste sur place</li>
     </ul>
 
     <p><strong>Relance plusieurs fois.</strong> Le résultat change à chaque exécution :
@@ -151,7 +151,7 @@ print("Le programme continue.")
       <div class="box-title">🎯 Le cahier des charges</div>
       <ol>
         <li>Si le joueur tape du texte, redemander sans planter</li>
-        <li>Si le nombre est en dehors de 1–100, le dire et redemander</li>
+        <li>Si le nombre est en dehors de 1-100, le dire et redemander</li>
         <li>Compter les coups, et au 8<sup>e</sup> essai raté, donner la réponse</li>
         <li>À la fin, proposer de rejouer</li>
       </ol>
@@ -183,7 +183,7 @@ coups = 0
 
     <p>Une intelligence artificielle écrit du code en trois secondes. Le code a l'air
     parfait : bien présenté, bien nommé, sûr de lui. <strong>Et il est parfois faux.</strong>
-    Pas de message d'erreur, pas de plantage — juste un résultat qui ne veut rien dire.</p>
+    Pas de message d'erreur, pas de plantage - juste un résultat qui ne veut rien dire.</p>
 
     <p>Voici trois programmes produits par une IA. <strong>Un seul bug dans chacun.</strong>
     Clique sur la ligne que tu crois fausse.</p>
@@ -212,7 +212,7 @@ coups = 0
     <div class="box reel">
       <div class="box-title">🌍 Ce qu'il faut retenir de tout ça</div>
       <p>Une IA ne comprend pas ton problème. Elle produit ce qui <em>ressemble</em>
-      à une bonne réponse — et elle le fait avec un aplomb total. Elle ne dit jamais
+      à une bonne réponse - et elle le fait avec un aplomb total. Elle ne dit jamais
       « je ne suis pas sûre ».</p>
       <p><strong>Le seul moyen de repérer ses erreurs, c'est de savoir coder soi-même.</strong>
       C'est exactement ce que tu as passé huit semaines à apprendre. Ce n'était pas
@@ -253,7 +253,7 @@ coups = 0
       <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
 
     <div class="box prof">
-      <div class="box-title">🏠 Mission maison — et c'est important</div>
+      <div class="box-title">🏠 Mission maison - et c'est important</div>
       <p><strong>Choisis ton projet final</strong> et écris son cahier des charges
       en français : ce que le programme fait, ce qu'il demande à l'utilisateur,
       ce qu'il affiche. Une demi-page suffit.</p>
@@ -395,7 +395,7 @@ window.EXERCICES = [
                  "<code>continue</code>"],
         pourquoi:"<code>break</code> sort de la boucle, <code>continue</code> saute au tour suivant. Deux outils différents." },
       { t:"" },
-      { b:1, indent:4, long:34, consigne:"Si l'essai est en dehors de 1 à 100 — c'est-à-dire <strong>plus petit que 1 ou plus grand que 100</strong>…",
+      { b:1, indent:4, long:34, consigne:"Si l'essai est en dehors de 1 à 100 - c'est-à-dire <strong>plus petit que 1 ou plus grand que 100</strong>…",
         ok:["if essai < 1 or essai > 100:"],
         indices:["Deux conditions reliées par <code>or</code>.",
                  "<code>if essai &lt; 1 or essai &gt; 100:</code>"],
@@ -436,7 +436,7 @@ window.EXERCICES = [
       bug: 4,
       explique: "Le calcul est juste… tant que la liste n'est pas vide. Avec " +
         "<code>moyenne([])</code>, <code>len(notes)</code> vaut 0 et Python plante sur " +
-        "<code>ZeroDivisionError</code>. L'IA n'a pas pensé au cas limite — elle ne " +
+        "<code>ZeroDivisionError</code>. L'IA n'a pas pensé au cas limite - elle ne " +
         "pense jamais aux cas limites qu'on ne lui a pas décrits.",
       reparation: "if len(notes) == 0:\n        return 0",
     },
@@ -469,8 +469,8 @@ window.EXERCICES = [
       ],
       bug: 3,
       explique: "Le <code>range(1, ...)</code> démarre à la case 1 : " +
-        "<strong>la première note est oubliée</strong>. Le résultat est faux de peu — " +
-        "10 au lieu de 13 — donc parfaitement crédible. C'est le genre d'erreur " +
+        "<strong>la première note est oubliée</strong>. Le résultat est faux de peu - " +
+        "10 au lieu de 13 - donc parfaitement crédible. C'est le genre d'erreur " +
         "qu'on ne remarque jamais si on ne vérifie pas soi-même.",
       reparation: "for i in range(len(notes)):",
     },
@@ -507,7 +507,7 @@ window.EXERCICES = [
     const c = CAS[k];
     if (i === c.bug) {
       fini = true; trouves++;
-      eR.innerHTML = '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé — ligne ' +
+      eR.innerHTML = '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne ' +
         (c.bug + 1) + "</div><p>" + c.explique + "</p>" +
         "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
         "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:10px 13px;border-radius:7px;white-space:pre;margin-top:6px'>" +

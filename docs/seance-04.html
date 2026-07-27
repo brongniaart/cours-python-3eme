@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Séance 4 — Répéter sans se fatiguer</title>
+<title>Séance 4 - Répéter sans se fatiguer</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -33,7 +33,7 @@
   <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
 
 <div class="topbar"><div class="topbar-inner">
-  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 4</a>
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 4</a>
   <nav class="steps"><a href="#e1">1</a><a href="#tour">👁</a><a href="#e2">2</a>
     <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a></nav>
 </div></div>
@@ -80,7 +80,7 @@ print("Terminé.")
     et <strong>de quoi avancer</strong> (<code>compteur = compteur + 1</code>).</p>
 
     <div class="box bug">
-      <div class="box-title">🐛 La boucle infinie — à faire exprès une fois</div>
+      <div class="box-title">🐛 La boucle infinie - à faire exprès une fois</div>
       <p>Enlève la ligne <code>compteur = compteur + 1</code> et lance.
       Le compteur reste à 1, la condition reste vraie, et Python affiche 1 pour toujours.</p>
       <p><strong>Ça arrive à tout le monde, y compris aux professionnels.</strong>
@@ -110,8 +110,8 @@ print("Terminé.")
         </div>
         <div>
           <div class="tour-etat">
-            <div class="ligne"><span>compteur</span><span class="v" id="t-c">—</span></div>
-            <div class="ligne"><span>compteur &lt;= 5 ?</span><span class="v" id="t-test">—</span></div>
+            <div class="ligne"><span>compteur</span><span class="v" id="t-c">-</span></div>
+            <div class="ligne"><span>compteur &lt;= 5 ?</span><span class="v" id="t-test">-</span></div>
             <div class="ligne"><span>tours effectués</span><span class="v" id="t-n">0</span></div>
           </div>
           <div class="tour-sortie" id="t-out"></div>
@@ -176,8 +176,8 @@ depart = -150
 for couleur in couleurs:
     dessine_bande(depart, couleur)
     depart = depart + 100</p>
-      <p><strong>Trente lignes deviennent six.</strong> Il manque encore une pièce —
-      la fonction <code>dessine_bande</code> — et c'est le sujet de la prochaine séance.</p>
+      <p><strong>Trente lignes deviennent six.</strong> Il manque encore une pièce -
+      la fonction <code>dessine_bande</code> - et c'est le sujet de la prochaine séance.</p>
     </div>
   </section>
 
@@ -252,7 +252,7 @@ coups = 0
     <div class="box prof">
       <div class="box-title">🎙️ Consigne prof</div>
       <p>Tu n'interviens pas avant <strong>20 minutes</strong>. Il va oublier
-      <code>int()</code> sur la proposition — laisse-le retrouver l'erreur de la séance 2 seul.</p>
+      <code>int()</code> sur la proposition - laisse-le retrouver l'erreur de la séance 2 seul.</p>
       <p>S'il finit vite : « fais en sorte qu'après 7 essais ratés, le jeu donne
       la réponse et s'arrête. »</p>
     </div>
@@ -299,7 +299,7 @@ coups = 0
       <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
 
     <div class="box prof">
-      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <div class="box-title">🏠 Mission maison - 15 minutes, pas plus</div>
       <p>Le <strong>compte à rebours de la rentrée</strong> : le programme affiche
       les nombres de 30 jusqu'à 1, puis <code>C'est la rentrée !</code></p>
       <p class="hint" style="margin-top:8px">Indice : <code>range(30, 0, -1)</code>
@@ -413,13 +413,13 @@ window.EXERCICES = [
         pourquoi:"Contrairement à <code>range</code>, <code>randint</code> inclut bien les deux bornes : 1 et 100 sont possibles." },
       { t:"coups = 0" },
       { t:"" },
-      { b:1, long:12, consigne:"Une boucle qui tourne pour toujours — on sortira avec un <code>break</code>.",
+      { b:1, long:12, consigne:"Une boucle qui tourne pour toujours - on sortira avec un <code>break</code>.",
         ok:["while True:"],
         indices:["Comme dans l'exercice précédent.","<code>while True:</code>"],
         pourquoi:"" },
       { b:1, indent:4, long:34, consigne:"Demande <code>Ton nombre ?</code> et convertis la réponse en entier.",
         ok:['essai = int(input("Ton nombre ? "))','essai = int(input("Ton nombre ?"))'],
-        indices:["N'oublie pas le <code>int()</code> — sinon tu ne pourras pas comparer.",
+        indices:["N'oublie pas le <code>int()</code> - sinon tu ne pourras pas comparer.",
                  '<code>essai = int(input("Ton nombre ? "))</code>'],
         pourquoi:"Sans <code>int()</code>, tu comparerais du texte à un nombre. Le piège de la séance 2." },
       { t:"    coups = coups + 1" },
@@ -443,7 +443,7 @@ window.EXERCICES = [
       { b:1, indent:8, long:8, consigne:"Et sors de la boucle : la partie est finie.",
         ok:["break"],
         indices:["Le mot qui arrête la boucle.","<code>break</code>"],
-        pourquoi:"Ton premier jeu est terminé. Fais-y jouer quelqu'un — c'est là que tu verras qu'il marche vraiment." },
+        pourquoi:"Ton premier jeu est terminé. Fais-y jouer quelqu'un - c'est là que tu verras qu'il marche vraiment." },
     ],
   },
 ];
@@ -479,9 +479,9 @@ window.EXERCICES = [
     eC.innerHTML = LIGNES.map((l, k) =>
       '<span class="l' + (k === p.l ? " on" : "") + '">' + (l || " ").replace(/</g, "&lt;") + "</span>"
     ).join("");
-    document.getElementById("t-c").textContent = p.c === null ? "—" : p.c;
+    document.getElementById("t-c").textContent = p.c === null ? "-" : p.c;
     const t = document.getElementById("t-test");
-    t.textContent = p.t === null ? "—" : p.t ? "vrai" : "faux";
+    t.textContent = p.t === null ? "-" : p.t ? "vrai" : "faux";
     t.className = "v " + (p.t === null ? "" : p.t ? "oui" : "non");
     document.getElementById("t-n").textContent = Math.min(5, Math.floor(Math.max(0, i - 1) / 3));
     eO.textContent = PAS.slice(0, i + 1).filter(x => x.out).map(x => x.out).join("\n");

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Séance 2 — Compter juste</title>
+<title>Séance 2 - Compter juste</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -43,7 +43,7 @@
 
 <div class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 2</a>
+    <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 2</a>
     <nav class="steps">
       <a href="#e1">1</a><a href="#bal">👁</a><a href="#e2">2</a>
       <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a>
@@ -57,7 +57,7 @@
     <div class="eyebrow">Séance 2 · 1 h 30</div>
     <h1>Compter juste</h1>
     <p class="lede">La dernière fois, tu as demandé : « et si je fais <code>age + 1</code> ? »
-    Réponse aujourd'hui — et elle explique pourquoi <strong>« 2 » + « 2 » ne fait pas 4</strong>.
+    Réponse aujourd'hui - et elle explique pourquoi <strong>« 2 » + « 2 » ne fait pas 4</strong>.
     À la fin, tu auras un convertisseur FCFA ↔ euro qui marche vraiment.</p>
   </div>
 
@@ -194,9 +194,9 @@ print(nombre + 1)
     </div>
 
     <ul>
-      <li><code>&lt;class 'int'&gt;</code> — un entier (<em>integer</em>)</li>
-      <li><code>&lt;class 'str'&gt;</code> — du texte (<em>string</em>)</li>
-      <li><code>&lt;class 'float'&gt;</code> — un nombre à virgule</li>
+      <li><code>&lt;class 'int'&gt;</code> - un entier (<em>integer</em>)</li>
+      <li><code>&lt;class 'str'&gt;</code> - du texte (<em>string</em>)</li>
+      <li><code>&lt;class 'float'&gt;</code> - un nombre à virgule</li>
     </ul>
 
     <div class="box bug">
@@ -255,7 +255,7 @@ print(age + 1)
       <p><strong>Convertir tout de suite</strong>, c'est la bonne habitude :</p>
       <p style="font-family:var(--mono);font-size:14px">age = int(input("Ton âge ? "))</p>
       <p>Ou convertir au moment du calcul : <code>int(age) + 1</code>.
-      La première est meilleure — après cette ligne, tu es sûr d'avoir un nombre partout.</p>
+      La première est meilleure - après cette ligne, tu es sûr d'avoir un nombre partout.</p>
     </div>
   </section>
 
@@ -294,7 +294,7 @@ TAUX = 655.957
       <div class="box-title">🌍 Pourquoi le taux ne bouge jamais</div>
       <p>Le franc CFA est <strong>arrimé à l'euro à un taux fixe depuis 1999</strong> :
       655,957 FCFA pour 1 euro, et ce chiffre n'a pas changé depuis.
-      C'est très rare — le dollar, le naira ou le cedi bougent tous les jours.
+      C'est très rare - le dollar, le naira ou le cedi bougent tous les jours.
       C'est aussi pour ça qu'on peut écrire ce taux en dur dans le programme :
       pour n'importe quelle autre monnaie, il faudrait aller le chercher sur internet
       à chaque lancement.</p>
@@ -304,7 +304,7 @@ TAUX = 655.957
       <div class="box-title">🎙️ Consigne prof</div>
       <p>Tu n'interviens pas avant <strong>20 minutes</strong>. S'il bloque, une seule question :
       <em>« qu'est-ce que <code>input</code> te rend, du texte ou un nombre ? »</em></p>
-      <p>S'il finit vite : « fais l'inverse — des euros vers les FCFA. »</p>
+      <p>S'il finit vite : « fais l'inverse - des euros vers les FCFA. »</p>
     </div>
   </section>
 
@@ -370,7 +370,7 @@ TAUX = 655.957
     </div>
 
     <div class="box prof">
-      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <div class="box-title">🏠 Mission maison - 15 minutes, pas plus</div>
       <p>Un <strong>calculateur de recharge téléphone</strong> : il demande combien
       de FCFA tu recharges et le prix d'une minute d'appel, puis affiche combien
       de minutes tu peux parler.</p>
@@ -402,7 +402,7 @@ window.EXERCICES = [
     contexte: "Trois affichages pour bien voir la différence. Lis les résultats avant de passer à la suite.",
     lignes: [
       { b: 1, long: 12,
-        consigne: "Affiche le résultat de <code>7 + 3</code> — en vrais nombres, sans guillemets.",
+        consigne: "Affiche le résultat de <code>7 + 3</code> - en vrais nombres, sans guillemets.",
         ok: ["print(7 + 3)"],
         indices: ["Pas de guillemets : on veut que Python calcule.",
                   "<code>print(7 + 3)</code>"],
@@ -418,7 +418,7 @@ window.EXERCICES = [
         ok: ["print(type(7))"],
         indices: ["L'instruction qui donne le type s'appelle <code>type</code>.",
                   "Elle se glisse à l'intérieur du print : <code>print(type(7))</code>"],
-        pourquoi: "<code>&lt;class 'int'&gt;</code> — un entier. Si tu avais mis \"7\", tu aurais eu <code>str</code>." },
+        pourquoi: "<code>&lt;class 'int'&gt;</code> - un entier. Si tu avais mis \"7\", tu aurais eu <code>str</code>." },
     ],
   },
 
@@ -430,11 +430,11 @@ window.EXERCICES = [
         consigne: "Demande <code>Ton âge ?</code> et range la réponse dans <code>age</code>, <strong>en la convertissant tout de suite en nombre entier</strong>.",
         ok: ['age = int(input("Ton âge ? "))', 'age = int(input("Ton âge ?"))'],
         indices: ["Il faut envelopper le <code>input(...)</code> dans un <code>int(...)</code>.",
-                  '<code>age = int(input("Ton âge ? "))</code> — compte bien les parenthèses fermantes : il en faut deux.'],
+                  '<code>age = int(input("Ton âge ? "))</code> - compte bien les parenthèses fermantes : il en faut deux.'],
         pourquoi: "Convertir dès la saisie, c'est la bonne habitude : après cette ligne, tu es sûr d'avoir un nombre." },
       { t: "" },
       { b: 1, long: 30,
-        consigne: "Affiche <code>L'année prochaine tu auras 16 ans.</code> — en faisant calculer Python.",
+        consigne: "Affiche <code>L'année prochaine tu auras 16 ans.</code> - en faisant calculer Python.",
         ok: ['print(f"L\'année prochaine tu auras {age + 1} ans.")',
              'print(f"L\'annee prochaine tu auras {age + 1} ans.")'],
         indices: ["Une f-string, et un calcul entre les accolades.",
@@ -508,12 +508,12 @@ window.EXERCICES = [
                   "<code>monnaie = donne - total</code>"],
         pourquoi: "Si le résultat est négatif, c'est que le client n'a pas donné assez. On apprendra à le détecter dès la prochaine séance." },
       { b: 1, long: 32,
-        consigne: "Affiche <code>Total : 3000 FCFA — à rendre : 2000 FCFA</code>.",
-        ok: ['print(f"Total : {total} FCFA — à rendre : {monnaie} FCFA")',
+        consigne: "Affiche <code>Total : 3000 FCFA - à rendre : 2000 FCFA</code>.",
+        ok: ['print(f"Total : {total} FCFA - à rendre : {monnaie} FCFA")',
              'print(f"Total : {total} FCFA - à rendre : {monnaie} FCFA")',
              'print(f"Total : {total} FCFA - a rendre : {monnaie} FCFA")'],
         indices: ["Une f-string avec deux accolades.",
-                  '<code>print(f"Total : {total} FCFA — à rendre : {monnaie} FCFA")</code>'],
+                  '<code>print(f"Total : {total} FCFA - à rendre : {monnaie} FCFA")</code>'],
         pourquoi: "Ce programme est utilisable tel quel derrière une caisse. C'est ton premier vrai outil." },
     ],
   },

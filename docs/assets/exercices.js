@@ -80,7 +80,7 @@ class Exerciseur {
         (ex.contexte ? '<p class="exo-contexte">' + ex.contexte + "</p>" : "") +
         '<div class="exo-code">' + lignes + "</div>" +
         '<div class="exo-consigne">' +
-          '<div class="lab">Ligne ' + (actif + 1) + " — à écrire</div>" +
+          '<div class="lab">Ligne ' + (actif + 1) + " - à écrire</div>" +
           (l.consigne || "") +
         "</div>" +
         '<div class="exo-bar">' +
@@ -159,7 +159,7 @@ class Exerciseur {
     }
 
     const ind = (l.indices || [])[this.essais - 1];
-    this.retour("nok", "❌ Pas encore — essai " + this.essais + " sur 3",
+    this.retour("nok", "❌ Pas encore - essai " + this.essais + " sur 3",
       "<p style='margin-bottom:0'>" + (ind || "Relis bien la consigne, mot par mot.") + "</p>");
   }
 
@@ -224,7 +224,7 @@ class Exerciseur {
     let mot;
     if (pct >= 90) mot = "Tu n'as presque rien lâché. Passe au défi bonus de la séance.";
     else if (pct >= 70) mot = "Solide. Les lignes que tu as ratées, réécris-les une fois de mémoire.";
-    else if (pct >= 40) mot = "C'est normal, c'est nouveau. Refais la série demain sans regarder — tu verras la différence.";
+    else if (pct >= 40) mot = "C'est normal, c'est nouveau. Refais la série demain sans regarder - tu verras la différence.";
     else mot = "Ne t'inquiète pas. Refais la série depuis le début : la deuxième fois, tout change.";
 
     this.el.innerHTML =

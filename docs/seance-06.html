@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Séance 6 — Fabriquer tes propres outils</title>
+<title>Séance 6 - Fabriquer tes propres outils</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -32,7 +32,7 @@
   <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
 
 <div class="topbar"><div class="topbar-inner">
-  <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 6</a>
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 6</a>
   <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#viz">👁</a>
     <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a></nav>
 </div></div>
@@ -97,7 +97,7 @@ print("--- après ---")
 
     <p>Un outil qui fait toujours exactement la même chose sert rarement.
     Ce qui est entre les parenthèses du <code>def</code>, ce sont les
-    <strong>réglages</strong> — comme le 100 dans <code>forward(100)</code>
+    <strong>réglages</strong> - comme le 100 dans <code>forward(100)</code>
     à la toute première séance.</p>
 
     <div class="duo">
@@ -203,7 +203,7 @@ print(round((m1 + m2) / 2, 1))
       <p><code>print</code> <strong>montre</strong> à l'utilisateur. La valeur part
       à l'écran et disparaît, on ne peut plus rien en faire.</p>
       <p><code>return</code> <strong>rend</strong> au programme. On peut la ranger dans
-      une boîte, la recalculer, la comparer — comme <code>m1 + m2</code> ci-dessus.</p>
+      une boîte, la recalculer, la comparer - comme <code>m1 + m2</code> ci-dessus.</p>
       <p><strong>Règle simple :</strong> un outil qui calcule doit <code>return</code>.
       Un outil qui affiche peut <code>print</code>. Mélanger les deux, c'est se limiter.</p>
     </div>
@@ -213,7 +213,7 @@ print(round((m1 + m2) / 2, 1))
       <p>Remplace <code>return</code> par <code>print</code> dans la fonction,
       puis essaie de calculer <code>(m1 + m2) / 2</code>.
       <br><code>TypeError: unsupported operand type(s) for +: 'NoneType' and 'NoneType'</code></p>
-      <p>Une fonction sans <code>return</code> ne rend rien du tout — littéralement
+      <p>Une fonction sans <code>return</code> ne rend rien du tout - littéralement
       « rien », qui s'appelle <code>None</code> en Python. Et on ne peut pas additionner
       deux riens.</p>
     </div>
@@ -264,9 +264,9 @@ def bande(x, couleur):
 
     <p>Écris trois outils que tu pourras réutiliser dans ton projet final :</p>
     <ul>
-      <li><code>moyenne(notes)</code> — rend la moyenne d'une liste</li>
-      <li><code>mention(note)</code> — rend « Très bien », « Bien »… (reprends la séance 3)</li>
-      <li><code>bulletin(nom, notes)</code> — affiche un bulletin complet en utilisant les deux autres</li>
+      <li><code>moyenne(notes)</code> - rend la moyenne d'une liste</li>
+      <li><code>mention(note)</code> - rend « Très bien », « Bien »… (reprends la séance 3)</li>
+      <li><code>bulletin(nom, notes)</code> - affiche un bulletin complet en utilisant les deux autres</li>
     </ul>
 
     <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
@@ -300,7 +300,7 @@ def bande(x, couleur):
       <h2>Avant de partir</h2><div class="etape-meta">5 minutes</div></div></div>
 
     <div class="box prof">
-      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <div class="box-title">🏠 Mission maison - 15 minutes, pas plus</div>
       <p>Reprends ton <strong>convertisseur FCFA de la séance 2</strong> et transforme-le
       en deux fonctions : <code>vers_euros(fcfa)</code> et <code>vers_fcfa(euros)</code>,
       qui <strong>rendent</strong> le résultat au lieu de l'afficher.</p>
@@ -341,7 +341,7 @@ window.EXERCICES = [
       { b:1, long:12, consigne:"Maintenant <strong>sers-toi</strong> de ton outil. Attention aux parenthèses.",
         ok:["saluer()"],
         indices:["Le nom, suivi des parenthèses.","<code>saluer()</code>"],
-        pourquoi:"Sans les parenthèses, rien ne se passerait — et sans message d'erreur." },
+        pourquoi:"Sans les parenthèses, rien ne se passerait - et sans message d'erreur." },
       { b:1, long:12, consigne:"Sers-t'en une deuxième fois.",
         ok:["saluer()"],
         indices:["Exactement la même ligne.","<code>saluer()</code>"],
@@ -356,7 +356,7 @@ window.EXERCICES = [
         ok:["def saluer(prenom):"],
         indices:["Le nom du réglage se met entre les parenthèses.","<code>def saluer(prenom):</code>"],
         pourquoi:"<code>prenom</code> n'existe pas encore : c'est une case qui attend une valeur." },
-      { b:1, indent:4, long:26, consigne:"Affiche <code>Bonjour Awa !</code> — en utilisant le réglage, pas un nom écrit en dur.",
+      { b:1, indent:4, long:26, consigne:"Affiche <code>Bonjour Awa !</code> - en utilisant le réglage, pas un nom écrit en dur.",
         ok:['print(f"Bonjour {prenom} !")'],
         indices:["Une f-string avec <code>{prenom}</code> entre accolades.",
                  '<code>print(f"Bonjour {prenom} !")</code>'],
@@ -380,7 +380,7 @@ window.EXERCICES = [
         ok:["def moyenne(notes):"],
         indices:["Comme l'exercice précédent, en changeant les noms.","<code>def moyenne(notes):</code>"],
         pourquoi:"" },
-      { b:1, indent:4, long:28, consigne:"<strong>Rends</strong> la somme divisée par le nombre de notes. Ne l'affiche pas — rends-la.",
+      { b:1, indent:4, long:28, consigne:"<strong>Rends</strong> la somme divisée par le nombre de notes. Ne l'affiche pas - rends-la.",
         ok:["return sum(notes) / len(notes)"],
         indices:["Le mot pour rendre une valeur est <code>return</code>.",
                  "<code>return sum(notes) / len(notes)</code>"],
@@ -427,10 +427,10 @@ window.EXERCICES = [
         ok:["m = moyenne(notes)"],
         indices:["Utilise l'outil défini tout en haut.","<code>m = moyenne(notes)</code>"],
         pourquoi:"" },
-      { b:1, long:36, consigne:"Affiche <code>14.7 — Bien</code> : la moyenne arrondie à 1 décimale, puis la mention.",
-        ok:['print(f"{round(m, 1)} — {mention(m)}")','print(f"{round(m, 1)} - {mention(m)}")'],
+      { b:1, long:36, consigne:"Affiche <code>14.7 - Bien</code> : la moyenne arrondie à 1 décimale, puis la mention.",
+        ok:['print(f"{round(m, 1)} - {mention(m)}")','print(f"{round(m, 1)} - {mention(m)}")'],
         indices:["Tu peux appeler <code>mention(m)</code> directement entre les accolades.",
-                 '<code>print(f"{round(m, 1)} — {mention(m)}")</code>'],
+                 '<code>print(f"{round(m, 1)} - {mention(m)}")</code>'],
         pourquoi:"Trois outils empilés dans une seule ligne lisible. C'est exactement comme ça qu'on construit un vrai programme." },
     ],
   },
@@ -485,7 +485,7 @@ window.EXERCICES = [
     g.className = "gros " + (v === "avant" ? "rouge" : "vert");
     document.getElementById("ap-lab").textContent = "lignes de code";
     document.getElementById("ap-mot").innerHTML = v === "avant"
-      ? "Trois fois le même bloc, copié-collé. Pour changer la hauteur des bandes, il faut modifier <strong>six lignes</strong> — et en oublier une."
+      ? "Trois fois le même bloc, copié-collé. Pour changer la hauteur des bandes, il faut modifier <strong>six lignes</strong> - et en oublier une."
       : "Le bloc n'est écrit <strong>qu'une seule fois</strong>. Pour changer la hauteur, tu modifies <strong>un seul chiffre</strong>. Et pour ajouter une quatrième bande, une seule ligne suffit.";
     document.querySelectorAll(".bascule-gd button").forEach(b =>
       b.classList.toggle("on", b.dataset.v === v));
