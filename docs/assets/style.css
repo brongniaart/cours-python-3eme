@@ -246,3 +246,74 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
   background: var(--bg-soft); border: 1px solid var(--line);
   padding: 3px 10px; border-radius: 20px; color: var(--ink-soft);
 }
+
+/* ============================================================
+   Exerciseur guidé — remplir le code ligne par ligne
+   ============================================================ */
+.exo-zone {
+  background: #fff; border: 2px solid var(--orange);
+  border-radius: var(--radius); padding: 28px; margin: 26px 0;
+  box-shadow: var(--shadow);
+}
+.exo-top { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.exo-pastilles { display: flex; gap: 7px; margin-left: auto; }
+.exo-pastilles i {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--line); display: block;
+}
+.exo-pastilles i.actif { background: var(--orange); transform: scale(1.35); }
+.exo-pastilles i.fini  { background: var(--green); }
+.exo-num {
+  font-size: 12px; font-weight: 750; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--orange);
+}
+.exo-titre { font-size: 21px; font-weight: 700; letter-spacing: -.01em; width: 100%; margin: 0; }
+.exo-contexte { color: var(--ink-soft); margin: 4px 0 18px; }
+
+.exo-code {
+  background: var(--code-bg); border-radius: 10px; padding: 16px 0;
+  font-family: var(--mono); font-size: 14.5px; line-height: 2.05; color: #cdd6e6;
+}
+.exo-l { padding: 0 18px; display: flex; align-items: center; gap: 0; white-space: pre; max-width: 100%; }
+.exo-l .n { color: #5f6b83; width: 26px; flex: none; font-size: 12.5px; }
+.exo-l.futur { opacity: .3; }
+.exo-l.faite .txt { color: #a9e5b8; }
+.exo-l .masque { color: #4c5468; letter-spacing: 1px; }
+
+.exo-saisie {
+  font-family: var(--mono); font-size: 14.5px;
+  background: #2b3346; color: #ffd9b3; border: 2px solid var(--orange);
+  border-radius: 7px; padding: 5px 11px; min-width: 0; max-width: 100%; flex: 1 1 auto;
+  outline: none; caret-color: var(--orange);
+}
+.exo-saisie.faux  { border-color: var(--red);   animation: secousse .35s; }
+.exo-saisie.juste { border-color: var(--green); color: #a9e5b8; }
+@keyframes secousse {
+  0%,100% { transform: translateX(0) } 25% { transform: translateX(-6px) }
+  75% { transform: translateX(6px) }
+}
+
+.exo-consigne {
+  background: var(--orange-soft); border: 1px solid #f7d8b8;
+  border-radius: 9px; padding: 13px 16px; margin: 16px 0 12px;
+}
+.exo-consigne .lab {
+  font-size: 12px; font-weight: 750; letter-spacing: .06em;
+  text-transform: uppercase; color: #b8560c; margin-bottom: 3px;
+}
+.exo-bar { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+.exo-essais { font-size: 13.5px; color: var(--ink-soft); margin-left: auto; }
+
+.exo-retour { border-radius: 9px; padding: 13px 16px; margin-top: 14px; font-size: 15.5px; }
+.exo-retour.ok  { background: var(--green-soft); border: 1px solid #bfe3d3; }
+.exo-retour.nok { background: var(--red-soft);   border: 1px solid #f5c9c4; }
+.exo-retour.sol { background: var(--blue-soft);  border: 1px solid #c5d8f5; }
+.exo-retour .t { font-weight: 700; margin-bottom: 4px; }
+.exo-retour.ok .t  { color: var(--green); }
+.exo-retour.nok .t { color: var(--red); }
+.exo-retour.sol .t { color: var(--blue); }
+.exo-retour code { background: rgba(255,255,255,.7); }
+
+.exo-fin { text-align: center; padding: 20px 0 6px; }
+.exo-fin .score { font-size: 30px; font-weight: 750; letter-spacing: -.02em; }
+.exo-fin .mot { color: var(--ink-soft); margin-top: 6px; }

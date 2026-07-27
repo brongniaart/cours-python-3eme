@@ -486,6 +486,26 @@ crayon.speed(0)
     </div>
   </section>
 
+  <!-- ============================ EXERCICES ============================ -->
+  <section class="etape" id="exos">
+    <div class="etape-head">
+      <div class="etape-num">✍️</div>
+      <div>
+        <h2>Les 4 exercices de fin de séance</h2>
+        <div class="etape-meta">15 minutes · une ligne à la fois</div>
+      </div>
+    </div>
+
+    <p>Tu écris le programme <strong>ligne par ligne</strong>. À chaque ligne, on te dit quoi faire,
+    tu écris, et tu vérifies. Si tu te trompes, tu as un indice.
+    <strong>Au bout de trois essais, on te montre la réponse</strong> — et là tu la relis à voix haute
+    avant de continuer.</p>
+
+    <p class="hint">Ce n'est pas noté. Se tromper ici, c'est exactement ce à quoi ça sert.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
   <!-- ============================ FIN ============================ -->
   <section class="etape">
     <div class="etape-head">
@@ -519,6 +539,159 @@ crayon.speed(0)
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="assets/moteur.js"></script>
+
+<script>
+/* ============================================================
+   Les 4 exercices guidés de la séance 0
+   ============================================================ */
+window.EXERCICES = [
+
+  {
+    titre: "Le programme qui se présente",
+    contexte: "Trois lignes, trois phrases affichées. On commence doucement.",
+    lignes: [
+      { b: 1, long: 18,
+        consigne: "Affiche le mot <code>Bonjour</code>. Attention aux guillemets autour du texte, et aux parenthèses.",
+        ok: ['print("Bonjour")'],
+        indices: ["L'instruction pour afficher s'appelle <code>print</code>.",
+                  'Le texte va entre guillemets, à l\'intérieur des parenthèses : <code>print("...")</code>'],
+        pourquoi: "<code>print</code> veut dire « affiche ». Ce qui est entre guillemets est recopié tel quel." },
+      { b: 1, long: 22,
+        consigne: "Sur la ligne suivante, affiche <code>Je suis en 3eme</code>.",
+        ok: ['print("Je suis en 3eme")'],
+        indices: ["Exactement comme la ligne du dessus, en changeant le texte.",
+                  'La forme est toujours : <code>print("ton texte")</code>'],
+        pourquoi: "Deux instructions à la suite : Python exécute la première, puis la deuxième." },
+      { b: 1, long: 26,
+        consigne: "Affiche <code>Et je code en Python</code>.",
+        ok: ['print("Et je code en Python")'],
+        indices: ["Toujours la même forme.",
+                  'Recopie la structure : <code>print("Et je code en Python")</code>'],
+        pourquoi: "Trois lignes, trois affichages, dans l'ordre où tu les as écrits. Toujours de haut en bas." },
+    ],
+  },
+
+  {
+    titre: "Le triangle",
+    contexte: "Un triangle, c'est trois côtés et trois virages. Le drapeau était fait de rectangles — là, on change de forme.",
+    tortue: true,
+    lignes: [
+      { t: "import turtle" },
+      { t: "" },
+      { t: "crayon = turtle.Turtle()" },
+      { t: "" },
+      { b: 1, long: 20,
+        consigne: "Fais avancer le crayon de <code>120</code>.",
+        ok: ["crayon.forward(120)", "crayon.fd(120)"],
+        indices: ["L'instruction pour avancer s'appelle <code>forward</code>.",
+                  "Il faut dire à qui tu parles : <code>crayon.forward(...)</code>"],
+        pourquoi: "<code>forward</code> veut dire « avance ». Le nombre entre parenthèses, c'est la distance." },
+      { b: 1, long: 18,
+        consigne: "Fais tourner le crayon de <code>120</code> degrés vers la <strong>gauche</strong>.",
+        ok: ["crayon.left(120)", "crayon.lt(120)"],
+        indices: ["Vers la gauche, ça s'écrit <code>left</code>.",
+                  "Même forme que <code>forward</code> : <code>crayon.left(...)</code>"],
+        pourquoi: "120 × 3 = 360. Trois virages de 120° et la tortue a fait un tour complet — donc la figure se referme." },
+      { t: "crayon.forward(120)" },
+      { t: "crayon.left(120)" },
+      { b: 1, long: 20,
+        consigne: "Le troisième et dernier côté du triangle.",
+        ok: ["crayon.forward(120)", "crayon.fd(120)"],
+        indices: ["C'est exactement la même ligne que le premier côté.",
+                  "<code>crayon.forward(120)</code>"],
+        pourquoi: "Trois côtés identiques, trois angles identiques : c'est un triangle équilatéral." },
+      { t: "crayon.hideturtle()" },
+    ],
+  },
+
+  {
+    titre: "Le rectangle bien placé",
+    contexte: "Se déplacer sans laisser de trace, puis dessiner. C'est ce qu'il fallait faire entre chaque bande du drapeau.",
+    tortue: true,
+    lignes: [
+      { t: "import turtle" },
+      { t: "" },
+      { t: "crayon = turtle.Turtle()" },
+      { t: "" },
+      { b: 1, long: 15,
+        consigne: "Lève le crayon, pour ne rien dessiner pendant le déplacement.",
+        ok: ["crayon.penup()", "crayon.pu()", "crayon.up()"],
+        indices: ["« Lever le crayon » se dit <code>penup</code>.",
+                  "Les parenthèses sont vides, mais elles sont obligatoires : <code>crayon.penup()</code>"],
+        pourquoi: "Sans ça, un trait parasite traverserait ton dessin pendant le déplacement." },
+      { b: 1, long: 22,
+        consigne: "Va directement au point <code>(-100, 50)</code>.",
+        ok: ["crayon.goto(-100, 50)"],
+        indices: ["L'instruction pour aller quelque part s'appelle <code>goto</code>.",
+                  "Deux nombres séparés par une virgule : <code>crayon.goto(-100, 50)</code>"],
+        pourquoi: "Le centre de l'écran est le point (0, 0). −100 veut dire 100 vers la gauche, 50 veut dire 50 vers le haut." },
+      { b: 1, long: 17,
+        consigne: "Repose le crayon : à partir d'ici, on dessine.",
+        ok: ["crayon.pendown()", "crayon.pd()", "crayon.down()"],
+        indices: ["C'est le contraire de <code>penup</code>.",
+                  "<code>crayon.pendown()</code>"],
+        pourquoi: "Levé pour se déplacer, posé pour dessiner. C'est tout le secret du drapeau." },
+      { t: "" },
+      { t: "crayon.forward(200)" },
+      { t: "crayon.right(90)" },
+      { t: "crayon.forward(100)" },
+      { t: "crayon.right(90)" },
+      { t: "crayon.forward(200)" },
+      { t: "crayon.right(90)" },
+      { t: "crayon.forward(100)" },
+      { t: "crayon.hideturtle()" },
+    ],
+  },
+
+  {
+    titre: "Une bande verte remplie",
+    contexte: "La dernière étape du drapeau : la couleur. Trois lignes à trouver, et tu sais refaire une bande entière.",
+    tortue: true,
+    lignes: [
+      { t: "import turtle" },
+      { t: "" },
+      { t: "crayon = turtle.Turtle()" },
+      { t: "crayon.speed(6)" },
+      { t: "" },
+      { t: "crayon.penup()" },
+      { t: "crayon.goto(-50, 100)" },
+      { t: "crayon.pendown()" },
+      { t: "" },
+      { b: 1, long: 26,
+        consigne: "Règle les couleurs : contour <strong>noir</strong>, intérieur <strong>vert</strong>.",
+        ok: ['crayon.color("black", "green")'],
+        indices: ["L'instruction s'appelle <code>color</code>, et elle prend deux couleurs.",
+                  'Le contour d\'abord, le remplissage ensuite : <code>crayon.color("black", "green")</code>'],
+        pourquoi: "Le contour sert à voir la forme même quand le remplissage se confond avec le fond — comme la bande blanche du drapeau." },
+      { b: 1, long: 19,
+        consigne: "Annonce à la machine que tu <strong>commences</strong> à remplir.",
+        ok: ["crayon.begin_fill()"],
+        indices: ["« Commencer » se dit <code>begin</code>, « remplir » se dit <code>fill</code>.",
+                  "Les deux mots sont reliés par un tiret bas : <code>crayon.begin_fill()</code>"],
+        pourquoi: "À partir de cette ligne, Python retient le chemin parcouru pour pouvoir le colorier à la fin." },
+      { t: "" },
+      { t: "crayon.forward(100)" },
+      { t: "crayon.right(90)" },
+      { t: "crayon.forward(200)" },
+      { t: "crayon.right(90)" },
+      { t: "crayon.forward(100)" },
+      { t: "crayon.right(90)" },
+      { t: "crayon.forward(200)" },
+      { t: "crayon.right(90)" },
+      { t: "" },
+      { b: 1, long: 17,
+        consigne: "Annonce que tu as <strong>fini</strong> de remplir. Sans cette ligne, rien ne se colorie.",
+        ok: ["crayon.end_fill()"],
+        indices: ["Si « commencer » c'était <code>begin</code>, « finir » c'est…",
+                  "<code>crayon.end_fill()</code>"],
+        pourquoi: "Une instruction qu'on ouvre, on la ferme. C'est vrai pour le remplissage, et ce sera vrai pour beaucoup d'autres choses." },
+      { t: "crayon.hideturtle()" },
+    ],
+  },
+
+];
+</script>
+<script src="assets/exercices.js"></script>
 
 <script>
 /* ---------- Widget « comprendre l'angle » ---------- */

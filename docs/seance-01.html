@@ -371,6 +371,25 @@ print(f"Depuis, plus personne n'ose parler de {lieu}.")
     </div>
   </section>
 
+  <!-- ============================ EXERCICES ============================ -->
+  <section class="etape" id="exos">
+    <div class="etape-head">
+      <div class="etape-num">✍️</div>
+      <div>
+        <h2>Les 4 exercices de fin de séance</h2>
+        <div class="etape-meta">15 minutes · une ligne à la fois</div>
+      </div>
+    </div>
+
+    <p>Même principe que la dernière fois : une ligne, une consigne, tu écris, tu vérifies.
+    Un indice si tu te trompes. <strong>Au bout de trois essais, on te montre la réponse</strong>,
+    et tu la relis à voix haute avant de continuer.</p>
+
+    <p class="hint">Ce n'est pas noté. Se tromper ici, c'est exactement ce à quoi ça sert.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
   <!-- ============================ FIN ============================ -->
   <section class="etape">
     <div class="etape-head">
@@ -415,6 +434,131 @@ print(f"Depuis, plus personne n'ose parler de {lieu}.")
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="assets/moteur.js"></script>
+
+<script>
+/* ============================================================
+   Les 4 exercices guidés de la séance 1
+   ============================================================ */
+window.EXERCICES = [
+
+  {
+    titre: "Trois boîtes",
+    contexte: "Créer des boîtes, puis les ouvrir. Attention au piège des guillemets.",
+    lignes: [
+      { b: 1, long: 16,
+        consigne: "Crée une boîte appelée <code>prenom</code> et range le texte <code>Awa</code> dedans.",
+        ok: ['prenom = "Awa"'],
+        indices: ["Le nom de la boîte, puis <code>=</code>, puis ce qu'on met dedans.",
+                  'Du texte, donc des guillemets : <code>prenom = "Awa"</code>'],
+        pourquoi: "Le <code>=</code> ne veut pas dire « égal ». Il veut dire « range ça dans la boîte »." },
+      { b: 1, long: 10,
+        consigne: "Crée une boîte <code>age</code> contenant le nombre <code>15</code>.",
+        ok: ["age = 15"],
+        indices: ["Même forme que la ligne du dessus.",
+                  "Un nombre ne prend <strong>pas</strong> de guillemets : <code>age = 15</code>"],
+        pourquoi: "Pas de guillemets autour de 15 : c'est un vrai nombre, pas du texte. On pourra calculer avec." },
+      { t: "" },
+      { b: 1, long: 14,
+        consigne: "Affiche <strong>ce qu'il y a dans</strong> la boîte <code>prenom</code>. Réfléchis bien aux guillemets.",
+        ok: ["print(prenom)"],
+        indices: ["Avec des guillemets, Python afficherait le mot « prenom » lui-même.",
+                  "Sans guillemets, il ouvre la boîte : <code>print(prenom)</code>"],
+        pourquoi: "Sans guillemets = le nom d'une boîte. Avec guillemets = du texte. C'est la distinction la plus importante de la séance." },
+      { t: "print(age)" },
+    ],
+  },
+
+  {
+    titre: "Le programme qui demande",
+    contexte: "Un programme qui ne pose jamais de question fait toujours la même chose. Là, il va s'adapter.",
+    lignes: [
+      { b: 1, long: 28,
+        consigne: "Pose la question <code>Tu habites où ?</code> et range la réponse dans une boîte appelée <code>ville</code>.",
+        ok: ['ville = input("Tu habites où ? ")', 'ville = input("Tu habites où ?")'],
+        indices: ["L'instruction qui pose une question s'appelle <code>input</code>.",
+                  'La réponse doit être rangée quelque part : <code>ville = input("...")</code>'],
+        pourquoi: "Sans le <code>ville =</code> devant, la question serait posée… et la réponse perdue dans le vide." },
+      { t: "" },
+      { b: 1, long: 26,
+        consigne: "Affiche <code>Bienvenue à</code> suivi de la ville. Utilise une virgule pour coller les deux morceaux.",
+        ok: ['print("Bienvenue à", ville)'],
+        indices: ["Le texte entre guillemets, puis une virgule, puis le nom de la boîte.",
+                  '<code>print("Bienvenue à", ville)</code>'],
+        pourquoi: "La virgule colle les morceaux à la suite, et Python met l'espace tout seul entre les deux." },
+      { b: 1, long: 30,
+        consigne: "Affiche ensuite <code>Bon courage pour tes devoirs</code>.",
+        ok: ['print("Bon courage pour tes devoirs")'],
+        indices: ["Du texte simple, sans boîte cette fois.",
+                  '<code>print("Bon courage pour tes devoirs")</code>'],
+        pourquoi: "Ton programme mélange maintenant du texte fixe et des réponses variables. C'est le principe de toute application." },
+    ],
+  },
+
+  {
+    titre: "Des phrases propres",
+    contexte: "Les f-strings : glisser directement le contenu d'une boîte au milieu d'une phrase.",
+    lignes: [
+      { t: 'prenom = "Awa"' },
+      { t: "age = 15" },
+      { t: 'sport = "basket"' },
+      { t: "" },
+      { b: 1, long: 28,
+        consigne: "Affiche la phrase <code>Awa a 15 ans.</code> en utilisant les deux boîtes — pas en réécrivant les valeurs à la main.",
+        ok: ['print(f"{prenom} a {age} ans.")'],
+        indices: ["Il faut un <code>f</code> juste avant le guillemet ouvrant.",
+                  'Le nom des boîtes va entre accolades : <code>print(f"{prenom} a {age} ans.")</code>'],
+        pourquoi: "Le <code>f</code> autorise les accolades. Sans lui, Python afficherait les accolades en toutes lettres — sans message d'erreur." },
+      { b: 1, long: 30,
+        consigne: "Affiche <code>Elle joue au basket.</code> en utilisant la boîte <code>sport</code>.",
+        ok: ['print(f"Elle joue au {sport}.")'],
+        indices: ["Même forme, une seule accolade cette fois.",
+                  '<code>print(f"Elle joue au {sport}.")</code>'],
+        pourquoi: "Le texte fixe et le contenu des boîtes se mélangent dans la même phrase." },
+      { b: 1, long: 34,
+        consigne: "Affiche <code>Dans 5 ans elle aura 20 ans.</code> — mais <strong>fais calculer Python</strong>, n'écris pas 20 toi-même.",
+        ok: ['print(f"Dans 5 ans elle aura {age + 5} ans.")'],
+        indices: ["Entre les accolades, tu as le droit de calculer.",
+                  '<code>print(f"Dans 5 ans elle aura {age + 5} ans.")</code>'],
+        pourquoi: "Si tu changes <code>age</code> en haut du programme, cette ligne se met à jour toute seule. Écrire 20 à la main, non." },
+    ],
+  },
+
+  {
+    titre: "La fiche de joueur",
+    contexte: "Tout ce que tu as vu aujourd'hui, dans un seul programme. Celui-là, tu peux le montrer.",
+    lignes: [
+      { b: 1, long: 26,
+        consigne: "Demande <code>Nom du joueur ?</code> et range la réponse dans <code>nom</code>.",
+        ok: ['nom = input("Nom du joueur ? ")', 'nom = input("Nom du joueur ?")'],
+        indices: ["Comme dans l'exercice 2 : une boîte, un <code>=</code>, un <code>input</code>.",
+                  '<code>nom = input("Nom du joueur ? ")</code>'],
+        pourquoi: "On range d'abord toutes les réponses, on affiche ensuite. C'est plus clair à relire." },
+      { b: 1, long: 22,
+        consigne: "Demande <code>Son club ?</code> et range la réponse dans <code>club</code>.",
+        ok: ['club = input("Son club ? ")', 'club = input("Son club ?")'],
+        indices: ["Exactement la même forme que la ligne du dessus.",
+                  '<code>club = input("Son club ? ")</code>'],
+        pourquoi: "Deux boîtes remplies par l'utilisateur. Le programme s'adapte à qui l'utilise." },
+      { t: "" },
+      { t: 'print("--- FICHE JOUEUR ---")' },
+      { b: 1, long: 28,
+        consigne: "Affiche <code>Joueur : </code> suivi du nom, avec une f-string.",
+        ok: ['print(f"Joueur : {nom}")'],
+        indices: ["N'oublie pas le <code>f</code> devant le guillemet.",
+                  '<code>print(f"Joueur : {nom}")</code>'],
+        pourquoi: "Une f-string te laisse placer exactement les espaces que tu veux — impossible avec les virgules." },
+      { b: 1, long: 28,
+        consigne: "Affiche <code>Club   : </code> suivi du club. Garde les mêmes espaces pour que ce soit aligné.",
+        ok: ['print(f"Club   : {club}")'],
+        indices: ["Trois espaces après <code>Club</code>, pour aligner avec la ligne du dessus.",
+                  '<code>print(f"Club   : {club}")</code>'],
+        pourquoi: "Un programme dont l'affichage est aligné, ça se lit mieux. Le soin compte aussi en programmation." },
+    ],
+  },
+
+];
+</script>
+<script src="assets/exercices.js"></script>
 
 <script>
 /* ---------- Visualiseur de mémoire pas à pas ---------- */
