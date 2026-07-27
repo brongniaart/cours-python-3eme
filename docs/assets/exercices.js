@@ -195,9 +195,7 @@ class Exerciseur {
           '<h3 class="exo-titre">' + esc(ex.titre) + " ✅</h3>" +
         "</div>" +
         '<p class="exo-contexte">Ton programme est complet. Lance-le pour voir le résultat.</p>' +
-        '<div data-cellule' + (ex.tortue ? ' data-tortue="oui"' : "") + ' id="exo-run">' +
-          '<script type="text/python">' + esc(code) + "</script>" +
-        "</div>" +
+        '<div data-cellule' + (ex.tortue ? ' data-tortue="oui"' : "") + ' id="exo-run"></div>' +
         '<div class="exo-bar" style="margin-top:18px">' +
           '<button class="btn-run" id="exo-next">' +
             (dernier ? "Voir mon résultat →" : "Exercice suivant →") +
@@ -205,7 +203,15 @@ class Exerciseur {
         "</div>" +
       "</div>";
 
-    new Cellule(this.el.querySelector("#exo-run"));
+    // le code est déposé en texte brut : dans un <script>, les entités HTML
+    // ne sont pas décodées, donc pas d'innerHTML ici sous peine de voir
+    // « >= » se transformer en « &gt;= »
+    const hote = this.el.querySelector("#exo-run");
+    const src = document.createElement("script");
+    src.type = "text/python";
+    src.textContent = code;
+    hote.appendChild(src);
+    new Cellule(hote);
     this.el.querySelector("#exo-next").onclick = () => {
       if (dernier) { this.bilan(); }
       else { this.iExo++; this.iTrou = 0; this.essais = 0; this.reponses = {}; this.rendre(); }

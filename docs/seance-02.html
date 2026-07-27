@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 2 — Compter juste</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .bal { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: end; }
+  @media (max-width: 700px) { .bal { grid-template-columns: 1fr; } }
+  .bal .plus { font-size: 30px; font-weight: 700; color: var(--ink-soft); padding-bottom: 8px; text-align: center; }
+  .bal-champ { display: flex; flex-direction: column; gap: 8px; }
+  .bal-champ input {
+    font-family: var(--mono); font-size: 16px; padding: 10px 13px;
+    border: 2px solid var(--line); border-radius: 9px; outline: none; width: 100%;
+  }
+  .bal-champ input:focus { border-color: var(--orange); }
+  .bascule { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .bascule button {
+    flex: 1; border: 0; border-radius: 0; background: #fff; color: var(--ink-soft);
+    font-size: 13px; padding: 7px 4px; font-weight: 650;
+  }
+  .bascule button.on { background: var(--orange); color: #fff; }
+  .bal-res {
+    margin-top: 22px; border-radius: 10px; padding: 16px 19px;
+    font-family: var(--mono); font-size: 15px; line-height: 1.7;
+  }
+  .bal-res.ok  { background: var(--code-bg); color: #a9e5b8; }
+  .bal-res.err { background: #2b1d1c; color: #ff8b7d; }
+  .bal-quoi { font-family: var(--sans); font-size: 15px; margin-top: 12px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-flag"></div>
+    <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 2</a>
+    <nav class="steps">
+      <a href="#e1">1</a><a href="#bal">👁</a><a href="#e2">2</a>
+      <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 2 · 1 h 30</div>
+    <h1>Compter juste</h1>
+    <p class="lede">La dernière fois, tu as demandé : « et si je fais <code>age + 1</code> ? »
+    Réponse aujourd'hui — et elle explique pourquoi <strong>« 2 » + « 2 » ne fait pas 4</strong>.
+    À la fin, tu auras un convertisseur FCFA ↔ euro qui marche vraiment.</p>
+  </div>
+
+  <!-- ============================ ÉTAPE 1 ============================ -->
+  <section class="etape" id="e1">
+    <div class="etape-head">
+      <div class="etape-num">1</div>
+      <div>
+        <h2>Deux sortes de valeurs</h2>
+        <div class="etape-meta">15 minutes · texte et nombre, ce n'est pas pareil</div>
+      </div>
+    </div>
+
+    <p>Pour Python, <code>2</code> et <code>"2"</code> sont deux choses complètement différentes.
+    Le premier est un <strong>nombre</strong> : on peut calculer avec.
+    Le second est un <strong>texte</strong> qui contient le caractère « 2 » : on ne peut que
+    le coller à d'autres textes.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+print(2 + 2)
+print("2" + "2")
+
+print(10 * 3)
+print("10" * 3)
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule>
+          <script type="text/python">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <p>Résultats : <code>4</code>, puis <code>22</code>, puis <code>30</code>, puis
+    <code>101010</code>. Sur du texte, <code>+</code> veut dire « colle »
+    et <code>*</code> veut dire « répète ».</p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La phrase à retenir</div>
+      <p>Le signe <code>+</code> ne fait pas toujours une addition.
+      <strong>Il fait ce qui a du sens pour le type des valeurs qu'on lui donne.</strong>
+      Entre deux nombres il additionne, entre deux textes il colle.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VISUALISATION ==================== -->
+  <section class="etape" id="bal">
+    <div class="etape-head">
+      <div class="etape-num">👁️</div>
+      <div>
+        <h2>Le testeur de types</h2>
+        <div class="etape-meta">change les valeurs, change les types, regarde ce qui sort</div>
+      </div>
+    </div>
+
+    <p>Écris deux valeurs et dis à Python si chacune est un <strong>texte</strong> ou un
+    <strong>nombre</strong>. Trouve la combinaison qui fait <strong>planter</strong> le programme.</p>
+
+    <div class="widget">
+      <div class="bal">
+        <div class="bal-champ">
+          <input id="bal-a" value="2" autocomplete="off">
+          <div class="bascule" data-cote="a">
+            <button data-t="num" class="on">nombre</button>
+            <button data-t="str">texte</button>
+          </div>
+        </div>
+        <div class="plus">+</div>
+        <div class="bal-champ">
+          <input id="bal-b" value="2" autocomplete="off">
+          <div class="bascule" data-cote="b">
+            <button data-t="num" class="on">nombre</button>
+            <button data-t="str">texte</button>
+          </div>
+        </div>
+      </div>
+      <div class="bal-res ok" id="bal-res"></div>
+      <div class="bal-quoi" id="bal-quoi"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Ce bug a coûté très cher à beaucoup de monde. Un site qui additionne des prix
+      arrivés sous forme de texte affiche <strong>« 25002500 FCFA »</strong> au lieu de 5000.
+      Un formulaire qui ne convertit pas l'âge saisi refuse de trier les utilisateurs.
+      La confusion texte / nombre est l'une des erreurs les plus fréquentes du métier,
+      tous langages confondus.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 2 ============================ -->
+  <section class="etape" id="e2">
+    <div class="etape-head">
+      <div class="etape-num">2</div>
+      <div>
+        <h2>Demander le type, et le changer</h2>
+        <div class="etape-meta">15 minutes · type(), int(), float()</div>
+      </div>
+    </div>
+
+    <p>Trois outils. <code>type(x)</code> te dit ce que c'est. <code>int(x)</code> transforme
+    en nombre entier. <code>float(x)</code> transforme en nombre à virgule.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+print(type(15))
+print(type("15"))
+print(type(15.5))
+
+texte = "15"
+nombre = int(texte)
+
+print(nombre + 1)
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule>
+          <script type="text/python">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <ul>
+      <li><code>&lt;class 'int'&gt;</code> — un entier (<em>integer</em>)</li>
+      <li><code>&lt;class 'str'&gt;</code> — du texte (<em>string</em>)</li>
+      <li><code>&lt;class 'float'&gt;</code> — un nombre à virgule</li>
+    </ul>
+
+    <div class="box bug">
+      <div class="box-title">🐛 À faire planter exprès</div>
+      <p>Essaie <code>int("bonjour")</code>. Message :
+      <code>ValueError: invalid literal for int()</code>.</p>
+      <p>Python veut bien convertir, mais il ne fait pas de miracle : il faut que le texte
+      <strong>contienne réellement un nombre</strong>. On apprendra à gérer ça proprement
+      en séance 8.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 3 ============================ -->
+  <section class="etape" id="e3">
+    <div class="etape-head">
+      <div class="etape-num">3</div>
+      <div>
+        <h2>Le piège d'input()</h2>
+        <div class="etape-meta">10 minutes · la réponse à ta question de la dernière fois</div>
+      </div>
+    </div>
+
+    <p><code>input()</code> rend <strong>toujours du texte</strong>. Toujours. Même si la
+    personne tape 15, même si elle tape 3.14. Pour Python, ce qui revient du clavier est du texte,
+    point.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Ce qui plante</div>
+        <div data-ref>
+          <script type="text/python">
+age = input("Ton âge ? ")
+
+print(age + 1)
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> Répare-le</div>
+        <div data-cellule>
+          <script type="text/python">
+age = input("Ton âge ? ")
+
+print(age + 1)
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <p>Le message est <code>TypeError: can only concatenate str (not "int") to str</code>.
+    Traduction : « je sais coller du texte à du texte, mais tu me demandes de coller
+    un nombre à du texte, et ça je ne sais pas ».</p>
+
+    <div class="box defi">
+      <div class="box-title">💡 Les deux façons de réparer</div>
+      <p><strong>Convertir tout de suite</strong>, c'est la bonne habitude :</p>
+      <p style="font-family:var(--mono);font-size:14px">age = int(input("Ton âge ? "))</p>
+      <p>Ou convertir au moment du calcul : <code>int(age) + 1</code>.
+      La première est meilleure — après cette ligne, tu es sûr d'avoir un nombre partout.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 4 ============================ -->
+  <section class="etape" id="e4">
+    <div class="etape-head">
+      <div class="etape-num">4</div>
+      <div>
+        <h2>Chantier : le convertisseur FCFA ↔ euro</h2>
+        <div class="etape-meta">30 minutes · tu es seul aux commandes</div>
+      </div>
+    </div>
+
+    <p>Le taux est <strong>fixe</strong> : <code>1 € = 655.957 FCFA</code>.
+    Écris un programme qui demande un montant en FCFA et affiche la valeur en euros,
+    arrondie à deux chiffres après la virgule.</p>
+
+    <p><code>round(nombre, 2)</code> arrondit à deux décimales.</p>
+
+    <div class="panel moi">
+      <div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule>
+        <script type="text/python">
+TAUX = 655.957
+
+# 1. Demande le montant en FCFA (attention au type !)
+
+
+# 2. Calcule et affiche
+
+        </script>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi le taux ne bouge jamais</div>
+      <p>Le franc CFA est <strong>arrimé à l'euro à un taux fixe depuis 1999</strong> :
+      655,957 FCFA pour 1 euro, et ce chiffre n'a pas changé depuis.
+      C'est très rare — le dollar, le naira ou le cedi bougent tous les jours.
+      C'est aussi pour ça qu'on peut écrire ce taux en dur dans le programme :
+      pour n'importe quelle autre monnaie, il faudrait aller le chercher sur internet
+      à chaque lancement.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Tu n'interviens pas avant <strong>20 minutes</strong>. S'il bloque, une seule question :
+      <em>« qu'est-ce que <code>input</code> te rend, du texte ou un nombre ? »</em></p>
+      <p>S'il finit vite : « fais l'inverse — des euros vers les FCFA. »</p>
+    </div>
+  </section>
+
+  <!-- ============================ DÉFI ============================ -->
+  <section class="etape" id="defi">
+    <div class="etape-head">
+      <div class="etape-num">★</div>
+      <div>
+        <h2>Défi : la monnaie à rendre</h2>
+        <div class="etape-meta">15 minutes · un vrai outil de caisse</div>
+      </div>
+    </div>
+
+    <p>Un programme de caisse : il demande le <strong>prix à payer</strong>, puis
+    <strong>ce que le client donne</strong>, et affiche la monnaie à rendre.</p>
+
+    <div class="panel moi">
+      <div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule>
+        <script type="text/python">
+
+
+        </script>
+      </div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Pour aller plus loin</div>
+      <p>Ajoute la <strong>quantité</strong> : le programme demande le prix d'un article,
+      combien le client en prend, calcule le total, puis la monnaie.</p>
+      <p>Et si tu veux vraiment t'amuser : combien de billets de 10 000, de 5 000, de 2 000
+      et de 1 000 faut-il rendre ? <em>(Indice : <code>//</code> donne le quotient entier
+      et <code>%</code> donne le reste. Cherche ce que fait <code>17 // 5</code>
+      et <code>17 % 5</code>.)</em></p>
+    </div>
+  </section>
+
+  <!-- ============================ EXERCICES ============================ -->
+  <section class="etape" id="exos">
+    <div class="etape-head">
+      <div class="etape-num">✍️</div>
+      <div>
+        <h2>Les 4 exercices de fin de séance</h2>
+        <div class="etape-meta">15 minutes · une ligne à la fois</div>
+      </div>
+    </div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies. Un indice si tu te trompes.
+    <strong>Au bout de trois essais, on te montre la réponse</strong>, et tu la relis
+    à voix haute avant de continuer.</p>
+    <p class="hint">Ce n'est pas noté. Se tromper ici, c'est exactement ce à quoi ça sert.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- ============================ FIN ============================ -->
+  <section class="etape">
+    <div class="etape-head">
+      <div class="etape-num">🏠</div>
+      <div>
+        <h2>Avant de partir</h2>
+        <div class="etape-meta">5 minutes</div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>Un <strong>calculateur de recharge téléphone</strong> : il demande combien
+      de FCFA tu recharges et le prix d'une minute d'appel, puis affiche combien
+      de minutes tu peux parler.</p>
+      <p class="hint" style="margin-top:8px">Contrainte : le résultat doit être un
+      <strong>nombre entier</strong> de minutes. Cherche ce que fait <code>//</code>.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-01.html" style="color:var(--orange);font-weight:650">← Séance 1</a>
+      &nbsp;·&nbsp;
+      <a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;
+      <a href="seance-03.html" style="color:var(--orange);font-weight:650">Séance 3 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+
+  {
+    titre: "Texte ou nombre ?",
+    contexte: "Trois affichages pour bien voir la différence. Lis les résultats avant de passer à la suite.",
+    lignes: [
+      { b: 1, long: 12,
+        consigne: "Affiche le résultat de <code>7 + 3</code> — en vrais nombres, sans guillemets.",
+        ok: ["print(7 + 3)"],
+        indices: ["Pas de guillemets : on veut que Python calcule.",
+                  "<code>print(7 + 3)</code>"],
+        pourquoi: "Entre deux nombres, le <code>+</code> additionne. Résultat : 10." },
+      { b: 1, long: 16,
+        consigne: "Affiche maintenant <code>7 + 3</code> mais avec les deux chiffres écrits <strong>en texte</strong>.",
+        ok: ['print("7" + "3")'],
+        indices: ["Des guillemets autour de chaque chiffre.",
+                  '<code>print("7" + "3")</code>'],
+        pourquoi: "Entre deux textes, le <code>+</code> colle. Résultat : 73, et pas 10." },
+      { b: 1, long: 15,
+        consigne: "Affiche le <strong>type</strong> de la valeur <code>7</code>.",
+        ok: ["print(type(7))"],
+        indices: ["L'instruction qui donne le type s'appelle <code>type</code>.",
+                  "Elle se glisse à l'intérieur du print : <code>print(type(7))</code>"],
+        pourquoi: "<code>&lt;class 'int'&gt;</code> — un entier. Si tu avais mis \"7\", tu aurais eu <code>str</code>." },
+    ],
+  },
+
+  {
+    titre: "Réparer le programme qui plante",
+    contexte: "Ce programme demande un âge et veut ajouter 1. Il plante. À toi de le réparer.",
+    lignes: [
+      { b: 1, long: 28,
+        consigne: "Demande <code>Ton âge ?</code> et range la réponse dans <code>age</code>, <strong>en la convertissant tout de suite en nombre entier</strong>.",
+        ok: ['age = int(input("Ton âge ? "))', 'age = int(input("Ton âge ?"))'],
+        indices: ["Il faut envelopper le <code>input(...)</code> dans un <code>int(...)</code>.",
+                  '<code>age = int(input("Ton âge ? "))</code> — compte bien les parenthèses fermantes : il en faut deux.'],
+        pourquoi: "Convertir dès la saisie, c'est la bonne habitude : après cette ligne, tu es sûr d'avoir un nombre." },
+      { t: "" },
+      { b: 1, long: 30,
+        consigne: "Affiche <code>L'année prochaine tu auras 16 ans.</code> — en faisant calculer Python.",
+        ok: ['print(f"L\'année prochaine tu auras {age + 1} ans.")',
+             'print(f"L\'annee prochaine tu auras {age + 1} ans.")'],
+        indices: ["Une f-string, et un calcul entre les accolades.",
+                  '<code>print(f"L\'année prochaine tu auras {age + 1} ans.")</code>'],
+        pourquoi: "Maintenant que <code>age</code> est un vrai nombre, <code>age + 1</code> fonctionne." },
+    ],
+  },
+
+  {
+    titre: "Le convertisseur FCFA → euro",
+    contexte: "Le taux est fixe depuis 1999 : 1 euro vaut exactement 655,957 FCFA.",
+    lignes: [
+      { b: 1, long: 16,
+        consigne: "Range le taux <code>655.957</code> dans une boîte appelée <code>TAUX</code>. Attention : en Python, on écrit les décimales avec un <strong>point</strong>, pas une virgule.",
+        ok: ["TAUX = 655.957"],
+        indices: ["Un nombre à virgule s'écrit avec un point : <code>655.957</code>",
+                  "<code>TAUX = 655.957</code>"],
+        pourquoi: "En majuscules parce que c'est une valeur qui ne changera jamais. C'est une convention entre programmeurs." },
+      { t: "" },
+      { b: 1, long: 32,
+        consigne: "Demande <code>Combien de FCFA ?</code> et convertis la réponse en nombre <strong>à virgule</strong>.",
+        ok: ['montant = float(input("Combien de FCFA ? "))', 'montant = float(input("Combien de FCFA ?"))'],
+        indices: ["Pour un nombre à virgule, on utilise <code>float</code> et pas <code>int</code>.",
+                  '<code>montant = float(input("Combien de FCFA ? "))</code>'],
+        pourquoi: "<code>float</code> accepte 1500 comme 1500.75. <code>int</code> aurait refusé les décimales." },
+      { t: "" },
+      { b: 1, long: 22,
+        consigne: "Calcule le montant en euros et range-le dans <code>euros</code>. Pour passer des FCFA aux euros, on <strong>divise</strong> par le taux.",
+        ok: ["euros = montant / TAUX"],
+        indices: ["Le signe de la division est <code>/</code>",
+                  "<code>euros = montant / TAUX</code>"],
+        pourquoi: "655 957 FCFA divisés par 655,957 font bien 1 000 euros. Teste-le." },
+      { b: 1, long: 34,
+        consigne: "Affiche le résultat arrondi à 2 décimales, sous la forme <code>1500.0 FCFA = 2.29 euros</code>.",
+        ok: ['print(f"{montant} FCFA = {round(euros, 2)} euros")'],
+        indices: ["<code>round(euros, 2)</code> arrondit à deux chiffres après la virgule.",
+                  '<code>print(f"{montant} FCFA = {round(euros, 2)} euros")</code>'],
+        pourquoi: "Sans <code>round</code>, tu obtiendrais 2.2866... Personne n'affiche un prix avec 14 décimales." },
+    ],
+  },
+
+  {
+    titre: "La caisse du maquis",
+    contexte: "Un vrai outil : le prix, la quantité, ce que le client donne, et la monnaie à rendre.",
+    lignes: [
+      { b: 1, long: 30,
+        consigne: "Demande <code>Prix d'un plat ?</code> et convertis en nombre entier.",
+        ok: ['prix = int(input("Prix d\'un plat ? "))', 'prix = int(input("Prix d\'un plat ?"))'],
+        indices: ["Comme dans l'exercice 2 : <code>int(input(...))</code>",
+                  '<code>prix = int(input("Prix d\'un plat ? "))</code>'],
+        pourquoi: "Des FCFA, ça n'a pas de centimes. <code>int</code> suffit." },
+      { b: 1, long: 30,
+        consigne: "Demande <code>Combien de plats ?</code> et convertis aussi en entier.",
+        ok: ['quantite = int(input("Combien de plats ? "))', 'quantite = int(input("Combien de plats ?"))'],
+        indices: ["Même forme, en rangeant dans une boîte <code>quantite</code>.",
+                  '<code>quantite = int(input("Combien de plats ? "))</code>'],
+        pourquoi: "Sans accent dans le nom de la boîte : c'est plus sûr et c'est l'usage." },
+      { t: "" },
+      { b: 1, long: 22,
+        consigne: "Calcule le <code>total</code> à payer.",
+        ok: ["total = prix * quantite"],
+        indices: ["Le signe de la multiplication est <code>*</code>",
+                  "<code>total = prix * quantite</code>"],
+        pourquoi: "Deux vrais nombres multipliés. Si tu avais oublié les <code>int</code>, cette ligne aurait répété le texte au lieu de multiplier." },
+      { t: 'donne = int(input("Le client donne : "))' },
+      { t: "" },
+      { b: 1, long: 20,
+        consigne: "Calcule la <code>monnaie</code> à rendre.",
+        ok: ["monnaie = donne - total"],
+        indices: ["Ce que le client donne, moins ce qu'il doit.",
+                  "<code>monnaie = donne - total</code>"],
+        pourquoi: "Si le résultat est négatif, c'est que le client n'a pas donné assez. On apprendra à le détecter dès la prochaine séance." },
+      { b: 1, long: 32,
+        consigne: "Affiche <code>Total : 3000 FCFA — à rendre : 2000 FCFA</code>.",
+        ok: ['print(f"Total : {total} FCFA — à rendre : {monnaie} FCFA")',
+             'print(f"Total : {total} FCFA - à rendre : {monnaie} FCFA")',
+             'print(f"Total : {total} FCFA - a rendre : {monnaie} FCFA")'],
+        indices: ["Une f-string avec deux accolades.",
+                  '<code>print(f"Total : {total} FCFA — à rendre : {monnaie} FCFA")</code>'],
+        pourquoi: "Ce programme est utilisable tel quel derrière une caisse. C'est ton premier vrai outil." },
+    ],
+  },
+
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Testeur de types ---------- */
+(function () {
+  const etat = { a: "num", b: "num" };
+  const ea = document.getElementById("bal-a"), eb = document.getElementById("bal-b");
+  const res = document.getElementById("bal-res"), quoi = document.getElementById("bal-quoi");
+
+  document.querySelectorAll(".bascule").forEach((g) => {
+    g.querySelectorAll("button").forEach((b) => {
+      b.onclick = () => {
+        g.querySelectorAll("button").forEach((x) => x.classList.remove("on"));
+        b.classList.add("on");
+        etat[g.dataset.cote] = b.dataset.t;
+        calc();
+      };
+    });
+  });
+  [ea, eb].forEach((i) => i.addEventListener("input", calc));
+
+  function lit(v, t) {
+    if (t === "str") return { py: '"' + v + '"', val: v, type: "str" };
+    const n = Number(v);
+    if (v.trim() === "" || isNaN(n)) return { py: v || "?", val: NaN, type: "num", casse: true };
+    return { py: String(n), val: n, type: "num" };
+  }
+
+  function calc() {
+    const A = lit(ea.value, etat.a), B = lit(eb.value, etat.b);
+    const expr = "print(" + A.py + " + " + B.py + ")";
+
+    if (A.casse || B.casse) {
+      res.className = "bal-res err";
+      res.textContent = expr + "\n\n⚠ écris un vrai nombre, ou bascule sur « texte »";
+      quoi.textContent = "";
+      return;
+    }
+    if (A.type === B.type) {
+      const r = A.type === "num" ? A.val + B.val : A.val + B.val;
+      res.className = "bal-res ok";
+      res.textContent = expr + "\n\n" + r;
+      quoi.innerHTML = A.type === "num"
+        ? "Deux <strong>nombres</strong> : Python additionne. C'est ce qu'on attend."
+        : "Deux <strong>textes</strong> : Python colle bout à bout. Il n'a rien calculé du tout.";
+    } else {
+      // Python ne dit pas la même chose selon le côté où se trouve le texte
+      const msg = A.type === "str"
+        ? 'TypeError: can only concatenate str (not "int") to str'
+        : "TypeError: unsupported operand type(s) for +: 'int' and 'str'";
+      res.className = "bal-res err";
+      res.textContent = expr + "\n\n" + msg;
+      quoi.innerHTML = "🎯 <strong>Un texte et un nombre : Python refuse.</strong> " +
+        "Il ne devine pas ce que tu voulais. C'est exactement l'erreur que tu obtiens " +
+        "quand tu oublies de convertir ce que rend <code>input()</code>.";
+    }
+  }
+  calc();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 3 — Choisir</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .arbre { display: grid; grid-template-columns: 1fr 300px; gap: 26px; align-items: center; }
+  @media (max-width: 800px) { .arbre { grid-template-columns: 1fr; } }
+  .arbre-code {
+    background: var(--code-bg); border-radius: 10px; padding: 14px 0;
+    font-family: var(--mono); font-size: 14px; line-height: 1.95; color: #6a748c;
+  }
+  .arbre-code .l { padding: 0 18px; display: block; white-space: pre; transition: all .2s; }
+  .arbre-code .l.on { color: #cdd6e6; background: rgba(240,120,24,.16); }
+  .arbre-code .l.gagne { color: #a9e5b8; background: rgba(14,138,85,.22); font-weight: 600; }
+  .arbre-res {
+    text-align: center; background: #fff; border: 2px solid var(--line);
+    border-radius: 12px; padding: 24px 18px;
+  }
+  .arbre-res .note { font-size: 46px; font-weight: 750; letter-spacing: -.03em; color: var(--orange); }
+  .arbre-res .mention { font-size: 21px; font-weight: 700; margin-top: 6px; }
+  .arbre-res .expl { font-size: 14px; color: var(--ink-soft); margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-flag"></div>
+    <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="brand-dot"></span> Python — Séance 3</a>
+    <nav class="steps">
+      <a href="#e1">1</a><a href="#e2">2</a><a href="#arbre">👁</a>
+      <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 3 · 1 h 30</div>
+    <h1>Choisir</h1>
+    <p class="lede">Jusqu'ici, ton programme faisait toujours toutes les lignes, dans l'ordre.
+    Aujourd'hui il va <strong>décider</strong> lesquelles exécuter. C'est ce qui sépare
+    un programme d'une liste de courses.</p>
+  </div>
+
+  <!-- ============================ ÉTAPE 1 ============================ -->
+  <section class="etape" id="e1">
+    <div class="etape-head">
+      <div class="etape-num">1</div>
+      <div>
+        <h2>Si… alors</h2>
+        <div class="etape-meta">15 minutes · if, et le décalage qui compte</div>
+      </div>
+    </div>
+
+    <p>Un <code>if</code> se lit comme en français : <em>si cette condition est vraie,
+    alors fais ce qui suit</em>. Deux choses obligatoires : les <strong>deux points</strong>
+    en fin de ligne, et le <strong>décalage</strong> des lignes qui suivent.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+age = 15
+
+if age >= 13:
+    print("Tu peux avoir un compte.")
+    print("Bienvenue !")
+
+print("Fin du programme.")
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule>
+          <script type="text/python">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <p>Les deux lignes décalées appartiennent au <code>if</code> : elles ne s'exécutent
+    que si la condition est vraie. La dernière ligne, elle, n'est pas décalée — donc elle
+    s'exécute <strong>toujours</strong>.</p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ L'essai à faire tout de suite</div>
+      <p>Change <code>age = 15</code> en <code>age = 10</code> et relance.
+      Deux lignes disparaissent, la troisième reste.</p>
+      <p>Puis <strong>enlève le décalage</strong> de la ligne <code>print("Bienvenue !")</code>
+      et remets <code>age = 10</code>. Elle réapparaît. En Python,
+      <strong>c'est le décalage qui dit ce qui est à l'intérieur du <code>if</code></strong>.</p>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Les deux erreurs garanties</div>
+      <p><code>SyntaxError: expected ':'</code> — les deux points sont oubliés en fin de ligne.</p>
+      <p><code>IndentationError: expected an indented block</code> — la ligne d'après n'est
+      pas décalée. Python attend un décalage de <strong>4 espaces</strong>
+      (la touche Tab les met pour toi).</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 2 ============================ -->
+  <section class="etape" id="e2">
+    <div class="etape-head">
+      <div class="etape-num">2</div>
+      <div>
+        <h2>Comparer</h2>
+        <div class="etape-meta">10 minutes · et enfin la réponse sur == </div>
+      </div>
+    </div>
+
+    <p>Tu avais posé la question en séance 1. La voici :</p>
+
+    <div class="box defi">
+      <div class="box-title">💡 = et == n'ont rien à voir</div>
+      <p><code>=</code> veut dire <strong>« range ça dans la boîte »</strong>.
+      <code>==</code> veut dire <strong>« est-ce que c'est pareil ? »</strong></p>
+      <p><code>age = 15</code> range 15 dans <code>age</code>.
+      <code>age == 15</code> pose une question, dont la réponse est vrai ou faux.</p>
+    </div>
+
+    <table style="border-collapse:collapse;width:100%;font-size:15.5px;margin:18px 0">
+      <thead><tr style="text-align:left;border-bottom:2px solid var(--line)">
+        <th style="padding:9px 8px">Signe</th><th>Se lit</th><th>Exemple vrai</th></tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>==</code></td><td>est égal à</td><td><code>15 == 15</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>!=</code></td><td>est différent de</td><td><code>15 != 12</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>&gt;</code></td><td>est plus grand que</td><td><code>15 &gt; 12</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>&lt;</code></td><td>est plus petit que</td><td><code>12 &lt; 15</code></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>&gt;=</code></td><td>est supérieur ou égal</td><td><code>15 &gt;= 15</code></td></tr>
+        <tr><td style="padding:8px"><code>&lt;=</code></td><td>est inférieur ou égal</td><td><code>15 &lt;= 15</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+print(15 == 15)
+print(15 == 12)
+print(15 != 12)
+print("Awa" == "awa")
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule>
+          <script type="text/python">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <p><code>True</code> et <code>False</code> : vrai et faux. Et la dernière ligne répond
+    <code>False</code> — <strong>Python fait la différence entre majuscules et minuscules</strong>,
+    même à l'intérieur d'un texte. Retiens-le, ça va te jouer des tours dans le quiz.</p>
+  </section>
+
+  <!-- ==================== VISUALISATION ==================== -->
+  <section class="etape" id="arbre">
+    <div class="etape-head">
+      <div class="etape-num">👁️</div>
+      <div>
+        <h2>Voir le programme choisir son chemin</h2>
+        <div class="etape-meta">bouge la note, regarde quelle ligne s'allume</div>
+      </div>
+    </div>
+
+    <p>Avec <code>elif</code> (« sinon si ») et <code>else</code> (« sinon »), on enchaîne
+    plusieurs cas. Python les teste <strong>de haut en bas</strong> et
+    <strong>s'arrête au premier qui est vrai</strong>. Bouge le curseur et regarde.</p>
+
+    <div class="widget">
+      <div class="arbre">
+        <div>
+          <div class="arbre-code" id="arbre-code"></div>
+        </div>
+        <div>
+          <div class="slider-row">
+            <label>Ta moyenne <span class="val" id="v-note">14</span></label>
+            <input type="range" id="s-note" min="0" max="20" step="0.5" value="14">
+          </div>
+          <div class="arbre-res">
+            <div class="note" id="r-note">14</div>
+            <div class="mention" id="r-mention"></div>
+            <div class="expl" id="r-expl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La question piège à lui poser</div>
+      <p class="dialogue">« Mets 18. Trois conditions sont vraies en même temps :
+      <code>&gt;= 10</code>, <code>&gt;= 14</code> et <code>&gt;= 16</code>.
+      Pourquoi il n'affiche qu'une seule mention ? »</p>
+      <p>Réponse : parce que Python <strong>s'arrête au premier <code>elif</code> vrai</strong>
+      et saute tout le reste. C'est pour ça que l'ordre des conditions compte —
+      et c'est pour ça qu'on écrit les seuils du plus grand au plus petit.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Ce petit escalier de conditions est partout. Ton <strong>opérateur mobile</strong>
+      l'utilise pour savoir dans quel forfait tu tombes selon ta consommation. Une
+      <strong>banque</strong> s'en sert pour décider si un virement passe.
+      Une <strong>appli de livraison</strong> pour calculer les frais selon la distance.
+      Toujours le même escalier, testé de haut en bas.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 3 ============================ -->
+  <section class="etape" id="e3">
+    <div class="etape-head">
+      <div class="etape-num">3</div>
+      <div>
+        <h2>Et, ou</h2>
+        <div class="etape-meta">10 minutes · combiner deux conditions</div>
+      </div>
+    </div>
+
+    <p><code>and</code> : les <strong>deux</strong> conditions doivent être vraies.
+    <code>or</code> : il suffit qu'<strong>une seule</strong> le soit.</p>
+
+    <div class="duo">
+      <div class="panel ref">
+        <div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref>
+          <script type="text/python">
+age = 15
+moyenne = 13
+
+if age >= 15 and moyenne >= 12:
+    print("Tu peux t'inscrire au club.")
+
+if age < 12 or moyenne < 8:
+    print("Il faut une autorisation.")
+else:
+    print("Inscription directe.")
+          </script>
+        </div>
+      </div>
+      <div class="panel moi">
+        <div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule>
+          <script type="text/python">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ À tester</div>
+      <p>Change <code>moyenne = 13</code> en <code>moyenne = 7</code>.
+      Puis en <code>moyenne = 11</code>. Fais-lui <strong>prédire le résultat avant de lancer</strong>
+      à chaque fois. C'est là qu'on voit s'il a compris ou s'il devine.</p>
+    </div>
+  </section>
+
+  <!-- ============================ ÉTAPE 4 ============================ -->
+  <section class="etape" id="e4">
+    <div class="etape-head">
+      <div class="etape-num">4</div>
+      <div>
+        <h2>Chantier : le quiz</h2>
+        <div class="etape-meta">30 minutes · trois questions et un score</div>
+      </div>
+    </div>
+
+    <p>Un quiz de trois questions. À chaque bonne réponse, le score augmente de 1.
+    À la fin, tu affiches le score.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 La ligne qui va te surprendre</div>
+      <p style="font-family:var(--mono);font-size:14.5px">score = score + 1</p>
+      <p>En maths, c'est absurde — aucun nombre n'est égal à lui-même plus un.
+      En Python, ça se lit de droite à gauche : <strong>« prends ce qu'il y a dans la boîte
+      score, ajoute 1, et remets le tout dans la boîte »</strong>.</p>
+      <p>Si tu avais gardé « égal » en tête pour le signe <code>=</code>, c'est le moment
+      de le désapprendre pour de bon.</p>
+    </div>
+
+    <div class="panel moi">
+      <div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule>
+        <script type="text/python">
+score = 0
+
+# Question 1
+
+
+# Question 2
+
+
+# Question 3
+
+
+# Le score final
+
+        </script>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Tu n'interviens pas avant <strong>20 minutes</strong>. La question à lui poser s'il
+      bloque : <em>« qu'est-ce que tu compares, exactement ? »</em> — souvent il compare
+      la question au lieu de la réponse.</p>
+      <p>Il va aussi buter sur les majuscules : il tape <em>yamoussoukro</em> et le programme
+      dit faux. <strong>Ne le préviens pas à l'avance.</strong> Laisse-le le découvrir,
+      puis montre-lui <code>.lower()</code>.</p>
+    </div>
+  </section>
+
+  <!-- ============================ DÉFI ============================ -->
+  <section class="etape" id="defi">
+    <div class="etape-head">
+      <div class="etape-num">★</div>
+      <div>
+        <h2>Défi : le calculateur de mention</h2>
+        <div class="etape-meta">15 minutes</div>
+      </div>
+    </div>
+
+    <p>Un programme qui demande ta moyenne et affiche la mention, comme sur ton bulletin :</p>
+
+    <ul>
+      <li>16 et plus → <strong>Très bien</strong></li>
+      <li>14 à 16 → <strong>Bien</strong></li>
+      <li>12 à 14 → <strong>Assez bien</strong></li>
+      <li>10 à 12 → <strong>Passable</strong></li>
+      <li>moins de 10 → <strong>Insuffisant</strong></li>
+    </ul>
+
+    <div class="panel moi">
+      <div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule>
+        <script type="text/python">
+
+
+        </script>
+      </div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Le piège des majuscules</div>
+      <p>Pour que le quiz accepte <em>yamoussoukro</em>, <em>Yamoussoukro</em> et
+      <em>YAMOUSSOUKRO</em>, il existe <code>.lower()</code>, qui met tout en minuscules :</p>
+      <p style="font-family:var(--mono);font-size:14px">if reponse.lower() == "yamoussoukro":</p>
+      <p>Ajoute-le à ton quiz. Un vrai programme ne punit pas l'utilisateur pour
+      une majuscule.</p>
+    </div>
+  </section>
+
+  <!-- ============================ EXERCICES ============================ -->
+  <section class="etape" id="exos">
+    <div class="etape-head">
+      <div class="etape-num">✍️</div>
+      <div>
+        <h2>Les 4 exercices de fin de séance</h2>
+        <div class="etape-meta">15 minutes · une ligne à la fois</div>
+      </div>
+    </div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies. Un indice si tu te trompes.
+    <strong>Au bout de trois essais, on te montre la réponse.</strong></p>
+    <p class="hint">Le décalage des lignes à l'intérieur d'un <code>if</code> est déjà mis
+    pour toi — tu n'as qu'à écrire l'instruction elle-même.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- ============================ FIN ============================ -->
+  <section class="etape">
+    <div class="etape-head">
+      <div class="etape-num">🏠</div>
+      <div>
+        <h2>Avant de partir</h2>
+        <div class="etape-meta">5 minutes</div>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Mission maison — 15 minutes, pas plus</div>
+      <p>Un <strong>videur de boîte de nuit</strong>. Le programme demande l'âge
+      et si la personne est sur la liste (<code>oui</code> ou <code>non</code>).</p>
+      <p>Elle entre si elle a 18 ans ou plus <strong>et</strong> qu'elle est sur la liste.
+      Sinon, le programme explique lequel des deux critères a manqué.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-02.html" style="color:var(--orange);font-weight:650">← Séance 2</a>
+      &nbsp;·&nbsp;
+      <a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="assets/moteur.js"></script>
+
+<script>
+window.EXERCICES = [
+
+  {
+    titre: "Le contrôle d'âge",
+    contexte: "Un programme qui ne laisse passer que les 13 ans et plus.",
+    lignes: [
+      { t: 'age = int(input("Ton âge ? "))' },
+      { t: "" },
+      { b: 1, long: 16,
+        consigne: "Écris la condition : <strong>si</strong> <code>age</code> est supérieur ou égal à 13. N'oublie pas les deux points à la fin.",
+        ok: ["if age >= 13:"],
+        indices: ["« Si » s'écrit <code>if</code>, et « supérieur ou égal » s'écrit <code>&gt;=</code>",
+                  "Et il faut deux points tout à la fin : <code>if age &gt;= 13:</code>"],
+        pourquoi: "Les deux points annoncent « ce qui suit et qui est décalé m'appartient »." },
+      { b: 1, indent: 4, long: 24,
+        consigne: "Affiche <code>Tu peux entrer.</code> — cette ligne est <strong>à l'intérieur</strong> du if.",
+        ok: ['print("Tu peux entrer.")'],
+        indices: ["Un print tout simple. Le décalage est déjà mis pour toi.",
+                  '<code>print("Tu peux entrer.")</code>'],
+        pourquoi: "Décalée, donc elle ne s'exécute que si la condition est vraie." },
+      { b: 1, long: 6,
+        consigne: "Écris <strong>sinon</strong>. Attention : ce mot n'est <strong>pas</strong> décalé, il est aligné avec le <code>if</code>.",
+        ok: ["else:"],
+        indices: ["« Sinon » s'écrit <code>else</code>.",
+                  "Avec les deux points, et sans rien avant : <code>else:</code>"],
+        pourquoi: "<code>else</code> n'a pas de condition : c'est « dans tous les autres cas »." },
+      { b: 1, indent: 4, long: 26,
+        consigne: "Affiche <code>Trop jeune, désolé.</code>",
+        ok: ['print("Trop jeune, désolé.")', 'print("Trop jeune, desole.")'],
+        indices: ["Encore un print décalé.",
+                  '<code>print("Trop jeune, désolé.")</code>'],
+        pourquoi: "Un des deux chemins sera pris, jamais les deux. C'est le principe du if/else." },
+    ],
+  },
+
+  {
+    titre: "Pair ou impair",
+    contexte: "Le signe <code>%</code> donne le reste d'une division. 10 % 2 vaut 0, et 7 % 2 vaut 1.",
+    lignes: [
+      { t: 'nombre = int(input("Donne un nombre : "))' },
+      { t: "" },
+      { b: 1, long: 20,
+        consigne: "Si le <strong>reste</strong> de la division de <code>nombre</code> par 2 <strong>vaut</strong> 0…",
+        ok: ["if nombre % 2 == 0:"],
+        indices: ["Le reste s'obtient avec <code>%</code>, et « vaut » se dit <code>==</code>",
+                  "<code>if nombre % 2 == 0:</code>"],
+        pourquoi: "Un seul <code>=</code> aurait rangé une valeur au lieu de comparer. Ici on pose une question, donc <code>==</code>." },
+      { b: 1, indent: 4, long: 26,
+        consigne: "Affiche le nombre suivi de <code>est pair</code>, avec une f-string.",
+        ok: ['print(f"{nombre} est pair")'],
+        indices: ["Une f-string avec le nom de la boîte entre accolades.",
+                  '<code>print(f"{nombre} est pair")</code>'],
+        pourquoi: "On réutilise ce qu'on sait depuis la séance 1 à l'intérieur d'un <code>if</code>." },
+      { t: "else:" },
+      { b: 1, indent: 4, long: 28,
+        consigne: "Affiche le nombre suivi de <code>est impair</code>.",
+        ok: ['print(f"{nombre} est impair")'],
+        indices: ["Comme la ligne du dessus, en changeant le mot.",
+                  '<code>print(f"{nombre} est impair")</code>'],
+        pourquoi: "Tester le reste d'une division par 2, c'est LA façon de savoir si un nombre est pair. Tu la reverras toute ta vie." },
+    ],
+  },
+
+  {
+    titre: "La mention",
+    contexte: "Un escalier de conditions. L'ordre compte : du plus exigeant au moins exigeant.",
+    lignes: [
+      { t: 'moyenne = float(input("Ta moyenne ? "))' },
+      { t: "" },
+      { b: 1, long: 20,
+        consigne: "Premier étage : si la moyenne est supérieure ou égale à <code>16</code>.",
+        ok: ["if moyenne >= 16:"],
+        indices: ["C'est un <code>if</code>, avec <code>&gt;=</code> et deux points.",
+                  "<code>if moyenne &gt;= 16:</code>"],
+        pourquoi: "On commence par le seuil le plus haut. Si on commençait par 10, tout le monde aurait « Passable »." },
+      { b: 1, indent: 4, long: 22,
+        consigne: "Affiche <code>Très bien</code>.",
+        ok: ['print("Très bien")', 'print("Tres bien")'],
+        indices: ["Un print décalé.",
+                  '<code>print("Très bien")</code>'],
+        pourquoi: "" },
+      { b: 1, long: 22,
+        consigne: "Deuxième étage : <strong>sinon si</strong> la moyenne est supérieure ou égale à <code>14</code>.",
+        ok: ["elif moyenne >= 14:"],
+        indices: ["« Sinon si » s'écrit en un seul mot : <code>elif</code>",
+                  "<code>elif moyenne &gt;= 14:</code>"],
+        pourquoi: "<code>elif</code> n'est testé que si le <code>if</code> du dessus était faux. C'est pour ça qu'une note de 18 n'affiche pas deux mentions." },
+      { b: 1, indent: 4, long: 16,
+        consigne: "Affiche <code>Bien</code>.",
+        ok: ['print("Bien")'],
+        indices: ["Un print décalé, tout simple.",
+                  '<code>print("Bien")</code>'],
+        pourquoi: "" },
+      { t: "elif moyenne >= 10:" },
+      { t: '    print("Passable")' },
+      { b: 1, long: 6,
+        consigne: "Dernier étage : dans <strong>tous les autres cas</strong>.",
+        ok: ["else:"],
+        indices: ["Le mot qui veut dire « sinon », sans condition.",
+                  "<code>else:</code>"],
+        pourquoi: "Sans <code>else</code>, une moyenne de 8 n'afficherait rien du tout. Il faut toujours prévoir le cas restant." },
+      { b: 1, indent: 4, long: 24,
+        consigne: "Affiche <code>Insuffisant</code>.",
+        ok: ['print("Insuffisant")'],
+        indices: ["Un dernier print décalé.",
+                  '<code>print("Insuffisant")</code>'],
+        pourquoi: "Ton escalier est complet : toute note entre 0 et 20 tombe dans exactement une case." },
+    ],
+  },
+
+  {
+    titre: "Le quiz qui compte les points",
+    contexte: "Deux questions, un score. Et la ligne qui fait bugger tous les débutants.",
+    lignes: [
+      { b: 1, long: 10,
+        consigne: "Crée une boîte <code>score</code> qui vaut <code>0</code> au départ.",
+        ok: ["score = 0"],
+        indices: ["Une boîte et un nombre, comme en séance 1.",
+                  "<code>score = 0</code>"],
+        pourquoi: "On part de zéro, et on ajoutera au fur et à mesure. C'est un compteur." },
+      { t: "" },
+      { t: 'reponse = input("Capitale politique de la Côte d\'Ivoire ? ")' },
+      { b: 1, long: 32,
+        consigne: "Si la réponse, <strong>mise en minuscules</strong>, vaut <code>yamoussoukro</code>.",
+        ok: ['if reponse.lower() == "yamoussoukro":'],
+        indices: ["Pour mettre en minuscules, on écrit <code>reponse.lower()</code>",
+                  '<code>if reponse.lower() == "yamoussoukro":</code>'],
+        pourquoi: "Sans <code>.lower()</code>, quelqu'un qui écrit « Yamoussoukro » avec une majuscule aurait faux. Un bon programme ne punit pas ça." },
+      { b: 1, indent: 4, long: 20,
+        consigne: "Affiche <code>Correct !</code>",
+        ok: ['print("Correct !")'],
+        indices: ["Un print décalé.",
+                  '<code>print("Correct !")</code>'],
+        pourquoi: "" },
+      { b: 1, indent: 4, long: 18,
+        consigne: "Ajoute 1 au score. <strong>Relis l'encadré du chantier si tu hésites.</strong>",
+        ok: ["score = score + 1", "score += 1"],
+        indices: ["Ça se lit de droite à gauche : prends le score, ajoute 1, remets le tout dedans.",
+                  "<code>score = score + 1</code>"],
+        pourquoi: "Absurde en maths, normal en Python. Le <code>=</code> range, il ne compare pas." },
+      { t: "else:" },
+      { t: '    print("Non, c\'est Yamoussoukro.")' },
+      { t: "" },
+      { b: 1, long: 28,
+        consigne: "Affiche le score final sous la forme <code>Score : 1 / 1</code>.",
+        ok: ['print(f"Score : {score} / 1")'],
+        indices: ["Une f-string avec la boîte <code>score</code>.",
+                  '<code>print(f"Score : {score} / 1")</code>'],
+        pourquoi: "Tu viens d'écrire un quiz complet. Ajoute deux questions de plus et tu peux le faire jouer à quelqu'un." },
+    ],
+  },
+
+];
+</script>
+<script src="assets/exercices.js"></script>
+
+<script>
+/* ---------- Arbre de décision ---------- */
+(function () {
+  const LIGNES = [
+    { txt: "if moyenne >= 16:",        seuil: 16 },
+    { txt: '    print("Très bien")',   res: "Très bien" },
+    { txt: "elif moyenne >= 14:",      seuil: 14 },
+    { txt: '    print("Bien")',        res: "Bien" },
+    { txt: "elif moyenne >= 12:",      seuil: 12 },
+    { txt: '    print("Assez bien")',  res: "Assez bien" },
+    { txt: "elif moyenne >= 10:",      seuil: 10 },
+    { txt: '    print("Passable")',    res: "Passable" },
+    { txt: "else:",                    seuil: -1 },
+    { txt: '    print("Insuffisant")', res: "Insuffisant" },
+  ];
+
+  const s = document.getElementById("s-note");
+  const eCode = document.getElementById("arbre-code");
+
+  function maj() {
+    const n = parseFloat(s.value);
+    document.getElementById("v-note").textContent = n;
+    document.getElementById("r-note").textContent = n;
+
+    // quel test gagne ?
+    let gagnant = -1;
+    for (let i = 0; i < LIGNES.length; i += 2) {
+      const seuil = LIGNES[i].seuil;
+      if (seuil === -1 || n >= seuil) { gagnant = i; break; }
+    }
+
+    eCode.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (i < gagnant && i % 2 === 0) cls += " on";        // testés puis rejetés
+      if (i === gagnant || i === gagnant + 1) cls += " gagne";
+      return '<span class="' + cls + '">' + l.txt.replace(/</g, "&lt;") + "</span>";
+    }).join("");
+
+    const mention = LIGNES[gagnant + 1].res;
+    document.getElementById("r-mention").textContent = mention;
+    const testes = gagnant / 2;
+    document.getElementById("r-expl").innerHTML = testes === 0
+      ? "Le tout premier test est vrai. Python n'a rien regardé d'autre."
+      : testes + (testes > 1 ? " tests ont" : " test a") +
+        " échoué avant celui-ci. Tout ce qui suit est ignoré.";
+  }
+  s.addEventListener("input", maj);
+  maj();
+})();
+</script>
+
+</body>
+</html>
