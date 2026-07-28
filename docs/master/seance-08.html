@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 8 - Ton environnement de travail</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>
+  .term { background: #10141d; color: #cdd6e6; border-radius: 10px; padding: 15px 18px;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.85; white-space: pre-wrap; margin: 12px 0; }
+  .term .p { color: #6f7d97; }
+  .term .c { color: #a9e5b8; }
+  .term .o { color: #8fa6c9; }
+
+  .os { display: flex; border: 1px solid var(--line); border-radius: 9px;
+    overflow: hidden; width: fit-content; margin-bottom: 14px; }
+  .os button { border: 0; border-radius: 0; background: #fff; color: var(--ink-soft);
+    padding: 9px 22px; font-weight: 650; font-size: 14.5px; }
+  .os button.on { background: var(--orange); color: #fff; }
+
+  .panne { border: 1px solid var(--line); border-radius: 11px; margin-bottom: 10px;
+    background: #fff; overflow: hidden; }
+  .panne > div:first-child { padding: 13px 16px; cursor: pointer; font-weight: 650;
+    display: flex; align-items: center; gap: 10px; }
+  .panne .sol { padding: 0 16px 15px; font-size: 15px; color: var(--ink-soft); display: none; }
+  .panne.ouvert .sol { display: block; }
+  .panne code { font-size: 12.5px; }
+  .panne .fl { margin-left: auto; color: var(--ink-soft); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 8</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+    <a href="#e4">4</a><a href="#pannes">🔧</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 8 · 1 h 30</div>
+    <h1>Ton environnement de travail</h1>
+    <p class="lede">Sept séances sans rien installer, c'était volontaire : zéro friction
+    pour apprendre. Mais aucun analyste ne travaille dans un navigateur.
+    <strong>Aujourd'hui tu montes ton poste de travail</strong>, celui que tu utiliseras
+    en stage.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Installer Python et VS Code, créer un environnement isolé par projet,
+    y installer pandas, et ouvrir ton premier notebook. Et surtout : savoir
+    <strong>diagnostiquer</strong> quand ça ne marche pas, parce que ça n'ira pas
+    du premier coup.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Installer Python et VS Code</h2>
+      <div class="etape-meta">20 minutes · les deux briques de base</div></div></div>
+
+    <p>Deux logiciels, dans cet ordre. <strong>Python</strong> exécute le code,
+    <strong>VS Code</strong> est l'éditeur dans lequel tu l'écris. Ce sont deux choses
+    séparées, et c'est la source de confusion numéro un des débutants.</p>
+
+    <div class="os">
+      <button class="on" data-os="win">Windows</button>
+      <button data-os="mac">macOS</button>
+    </div>
+    <div id="instructions"></div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 La case à cocher qui coûte une heure</div>
+      <p>Sur Windows, l'installateur Python propose <strong>« Add python.exe to PATH »</strong>
+      en tout petit, en bas de la première fenêtre. Elle n'est pas cochée par défaut.</p>
+      <p>Si tu l'oublies, ton terminal répondra <code>python n'est pas reconnu</code>
+      à chaque commande, et rien d'autre ne marchera. <strong>Coche-la.</strong>
+      Si c'est déjà raté, réinstalle : c'est plus rapide que de réparer.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Les trois extensions VS Code, et pas une de plus</div>
+      <p>Dans l'onglet Extensions (l'icône en forme de blocs) : <strong>Python</strong>,
+      <strong>Pylance</strong> et <strong>Jupyter</strong>, toutes trois publiées par Microsoft.</p>
+      <p>Résiste aux dizaines d'autres. Un éditeur surchargé d'extensions
+      devient lent et imprévisible, et tu passeras plus de temps à le configurer
+      qu'à analyser.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Pourquoi un environnement par projet</h2>
+      <div class="etape-meta">20 minutes · l'environnement virtuel</div></div></div>
+
+    <p>Imagine deux missions. La première utilise pandas 1.5, la seconde exige pandas 2.2,
+    qui a changé le comportement de certaines fonctions. <strong>Une seule installation
+    de Python sur ta machine ne peut pas satisfaire les deux.</strong></p>
+
+    <p>Un <strong>environnement virtuel</strong> est un dossier qui contient sa propre
+    copie de Python et ses propres bibliothèques. Un par projet. Ils s'ignorent
+    complètement.</p>
+
+    <div class="term"><span class="p">$</span> <span class="c">cd Documents/analyse-elections</span>
+
+<span class="o"># creer l'environnement (une seule fois par projet)</span>
+<span class="p">$</span> <span class="c">python -m venv .venv</span>
+
+<span class="o"># l'activer (a chaque fois qu'on ouvre un terminal)</span>
+<span class="p">$</span> <span class="c">.venv\Scripts\activate</span>       <span class="o">← Windows</span>
+<span class="p">$</span> <span class="c">source .venv/bin/activate</span>    <span class="o">← macOS</span>
+
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="o">← le prefixe confirme que c'est actif</span></div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Le préfixe <code>(.venv)</code> est ton seul témoin</div>
+      <p>Tant qu'il n'apparaît pas au début de ta ligne de commande,
+      <strong>tu travailles dans le Python global</strong>, et tout ce que tu installes
+      part au mauvais endroit.</p>
+      <p>C'est la cause de 80 % des « ça marchait hier ». Prends le réflexe :
+      avant toute commande <code>pip</code>, regarde si le préfixe est là.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi ça compte vraiment en entreprise</div>
+      <p>Le vrai problème n'est pas ton confort, c'est la <strong>reproductibilité</strong>.
+      Une analyse qui ne tourne que sur ta machine n'a aucune valeur : personne ne peut
+      la vérifier, la reprendre, ni la faire tourner l'an prochain.</p>
+      <p>L'environnement isolé, plus le fichier <code>requirements.txt</code>,
+      c'est ce qui permet à un collègue de reproduire ton résultat exactement.
+      En finance et en conseil, un chiffre non reproductible est un chiffre mort.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Installer les bibliothèques</h2>
+      <div class="etape-meta">15 minutes · pip et requirements.txt</div></div></div>
+
+    <div class="term"><span class="o">(.venv)</span> <span class="p">$</span> <span class="c">pip install pandas matplotlib jupyter</span>
+
+<span class="o"># verifier ce qui est installe</span>
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="c">pip list</span>
+
+<span class="o"># figer les versions, pour que quelqu'un d'autre reproduise</span>
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="c">pip freeze > requirements.txt</span>
+
+<span class="o"># et pour reinstaller a l'identique, ailleurs</span>
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="c">pip install -r requirements.txt</span></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le fichier qui te sauvera</div>
+      <p><code>requirements.txt</code> liste les bibliothèques <strong>avec leurs
+      numéros de version exacts</strong>. C'est le seul moyen de retrouver dans six mois
+      l'environnement qui produisait ton chiffre.</p>
+      <p>Fais-le générer maintenant, même s'il n'y a que trois lignes dedans.
+      L'habitude compte plus que le contenu.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Ton premier notebook</h2>
+      <div class="etape-meta">25 minutes · le format de travail de l'analyse</div></div></div>
+
+    <p>Un <strong>notebook</strong> mélange du code, ses résultats et du texte,
+    dans un document unique. C'est le format de travail réel de la finance
+    et du conseil : on y raisonne par étapes, chaque cellule s'exécute
+    indépendamment, et le résultat reste affiché sous le code qui l'a produit.</p>
+
+    <ol>
+      <li>Dans VS Code : <strong>Fichier → Nouveau fichier → Jupyter Notebook</strong></li>
+      <li>Enregistre-le sous <code>analyse.ipynb</code> dans ton dossier de projet</li>
+      <li>En haut à droite, clique sur <strong>Select Kernel</strong> et choisis
+      l'interpréteur qui contient <code>.venv</code></li>
+      <li>Dans la première cellule, tape le code ci-dessous, puis <code>Maj + Entrée</code></li>
+    </ol>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Ta cellule de vérification</div>
+        <div data-ref><script type="text/python">
+import sys
+import pandas as pd
+
+print(sys.executable)
+print("pandas", pd.__version__)
+
+df = pd.DataFrame({"parti": ["RN", "UG", "ENS"],
+                   "voix": [9379092, 8971581, 6425707]})
+df["part"] = (df["voix"] / 32057946 * 100).round(2)
+df
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> Essaie ici en attendant</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le contrôle qui valide toute la séance</div>
+      <p>La première ligne affiche le chemin de l'interpréteur utilisé.
+      <strong>Il doit contenir <code>.venv</code>.</strong></p>
+      <p>S'il pointe ailleurs — <code>Program Files</code>, <code>anaconda3</code>,
+      <code>/usr/bin</code> — le notebook n'utilise pas ton environnement,
+      et tes installations n'y seront pas. Reprends le choix du kernel.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le piège du notebook, à montrer tout de suite</div>
+      <p>Les cellules s'exécutent <strong>dans l'ordre où tu cliques</strong>,
+      pas dans l'ordre où elles sont écrites. On peut donc obtenir un notebook
+      qui affiche des résultats justes et qui, relancé de haut en bas, plante
+      ou donne autre chose.</p>
+      <p>Le réflexe professionnel : avant de partager quoi que ce soit,
+      <strong>Restart &amp; Run All</strong>. Si ça ne passe pas, ton analyse
+      n'est pas reproductible, donc elle n'existe pas.</p>
+    </div>
+  </section>
+
+  <!-- PANNES -->
+  <section class="etape" id="pannes">
+    <div class="etape-head"><div class="etape-num">🔧</div><div>
+      <h2>Quand ça ne marche pas</h2>
+      <div class="etape-meta">les six pannes qui arrivent vraiment</div></div></div>
+
+    <p>Clique sur le message d'erreur que tu vois.</p>
+    <div id="pannes-liste"></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que tu apprends vraiment aujourd'hui</div>
+      <p>Presque toutes ces pannes ont la même cause : <strong>plusieurs Python
+      coexistent sur ta machine, et tu ne parles pas à celui que tu crois</strong>.</p>
+      <p>D'où le seul diagnostic qui vaille, à faire avant tout autre :
+      <code>import sys ; print(sys.executable)</code>. Il te dit lequel te répond.
+      Retiens cette ligne, elle te servira pendant des années.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Comment installer pandas pour mon projet d'analyse de données en Python ?</p>
+      <p style="margin-top:12px">La réponse est correcte, très répandue sur internet,
+      et <strong>elle va te créer exactement le problème que la séance cherche à éviter</strong>.</p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi l'IA répond ça</div>
+      <p>Elle reproduit ce qui est le plus fréquent sur internet, et la majorité
+      des réponses en ligne datent d'avant la généralisation des environnements
+      virtuels, ou s'adressent à quelqu'un qui n'a qu'un seul projet.</p>
+      <p><strong>Elle ne sait pas que tu auras une deuxième mission dans trois mois.</strong>
+      Les bonnes pratiques dépendent du contexte, et le contexte est précisément
+      ce qu'une IA n'a pas.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · les commandes, une par une</div></div></div>
+    <p>Cette fois, ce sont des <strong>commandes de terminal</strong>, pas du Python.
+    Elles s'écrivent de mémoire au bout de trois projets — autant commencer.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Crée un dossier <code>analyse-elections</code>, son environnement virtuel,
+      installe <code>pandas matplotlib jupyter</code>, génère le
+      <code>requirements.txt</code>, et télécharge le fichier
+      <a href="donnees/legislatives-2024.csv">legislatives-2024.csv</a> dedans.</p>
+      <p class="hint" style="margin-top:8px">Puis ouvre un notebook, charge le fichier
+      avec <code>pd.read_csv("legislatives-2024.csv", sep=";")</code>, et affiche
+      les cinq premières lignes. <strong>Si ça marche, la séance 9 démarre en douceur.
+      Si ça ne marche pas, préviens-moi avant la séance</strong> plutôt que de perdre
+      vingt minutes dessus à deux.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-07.html" style="color:var(--orange);font-weight:650">← Séance 7</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-09.html" style="color:var(--orange);font-weight:650">Séance 9 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=3"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Créer l'environnement",
+    contexte: "Les commandes de terminal, pas du Python. Une seule fois par projet.",
+    lignes: [
+      { b:1, long:28, consigne:"Va dans le dossier du projet <code>analyse-elections</code>.",
+        ok:["cd analyse-elections"],
+        indices:["La commande pour changer de dossier est <code>cd</code>",
+                 "<code>cd analyse-elections</code>"],
+        pourquoi:"L'environnement se crée dans le dossier du projet. Se tromper de dossier est la première source d'ennuis." },
+      { b:1, long:26, consigne:"Crée un environnement virtuel nommé <code>.venv</code>.",
+        ok:["python -m venv .venv","python3 -m venv .venv"],
+        indices:["On appelle le module <code>venv</code> avec <code>python -m</code>",
+                 "<code>python -m venv .venv</code>"],
+        pourquoi:"Le point devant <code>.venv</code> est une convention : le dossier reste discret et les outils savent l'ignorer." },
+      { b:1, long:30, consigne:"Active-le, <strong>sur macOS ou Linux</strong>.",
+        ok:["source .venv/bin/activate"],
+        indices:["La commande commence par <code>source</code>",
+                 "<code>source .venv/bin/activate</code>"],
+        pourquoi:"Sur Windows ce serait <code>.venv\\Scripts\\activate</code>. C'est la seule commande de la séance qui diffère selon le système." },
+    ],
+  },
+  {
+    titre: "Installer et figer",
+    contexte: "Toujours avec le préfixe (.venv) devant la ligne de commande.",
+    lignes: [
+      { b:1, long:36, consigne:"Installe <code>pandas</code>, <code>matplotlib</code> et <code>jupyter</code> en une seule commande.",
+        ok:["pip install pandas matplotlib jupyter"],
+        indices:["Les trois noms se mettent à la suite, séparés par des espaces.",
+                 "<code>pip install pandas matplotlib jupyter</code>"],
+        pourquoi:"Une seule commande plutôt que trois : pip résout les dépendances communes en une fois." },
+      { b:1, long:12, consigne:"Vérifie ce qui est installé.",
+        ok:["pip list"],
+        indices:["Deux mots.","<code>pip list</code>"],
+        pourquoi:"La liste doit être courte. Si elle contient des dizaines de paquets que tu n'as pas demandés, tu n'es pas dans ton environnement." },
+      { b:1, long:32, consigne:"Fige les versions dans un fichier <code>requirements.txt</code>.",
+        ok:["pip freeze > requirements.txt"],
+        indices:["<code>pip freeze</code>, et le chevron redirige la sortie vers un fichier.",
+                 "<code>pip freeze > requirements.txt</code>"],
+        pourquoi:"Le chevron <code>&gt;</code> écrit la sortie dans un fichier au lieu de l'afficher. C'est du terminal, pas du Python." },
+      { b:1, long:34, consigne:"Et la commande inverse : réinstaller tout à l'identique depuis ce fichier.",
+        ok:["pip install -r requirements.txt"],
+        indices:["L'option est <code>-r</code>, pour « requirements ».",
+                 "<code>pip install -r requirements.txt</code>"],
+        pourquoi:"C'est cette commande qui rend ton analyse reproductible par quelqu'un d'autre, six mois plus tard." },
+    ],
+  },
+  {
+    titre: "Vérifier qu'on parle au bon Python",
+    contexte: "Le diagnostic à connaître par cœur. Là, c'est du Python.",
+    lignes: [
+      { b:1, long:12, consigne:"Importe le module <code>sys</code>.",
+        ok:["import sys"],
+        indices:["Deux mots.","<code>import sys</code>"],
+        pourquoi:"<code>sys</code> donne accès aux informations sur l'interpréteur lui-même." },
+      { b:1, long:26, consigne:"Affiche le chemin de l'interpréteur qui exécute ce code.",
+        ok:["print(sys.executable)"],
+        indices:["L'attribut s'appelle <code>executable</code>",
+                 "<code>print(sys.executable)</code>"],
+        pourquoi:"Ce chemin doit contenir <code>.venv</code>. C'est le seul moyen de savoir à quel Python tu parles vraiment." },
+      { t: "" },
+      { b:1, long:22, consigne:"Importe <code>pandas</code> sous le nom court <code>pd</code>.",
+        ok:["import pandas as pd"],
+        indices:["Le mot-clé est <code>as</code>","<code>import pandas as pd</code>"],
+        pourquoi:"<code>pd</code> est une convention universelle. Tout le code pandas du monde s'écrit comme ça." },
+      { b:1, long:28, consigne:"Affiche la version de pandas installée.",
+        ok:["print(pd.__version__)"],
+        indices:["L'attribut s'écrit avec deux tirets bas de chaque côté.",
+                 "<code>print(pd.__version__)</code>"],
+        pourquoi:"Noter la version dans ta note d'analyse fait partie de la reproductibilité : pandas 1.5 et 2.2 ne se comportent pas toujours pareil." },
+    ],
+  },
+  {
+    titre: "Premier contact avec pandas",
+    contexte: "Un avant-goût de la séance 9, dans ton nouvel environnement.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "" },
+      { b:1, long:52, consigne:"Crée un tableau <code>df</code> avec une colonne <code>parti</code> valant <code>RN, UG, ENS</code> et une colonne <code>voix</code> valant <code>9379092, 8971581, 6425707</code>.",
+        ok:['df = pd.DataFrame({"parti": ["RN", "UG", "ENS"], "voix": [9379092, 8971581, 6425707]})'],
+        indices:["Un dictionnaire dont chaque valeur est une liste : <code>pd.DataFrame({...})</code>",
+                 '<code>df = pd.DataFrame({"parti": ["RN", "UG", "ENS"], "voix": [9379092, 8971581, 6425707]})</code>'],
+        pourquoi:"Un DataFrame, c'est un dictionnaire de colonnes. Chaque clé devient un nom de colonne." },
+      { b:1, long:48, consigne:"Ajoute une colonne <code>part</code> : la part des 32057946 exprimés, en pourcentage arrondi à 2 décimales.",
+        ok:['df["part"] = (df["voix"] / 32057946 * 100).round(2)'],
+        indices:["On crée une colonne comme une clé de dictionnaire, et <code>.round(2)</code> arrondit toute la colonne.",
+                 '<code>df["part"] = (df["voix"] / 32057946 * 100).round(2)</code>'],
+        pourquoi:"Le calcul s'applique à toute la colonne d'un coup, sans boucle. C'est toute la puissance de pandas, et le sujet de la séance 9." },
+      { b:1, long:14, consigne:"Affiche le tableau.",
+        ok:["print(df)"],
+        indices:["Un print tout simple.","<code>print(df)</code>"],
+        pourquoi:"Dans un notebook, écrire <code>df</code> seul sur la dernière ligne suffit et donne un rendu bien plus lisible." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=3"></script>
+
+<script>
+/* ---------- Instructions selon le système ---------- */
+(function () {
+  const TXT = {
+    win: `<ol>
+      <li>Va sur <strong>python.org</strong>, onglet Downloads, télécharge la dernière version</li>
+      <li>Lance l'installateur et <strong>coche « Add python.exe to PATH »</strong> avant de cliquer sur Install</li>
+      <li>Va sur <strong>code.visualstudio.com</strong> et installe VS Code</li>
+      <li>Ouvre un terminal (touche Windows, tape <code>cmd</code>) et vérifie :</li>
+    </ol>
+    <div class="term"><span class="p">&gt;</span> <span class="c">python --version</span>
+<span class="o">Python 3.13.1</span>
+
+<span class="p">&gt;</span> <span class="c">pip --version</span>
+<span class="o">pip 24.3.1</span></div>`,
+    mac: `<ol>
+      <li>Va sur <strong>python.org</strong>, onglet Downloads, télécharge la version macOS</li>
+      <li>Lance l'installateur, tout est automatique</li>
+      <li>Va sur <strong>code.visualstudio.com</strong> et installe VS Code</li>
+      <li>Ouvre le Terminal et vérifie, en écrivant bien <code>python3</code> :</li>
+    </ol>
+    <div class="term"><span class="p">$</span> <span class="c">python3 --version</span>
+<span class="o">Python 3.13.1</span>
+
+<span class="p">$</span> <span class="c">pip3 --version</span>
+<span class="o">pip 24.3.1</span></div>
+    <p class="hint">Sur macOS, <code>python</code> tout court peut désigner une très vieille version
+    fournie par le système. Écris toujours <code>python3</code> tant que ton environnement
+    n'est pas activé.</p>`,
+  };
+  const z = document.getElementById("instructions");
+  function montre(os) {
+    z.innerHTML = TXT[os];
+    document.querySelectorAll(".os button").forEach((b) =>
+      b.classList.toggle("on", b.dataset.os === os));
+  }
+  document.querySelectorAll(".os button").forEach((b) =>
+    (b.onclick = () => montre(b.dataset.os)));
+  montre("win");
+})();
+
+/* ---------- Les pannes réelles ---------- */
+(function () {
+  const P = [
+    ["'python' n'est pas reconnu comme une commande interne",
+     "La case <strong>Add python.exe to PATH</strong> n'a pas été cochée à l'installation. " +
+     "Le plus rapide est de <strong>réinstaller Python en la cochant</strong>. " +
+     "Sur macOS, essaie <code>python3</code> au lieu de <code>python</code>."],
+    ["ModuleNotFoundError: No module named 'pandas'",
+     "Tu as installé pandas dans un environnement, et tu exécutes le code depuis un autre. " +
+     "Vérifie que le préfixe <code>(.venv)</code> est bien là avant de faire <code>pip install</code>, " +
+     "et que le kernel du notebook pointe sur <code>.venv</code>. " +
+     "Le diagnostic : <code>import sys ; print(sys.executable)</code>."],
+    ["L'activation est refusée sur Windows (execution of scripts is disabled)",
+     "PowerShell bloque les scripts par défaut. Deux options : ouvrir un terminal " +
+     "<code>cmd</code> classique plutôt que PowerShell, ou lancer une fois " +
+     "<code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>."],
+    ["VS Code ne propose pas mon environnement dans Select Kernel",
+     "Ferme et rouvre VS Code <strong>depuis le dossier du projet</strong> " +
+     "(Fichier → Ouvrir le dossier), pas depuis un fichier isolé. " +
+     "VS Code ne détecte les environnements que dans le dossier ouvert."],
+    ["Le notebook affiche des résultats, mais Restart & Run All plante",
+     "Tes cellules ont été exécutées dans le désordre. Une variable existe en mémoire " +
+     "mais n'est définie nulle part, ou plus bas dans le fichier. " +
+     "<strong>C'est un vrai bug, pas un caprice de l'outil</strong> : ton analyse " +
+     "n'est pas reproductible tant que ça ne passe pas."],
+    ["FileNotFoundError alors que le fichier est là",
+     "Python cherche à partir du <strong>dossier de travail</strong>, pas du dossier " +
+     "du script. Vérifie avec <code>import os ; print(os.getcwd())</code>. " +
+     "Dans VS Code, ouvre le dossier du projet plutôt qu'un fichier seul."],
+  ];
+
+  document.getElementById("pannes-liste").innerHTML = P.map(([t, s], i) =>
+    '<div class="panne" data-i="' + i + '"><div><span style="color:var(--red)">⚠</span>' +
+    "<code>" + t.replace(/</g, "&lt;") + "</code><span class='fl'>voir</span></div>" +
+    '<div class="sol">' + s + "</div></div>"
+  ).join("");
+
+  document.querySelectorAll(".panne").forEach((el) =>
+    (el.querySelector("div").onclick = () => {
+      el.classList.toggle("ouvert");
+      el.querySelector(".fl").textContent = el.classList.contains("ouvert") ? "masquer" : "voir";
+    }));
+})();
+
+/* ---------- Le code de l'IA : installation globale ---------- */
+(function () {
+  const LIGNES = [
+    "# Installation de pandas",
+    "",
+    "pip install pandas",
+    "",
+    "# Puis dans votre script :",
+    "import pandas as pd",
+    "",
+    "df = pd.read_csv"  + '("mon_fichier.csv")',
+    "print(df.head())",
+  ];
+  const BUGS = [2];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 3</div>' +
+        "<p>Il manque <strong>tout ce qui précède</strong> : créer et activer " +
+        "un environnement virtuel. Ce <code>pip install</code> nu installe pandas " +
+        "<strong>dans le Python global</strong>, partagé par tous tes projets.</p>" +
+        "<p>Aujourd'hui ça marche. Dans trois mois, ta deuxième mission exigera " +
+        "une autre version, tu la mettras à jour, et <strong>la première cessera " +
+        "de fonctionner</strong> sans que tu comprennes pourquoi.</p>" +
+        "<p style='margin-bottom:0'><strong>Ce qui manquait :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        "python -m venv .venv\n" +
+        "source .venv/bin/activate\n" +
+        "pip install pandas\n" +
+        "pip freeze > requirements.txt</p>" +
+        "<p style='margin-bottom:0'>Et il manque aussi le <code>sep=\";\"</code> " +
+        "dans le <code>read_csv</code> de la ligne 8 : le piège de la séance 6, " +
+        "qui revient exactement à l'identique.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne n'est pas fausse. La question est ailleurs : " +
+        "<em>où pandas va-t-il être installé, et que se passera-t-il quand tu auras " +
+        "un deuxième projet ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 9 - pandas, premiers pas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>
+  .avant-apres2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 820px) { .avant-apres2 { grid-template-columns: 1fr; } }
+  .bloc-code { background: var(--code-bg); color: #cdd6e6; border-radius: 10px;
+    padding: 14px 16px; font-family: var(--mono); font-size: 13px; line-height: 1.65;
+    white-space: pre; overflow-x: auto; }
+  .compte { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
+
+  .filtre-choix { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .filtre-choix button { border: 1px solid var(--line); background: #fff; color: var(--ink-soft);
+    border-radius: 20px; padding: 7px 15px; font-size: 14px; font-weight: 600; }
+  .filtre-choix button.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .tbl2 { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .tbl2 th { background: var(--bg-soft); padding: 7px 10px; text-align: left;
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+  .tbl2 td { padding: 6px 10px; border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 9</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 9 · 1 h 30</div>
+    <h1>pandas, premiers pas</h1>
+    <p class="lede">En séance 6, agréger le fichier t'a pris vingt-cinq lignes.
+    <strong>pandas le fait en une.</strong> Mais il rend aussi la mauvaise réponse
+    plus facile à écrire que la bonne — et c'est le vrai sujet du jour.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Charger un fichier, l'inspecter, filtrer des lignes, calculer des colonnes,
+    trier et agréger. C'est l'outil que tu utiliseras tous les jours, en finance
+    comme en conseil, pendant les dix prochaines années.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Charger et regarder</h2>
+      <div class="etape-meta">15 minutes · read_csv, head, info</div></div></div>
+
+    <p>Un <strong>DataFrame</strong> est un tableau : des colonnes nommées, des lignes
+    numérotées. Contrairement à une liste de listes, il connaît le type de chaque colonne
+    et sait travailler sur une colonne entière d'un coup.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+print(df.shape)
+print(df.columns.tolist())
+print(df.dtypes)
+print(df.head())
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Les quatre commandes du premier contact</div>
+      <p><code>.shape</code> donne le nombre de lignes et de colonnes.
+      <code>.columns</code> les noms. <code>.dtypes</code> <strong>le type de chaque
+      colonne</strong>. <code>.head()</code> les cinq premières lignes.</p>
+      <p><code>.dtypes</code> est la plus importante : c'est elle qui te dit si
+      <code>voix</code> est un nombre (<code>int64</code>) ou du texte
+      (<code>object</code>). Une colonne numérique qui apparaît en <code>object</code>,
+      c'est qu'une cellule contient autre chose qu'un nombre — et pandas a tout basculé
+      en texte sans rien dire.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le <code>sep=";"</code>, encore et toujours</div>
+      <p>Comme en séance 6. <code>pd.read_csv</code> suppose la virgule par défaut.
+      Sans <code>sep=";"</code>, tu obtiens un tableau d'<strong>une seule colonne</strong>
+      dont le nom est la ligne d'en-tête entière.</p>
+      <p>Le symptôme est reconnaissable : <code>df.shape</code> annonce
+      <code>(1057, 1)</code> au lieu de <code>(1057, 7)</code>.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Vingt-cinq lignes contre une</h2>
+      <div class="etape-meta">le même résultat, deux écritures</div></div></div>
+
+    <p>Voici l'agrégation du chantier de la séance 6, dans les deux écritures.
+    Le résultat est identique.</p>
+
+    <div class="avant-apres2">
+      <div>
+        <div class="panel-label" style="color:var(--ink-soft)">
+          <span class="tag" style="background:var(--ink-soft)"></span> Séance 6, en Python nu</div>
+        <div class="bloc-code">import csv
+
+f = open("legislatives-2024.csv",
+         encoding="utf-8", newline="")
+donnees = list(csv.reader(f,
+         delimiter=";"))[1:]
+f.close()
+
+totaux = {}
+for ligne in donnees:
+    nuance = ligne[5]
+    voix = int(ligne[6])
+    totaux[nuance] = totaux.get(
+        nuance, 0) + voix
+
+classement = sorted(
+    totaux.items(),
+    key=lambda x: -x[1])
+
+for nuance, voix in classement:
+    print(nuance, voix)</div>
+        <div class="compte">20 lignes utiles</div>
+      </div>
+      <div>
+        <div class="panel-label" style="color:var(--orange)">
+          <span class="tag" style="background:var(--orange)"></span> Aujourd'hui, avec pandas</div>
+        <div class="bloc-code">import pandas as pd
+
+df = pd.read_csv(
+    "legislatives-2024.csv", sep=";")
+
+df.groupby("nuance")["voix"].sum(
+    ).sort_values(ascending=False)</div>
+        <div class="compte">4 lignes utiles</div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que tu gagnes, et ce que tu perds</div>
+      <p><strong>Tu gagnes</strong> du temps, et surtout de la lisibilité :
+      <code>groupby("nuance")["voix"].sum()</code> se lit en français,
+      alors que la boucle demande de reconstituer mentalement ce qu'elle fait.</p>
+      <p><strong>Tu perds</strong> la visibilité sur ce qui se passe. La boucle
+      te forçait à décider quoi faire de chaque ligne. pandas décide à ta place,
+      selon des règles que tu ne connais pas encore. C'est confortable,
+      et c'est exactement pour ça qu'on a commencé par la boucle.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Filtrer</h2>
+      <div class="etape-meta">20 minutes · les masques</div></div></div>
+
+    <p>Pour ne garder que certaines lignes, on écrit une <strong>condition sur toute
+    la colonne</strong>. Elle produit une colonne de vrai/faux, qu'on passe entre
+    crochets au tableau.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+masque = df["nuance"] == "RN"
+print(masque.head())
+print(masque.sum(), "lignes retenues")
+
+rn = df[masque]
+print(rn.shape)
+print(rn["voix"].sum())
+
+# deux conditions : parentheses obligatoires, et & au lieu de and
+gros = df[(df["nuance"] == "RN") & (df["voix"] > 100000)]
+print(len(gros), "departements ou le RN depasse 100 000 voix")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 <code>and</code> ne marche pas ici</div>
+      <p>Remplace le <code>&amp;</code> par <code>and</code> :
+      <code>ValueError: The truth value of a Series is ambiguous</code>.</p>
+      <p>La raison est logique : <code>and</code> attend deux valeurs vrai/faux,
+      or ici chaque côté est une <strong>colonne entière</strong> de milliers de
+      vrai/faux. Python ne sait pas quoi en faire. Le <code>&amp;</code> compare
+      ligne à ligne.</p>
+      <p>Et les <strong>parenthèses sont obligatoires</strong> autour de chaque
+      condition, sinon <code>&amp;</code> est évalué avant <code>==</code>
+      et le résultat est incompréhensible.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Calculer et trier</h2>
+      <div class="etape-meta">15 minutes · colonnes calculées, groupby</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+# une colonne calculee : pas de boucle
+df["part"] = df["voix"] / df["exprimes"] * 100
+
+print(df[["departement", "nuance", "voix", "part"]].head())
+
+# le classement national
+national = df.groupby("nuance")["voix"].sum().sort_values(ascending=False)
+print(national.head(6))
+
+# le meilleur departement du RN, en pourcentage
+rn = df[df["nuance"] == "RN"].sort_values("part", ascending=False)
+print(rn[["departement", "part"]].head(3))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La ligne qui change la façon de penser</div>
+      <p><code>df["part"] = df["voix"] / df["exprimes"] * 100</code> calcule
+      <strong>1 057 divisions d'un coup</strong>, sans boucle. C'est ce qu'on appelle
+      travailler « par colonne » plutôt que « par ligne ».</p>
+      <p>C'est le changement mental le plus important de la séance : tu ne décris plus
+      ce qu'il faut faire à chaque ligne, tu décris une <strong>opération sur
+      une colonne entière</strong>. Sur des millions de lignes, la différence
+      de vitesse est d'un facteur cent.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la fiche d'un département</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Écris un programme qui, pour un département donné, produit sa fiche complète.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Ce que doit contenir la fiche</div>
+      <ol style="margin-bottom:0">
+        <li>Le nom du département, ses inscrits, ses votants, sa participation</li>
+        <li>Le classement de ses nuances, avec voix et part des exprimés</li>
+        <li>L'écart entre la première et la deuxième nuance</li>
+        <li>La comparaison de sa nuance de tête avec son score national</li>
+      </ol>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+departement = "Nord"
+
+# 1. Les lignes de ce departement
+
+
+# 2. La participation (attention : inscrits est repete sur chaque ligne)
+
+
+# 3. Le classement local
+
+
+# 4. La comparaison au national
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. Le piège du format long est
+      toujours là : <code>inscrits</code> est répété sur chaque ligne du département.
+      Il faut prendre <code>.iloc[0]</code> ou <code>.max()</code>, jamais
+      <code>.sum()</code>.</p>
+      <p><strong>Le contrôle :</strong> pour le Nord, la participation doit tomber
+      autour de <strong>64 %</strong>, et les inscrits sur
+      <strong>1 819 768</strong>. S'il obtient 20 millions d'inscrits,
+      il a additionné la colonne.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : les départements les plus disputés</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Dans quels départements l'écart entre la première et la deuxième nuance
+    est-il le plus faible ? Ce sont ceux où le second tour se joue à rien.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 La question de méthode qui compte</div>
+      <p>Faut-il mesurer l'écart <strong>en voix</strong> ou <strong>en points
+      de pourcentage</strong> ? Les deux classements ne donnent pas du tout
+      les mêmes départements.</p>
+      <p>En voix, les gros départements dominent mécaniquement. En points,
+      un département de 60 000 électeurs pèse autant que le Nord.
+      <strong>Il n'y a pas de bonne réponse dans l'absolu</strong> — il y a
+      une réponse selon la question posée, et un analyste doit dire laquelle
+      il a choisie et pourquoi.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">J'ai un fichier CSV des résultats électoraux avec les colonnes code, departement, inscrits, votants, exprimes, nuance, voix. Calcule-moi le taux de participation national avec pandas.</p>
+      <p style="margin-top:12px">Trois lignes, parfaitement idiomatiques.
+      Le résultat annoncé est <strong>66,45 %</strong>, quand le chiffre officiel
+      est 66,71 %. Un quart de point d'écart : assez proche pour ne pas alerter.</p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi pandas rend cette erreur plus probable</div>
+      <p>En séance 6, la boucle t'obligeait à décider explicitement quoi faire
+      de chaque ligne — et tu <em>voyais</em> que le département revenait.
+      <code>df["inscrits"].sum()</code> ne demande aucune décision.</p>
+      <p><strong>Un outil qui rend le calcul plus facile rend aussi l'erreur
+      plus facile.</strong> C'est vrai de pandas, d'Excel, et de toutes les IA.
+      Le garde-fou reste le même depuis la séance 1 : <strong>le test de l'ordre
+      de grandeur</strong>. La France compte 49 millions d'inscrits, pas 574.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Produis le <strong>classement des départements par participation</strong>,
+      des cinq plus forts aux cinq plus faibles, avec pandas cette fois.</p>
+      <p class="hint" style="margin-top:8px">Tu devras d'abord réduire le fichier
+      à une ligne par département. Cherche du côté de
+      <code>.drop_duplicates(subset="code")</code>. C'est la manière propre
+      de neutraliser le format long, et elle te resservira à chaque fois.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-08.html" style="color:var(--orange);font-weight:650">← Séance 8</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = ["pandas"];
+window.FICHIERS = ["donnees/legislatives-2024.csv"];
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=3"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Charger et inspecter",
+    contexte: "Les quatre commandes du premier contact avec un fichier.",
+    lignes: [
+      { b:1, long:22, consigne:"Importe pandas sous le nom court <code>pd</code>.",
+        ok:["import pandas as pd"],
+        indices:["Le mot-clé est <code>as</code>","<code>import pandas as pd</code>"],
+        pourquoi:"Convention universelle : tout le code pandas du monde s'écrit avec <code>pd</code>." },
+      { t: "" },
+      { b:1, long:46, consigne:"Charge <code>legislatives-2024.csv</code> dans <code>df</code>, avec le bon séparateur.",
+        ok:['df = pd.read_csv("legislatives-2024.csv", sep=";")'],
+        indices:["Le séparateur se précise avec <code>sep</code>, pas <code>delimiter</code>.",
+                 '<code>df = pd.read_csv("legislatives-2024.csv", sep=";")</code>'],
+        pourquoi:"Sans <code>sep=\";\"</code>, tu obtiens un tableau d'une seule colonne. Le symptôme : <code>df.shape</code> annonce (1057, 1)." },
+      { b:1, long:20, consigne:"Affiche les dimensions du tableau.",
+        ok:["print(df.shape)"],
+        indices:["L'attribut s'appelle <code>shape</code>, sans parenthèses.",
+                 "<code>print(df.shape)</code>"],
+        pourquoi:"(1057, 7) : 1 057 lignes et 7 colonnes. C'est le premier contrôle à faire, toujours." },
+      { b:1, long:22, consigne:"Affiche le <strong>type</strong> de chaque colonne.",
+        ok:["print(df.dtypes)"],
+        indices:["L'attribut s'appelle <code>dtypes</code>","<code>print(df.dtypes)</code>"],
+        pourquoi:"Si <code>voix</code> apparaît en <code>object</code> et non en <code>int64</code>, c'est qu'une cellule contient du texte et que pandas a tout basculé sans rien dire." },
+      { b:1, long:20, consigne:"Affiche les cinq premières lignes.",
+        ok:["print(df.head())"],
+        indices:["La méthode s'appelle <code>head()</code>, avec parenthèses.",
+                 "<code>print(df.head())</code>"],
+        pourquoi:"" },
+    ],
+  },
+  {
+    titre: "Filtrer avec un masque",
+    contexte: "Une condition sur toute une colonne, passée entre crochets.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:34, consigne:"Crée un masque <code>masque</code> : les lignes dont la nuance vaut <code>RN</code>.",
+        ok:['masque = df["nuance"] == "RN"'],
+        indices:["Une comparaison sur toute la colonne : <code>df[\"nuance\"] == \"RN\"</code>",
+                 '<code>masque = df["nuance"] == "RN"</code>'],
+        pourquoi:"Le masque est une colonne de vrai/faux, aussi longue que le tableau. Ce n'est pas encore un filtre." },
+      { b:1, long:34, consigne:"Compte combien de lignes il retient.",
+        ok:['print(masque.sum())'],
+        indices:["Sur une colonne de vrai/faux, <code>.sum()</code> compte les vrais.",
+                 "<code>print(masque.sum())</code>"],
+        pourquoi:"En Python, <code>True</code> vaut 1 et <code>False</code> vaut 0. Additionner un masque compte donc les lignes retenues." },
+      { b:1, long:22, consigne:"Applique le masque au tableau, dans <code>rn</code>.",
+        ok:["rn = df[masque]"],
+        indices:["Le masque se passe entre crochets.","<code>rn = df[masque]</code>"],
+        pourquoi:"" },
+      { b:1, long:28, consigne:"Affiche le total des voix du RN.",
+        ok:['print(rn["voix"].sum())'],
+        indices:["On sélectionne la colonne, puis on somme.",'<code>print(rn["voix"].sum())</code>'],
+        pourquoi:"9 379 092. Le même chiffre qu'en séance 6, en deux lignes au lieu de vingt." },
+      { t: "" },
+      { b:1, long:56, consigne:"Filtre les lignes où la nuance est <code>RN</code> <strong>et</strong> les voix dépassent <code>100000</code>, dans <code>gros</code>.",
+        ok:['gros = df[(df["nuance"] == "RN") & (df["voix"] > 100000)]'],
+        indices:["Le <code>et</code> s'écrit <code>&amp;</code>, et chaque condition va entre parenthèses.",
+                 '<code>gros = df[(df["nuance"] == "RN") & (df["voix"] > 100000)]</code>'],
+        pourquoi:"<code>and</code> lèverait une erreur : il attend deux valeurs, pas deux colonnes entières. Et sans parenthèses, <code>&amp;</code> passe avant <code>==</code>." },
+    ],
+  },
+  {
+    titre: "Colonne calculée et classement",
+    contexte: "Mille calculs d'un coup, sans écrire une seule boucle.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:46, consigne:"Ajoute une colonne <code>part</code> : les voix rapportées aux exprimés, en pourcentage.",
+        ok:['df["part"] = df["voix"] / df["exprimes"] * 100'],
+        indices:["Les deux colonnes se divisent directement, sans boucle.",
+                 '<code>df["part"] = df["voix"] / df["exprimes"] * 100</code>'],
+        pourquoi:"1 057 divisions en une ligne. C'est le changement mental de la séance : on décrit une opération sur une colonne, plus sur une ligne." },
+      { t: "" },
+      { b:1, long:52, consigne:"Calcule le total des voix <strong>par nuance</strong>, trié du plus grand au plus petit, dans <code>national</code>.",
+        ok:['national = df.groupby("nuance")["voix"].sum().sort_values(ascending=False)'],
+        indices:["<code>groupby</code> regroupe, puis on somme, puis on trie.",
+                 '<code>national = df.groupby("nuance")["voix"].sum().sort_values(ascending=False)</code>'],
+        pourquoi:"Cette seule ligne remplace les vingt lignes de la séance 6. <code>ascending=False</code> trie du plus grand au plus petit." },
+      { b:1, long:26, consigne:"Affiche les six premières nuances.",
+        ok:["print(national.head(6))"],
+        indices:["<code>head</code> accepte un nombre.","<code>print(national.head(6))</code>"],
+        pourquoi:"RN, UG, ENS, LR, UXD, DVD. Le résultat officiel du premier tour, reconstitué en quatre lignes." },
+    ],
+  },
+  {
+    titre: "Neutraliser le format long",
+    contexte: "Le piège de la séance : chaque département apparaît sur plusieurs lignes.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:48, consigne:"Réduis le tableau à <strong>une ligne par département</strong>, dans <code>deps</code>.",
+        ok:['deps = df.drop_duplicates(subset="code")'],
+        indices:["La méthode est <code>drop_duplicates</code>, avec <code>subset</code> pour dire sur quelle colonne.",
+                 '<code>deps = df.drop_duplicates(subset="code")</code>'],
+        pourquoi:"Sans cette ligne, chaque département compte autant de fois qu'il a de nuances, soit de 3 à 15 fois selon les cas." },
+      { b:1, long:26, consigne:"Vérifie : affiche le nombre de lignes de <code>deps</code>.",
+        ok:["print(len(deps))"],
+        indices:["<code>len</code> compte les lignes.","<code>print(len(deps))</code>"],
+        pourquoi:"107 au lieu de 1 057. Le contrôle prend deux secondes et évite l'erreur de toute la séance." },
+      { t: "" },
+      { b:1, long:56, consigne:"Calcule la participation nationale : total des votants sur total des inscrits, en pourcentage.",
+        ok:['print(deps["votants"].sum() / deps["inscrits"].sum() * 100)'],
+        indices:["Sur <code>deps</code>, pas sur <code>df</code> !",
+                 '<code>print(deps["votants"].sum() / deps["inscrits"].sum() * 100)</code>'],
+        pourquoi:"66,71 % : exactement le chiffre officiel du premier tour. Sur <code>df</code>, tu aurais obtenu 66,45 % et 574 millions d'inscrits." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=3"></script>
+
+<script>
+/* ---------- Le code de l'IA : le format long ignoré ---------- */
+(function () {
+  const LIGNES = [
+    "import pandas as pd",
+    "",
+    'df = pd.read_csv("legislatives-2024.csv", sep=";")',
+    "",
+    'participation = df["votants"].sum() / df["inscrits"].sum() * 100',
+    "",
+    'print(f"Participation nationale : {participation:.2f} %")',
+  ];
+  const BUGS = [4];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 5</div>' +
+        "<p>Le fichier est en <strong>format long</strong> : chaque département " +
+        "apparaît sur autant de lignes qu'il a de nuances, entre 3 et 15. " +
+        "<code>df[\"inscrits\"].sum()</code> compte donc chaque département " +
+        "de 3 à 15 fois.</p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:10px 0'>" +
+        "correct : 49 332 709 inscrits  ->  66,71 %\n" +
+        "obtenu  : 574 061 573 inscrits  ->  66,45 %</p>" +
+        "<p><strong>Le rapport reste crédible</strong>, parce que numérateur et " +
+        "dénominateur sont gonflés à peu près pareil. C'est ce qui rend l'erreur " +
+        "dangereuse : rien n'alerte.</p>" +
+        "<p>Mais <strong>574 millions d'inscrits en France</strong>, ça, ça se voit. " +
+        "C'est exactement le test de l'ordre de grandeur de la séance 1.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        'deps = df.drop_duplicates(subset="code")\n' +
+        'participation = deps["votants"].sum() / deps["inscrits"].sum() * 100</p>' +
+        "<p style='margin-bottom:0'>L'IA ne pouvait pas deviner que le fichier est " +
+        "en format long : <strong>elle ne l'a jamais vu</strong>. Le prompt lui donnait " +
+        "les noms de colonnes, pas la structure.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Repense au fichier : " +
+        "<em>combien de fois le Nord apparaît-il, et que vaut sa colonne inscrits " +
+        "sur chacune de ces lignes ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+</body>
+</html>

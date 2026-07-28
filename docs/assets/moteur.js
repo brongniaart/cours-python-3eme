@@ -378,6 +378,12 @@ async function demarrerPython() {
 import sys
 sys.path.insert(0, "/home/pyodide")
 `);
+    // une page peut réclamer des bibliothèques : window.PAQUETS = ["pandas", ...]
+    const paquets = window.PAQUETS || [];
+    if (paquets.length) {
+      try { await pyodide.loadPackage(paquets); }
+      catch (e) { console.warn("paquets non chargés :", e); }
+    }
     await chargerDonnees(pyodide);
     return pyodide;
   })();
