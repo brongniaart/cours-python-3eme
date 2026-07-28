@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 10 - Croiser et agréger</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>
+  .hemi { display: grid; grid-template-columns: 1fr 300px; gap: 28px; align-items: start; }
+  @media (max-width: 900px) { .hemi { grid-template-columns: 1fr; } }
+  .barres-p { display: flex; flex-direction: column; gap: 9px; }
+  .barre-p { display: flex; align-items: center; gap: 11px; font-size: 14.5px; }
+  .barre-p .nom { width: 52px; font-weight: 700; font-family: var(--mono); font-size: 13px; }
+  .barre-p .piste { flex: 1; height: 26px; background: var(--bg-soft); border-radius: 5px; overflow: hidden; position: relative; }
+  .barre-p .piste i { display: block; height: 100%; transition: width .3s; }
+  .barre-p .n { width: 42px; text-align: right; font-family: var(--mono); font-weight: 700; }
+  .barre-p .reel { width: 74px; text-align: right; font-size: 12.5px; color: var(--ink-soft); }
+
+  .verdict-p { border-radius: 12px; padding: 16px 18px; border: 1px solid; margin-top: 14px; }
+  .verdict-p.bascule { background: var(--red-soft); border-color: #f5c9c4; }
+  .verdict-p.stable { background: var(--green-soft); border-color: #bfe3d3; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 10</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+    <a href="#viz">👁</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 10 · 1 h 30</div>
+    <h1>Croiser et agréger</h1>
+    <p class="lede">Les mêmes voix, deux règles de répartition, deux vainqueurs différents.
+    <strong>Au scrutin majoritaire, le RN a obtenu 125 sièges. À la proportionnelle,
+    ces mêmes voix en donnent 171</strong>, et la première place.
+    Aujourd'hui tu calcules ça toi-même.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Regrouper sur plusieurs colonnes, construire un tableau croisé, joindre deux
+    sources. Et implémenter une règle de répartition de sièges : un algorithme
+    de vingt lignes qui décide de la composition d'un parlement.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Regrouper sur plusieurs niveaux</h2>
+      <div class="etape-meta">15 minutes · groupby, agg</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+# plusieurs statistiques d'un coup
+resume = df.groupby("nuance")["voix"].agg(["sum", "mean", "max", "count"])
+print(resume.sort_values("sum", ascending=False).head(5))
+
+# regrouper sur deux colonnes
+paires = df.groupby(["departement", "nuance"])["voix"].sum()
+print(paires.head(8))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 <code>count</code> est souvent la colonne la plus utile</div>
+      <p>Elle dit <strong>dans combien de départements chaque nuance était présente</strong>.
+      Une nuance à 500 000 voix présente partout et une nuance à 500 000 voix
+      concentrée sur trois départements ne racontent pas la même histoire.</p>
+      <p>Réflexe d'analyste : à côté de toute moyenne, toujours afficher l'effectif
+      sur lequel elle porte. Une moyenne sur trois observations n'est pas une moyenne.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Le tableau croisé</h2>
+      <div class="etape-meta">15 minutes · pivot_table</div></div></div>
+
+    <p>Un tableau croisé remet le format long en format large : les départements
+    en lignes, les nuances en colonnes. C'est ce que tout le monde attend
+    quand on demande « le tableau ».</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+croise = df.pivot_table(index="departement", columns="nuance",
+                        values="voix", aggfunc="sum", fill_value=0)
+
+print(croise.shape)
+print(croise[["RN", "UG", "ENS"]].head(6))
+
+# la part de chaque nuance, ligne par ligne
+parts = croise.div(croise.sum(axis=1), axis=0) * 100
+print(parts[["RN", "UG", "ENS"]].round(1).head(6))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 <code>fill_value=0</code> n'est pas anodin</div>
+      <p>Toutes les nuances ne se présentent pas dans tous les départements.
+      Sans <code>fill_value=0</code>, les cases manquantes valent <code>NaN</code>,
+      et toute somme les propage : <strong>un seul NaN suffit à rendre un total NaN</strong>.</p>
+      <p>Mais attention au sens : mettre 0 revient à dire « cette nuance a fait
+      zéro voix ici », alors que la réalité est « elle ne s'y présentait pas ».
+      Pour un total de voix c'est équivalent. Pour une moyenne, non :
+      elle sera tirée vers le bas par des zéros qui n'existent pas.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Joindre deux sources</h2>
+      <div class="etape-meta">15 minutes · merge</div></div></div>
+
+    <p>Une jointure relie deux tableaux par une colonne commune. C'est l'opération
+    la plus utile et la plus dangereuse de pandas : elle échoue en silence.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+# un tableau par departement : une ligne chacun
+deps = df.drop_duplicates(subset="code")[["code", "departement", "inscrits", "votants"]]
+deps = deps.copy()
+deps["participation"] = deps["votants"] / deps["inscrits"] * 100
+
+# on rattache la participation a chaque ligne de resultat
+fusion = df.merge(deps[["code", "participation"]], on="code", how="left")
+
+print(len(df), "->", len(fusion))
+print(fusion["participation"].isna().sum(), "lignes sans correspondance")
+print(fusion[["departement", "nuance", "voix", "participation"]].head(4))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Les deux contrôles obligatoires après toute jointure</div>
+      <p><strong>1. Le nombre de lignes a-t-il changé ?</strong> Si la table de droite
+      contient des doublons sur la clé, la jointure <em>multiplie</em> les lignes,
+      et tous tes totaux explosent sans avertissement.</p>
+      <p><strong>2. Combien de <code>NaN</code> a-t-elle créés ?</strong>
+      <code>.isna().sum()</code> compte les lignes qui n'ont trouvé aucune correspondance.
+      C'est exactement le bug du <code>zfill</code> de la séance 7 : neuf départements
+      disparaissaient, sans la moindre erreur.</p>
+      <p>Ces deux lignes de contrôle après chaque <code>merge</code>. Toujours.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Et si on avait voté à la proportionnelle ?</h2>
+      <div class="etape-meta">les vraies voix de 2024, une autre règle</div></div></div>
+
+    <p>Les barres pleines montrent la répartition des 577 sièges à la proportionnelle,
+    calculée sur les voix réelles du premier tour. À droite, la composition
+    <strong>réellement élue</strong> au scrutin majoritaire.</p>
+
+    <div class="widget">
+      <div class="hemi">
+        <div>
+          <div class="barres-p" id="barres"></div>
+          <p class="hint" id="maj" style="margin-top:12px"></p>
+          <div class="slider-row" style="margin-top:22px">
+            <label>Seuil d'éligibilité <span class="val" id="v-seuil">0 %</span></label>
+            <input type="range" id="s-seuil" min="0" max="10" step="0.5" value="0">
+          </div>
+          <div class="slider-row">
+            <label>Nombre de sièges <span class="val" id="v-sieges">577</span></label>
+            <input type="range" id="s-sieges" min="200" max="700" step="1" value="577">
+          </div>
+        </div>
+        <div>
+          <div class="verdict-p" id="verdict">
+            <div style="font-size:11.5px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)">En tête</div>
+            <div style="font-size:28px;font-weight:780;letter-spacing:-.02em" id="v-tete"></div>
+            <div class="hint" id="v-note" style="margin-top:6px"></div>
+          </div>
+          <p class="hint" id="v-seuil-note" style="margin-top:14px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box att" style="background:var(--red-soft);border:1px solid #f5c9c4;border-radius:11px;padding:17px 20px;margin:20px 0">
+      <div class="box-title" style="color:var(--red)">⚠️ La limite qu'il faut absolument énoncer</div>
+      <p>Cette comparaison n'est <strong>pas</strong> un contrefactuel rigoureux,
+      et le dire fait partie du travail.</p>
+      <p><strong>Sous un autre mode de scrutin, les gens ne votent pas pareil.</strong>
+      Le vote utile disparaît, de petites listes se présentent, les alliances
+      se forment autrement. Et la composition réelle sort d'un <em>second</em> tour,
+      avec désistements, alors qu'on compare aux voix du <em>premier</em>.</p>
+      <p style="margin-bottom:0">Ce calcul dit une chose, et une seule :
+      <strong>comment ces bulletins-là auraient été convertis par cette règle-là</strong>.
+      C'est déjà beaucoup. Le présenter comme « le résultat qu'on aurait eu »
+      serait malhonnête, et c'est pourtant ce qu'on lit partout.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la carte d'identité des départements</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Construis un tableau à une ligne par département, avec tout ce qu'il faut
+    pour la séance 13 sur la cartographie.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Les colonnes attendues</div>
+      <p style="margin-bottom:0"><code>code</code>, <code>departement</code>,
+      <code>inscrits</code>, <code>participation</code>, <code>nuance_tete</code>,
+      <code>part_tete</code>, <code>ecart_1_2</code> (l'écart en points entre
+      la première et la deuxième nuance).</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+# 1. La part de chaque nuance dans son departement
+
+
+# 2. Pour chaque departement : la nuance de tete et sa part
+#    (cherche du cote de .sort_values puis .groupby().head(1))
+
+
+# 3. L'ecart entre la premiere et la deuxieme
+
+
+# 4. Le tableau final, une ligne par departement
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. La difficulté est de récupérer
+      <em>la ligne</em> du maximum, pas seulement la valeur. Deux voies :
+      trier puis <code>groupby("code").head(1)</code>, ou
+      <code>.loc[df.groupby("code")["part"].idxmax()]</code>.</p>
+      <p><strong>Le contrôle :</strong> le tableau doit faire 107 lignes,
+      et le RN doit arriver en tête dans 55 d'entre elles.
+      S'il obtient 1 057 lignes, il a oublié de réduire.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : implémente la règle de D'Hondt</h2>
+      <div class="etape-meta">20 minutes · vingt lignes qui font un parlement</div></div></div>
+
+    <p>La méthode de la plus forte moyenne, dite de D'Hondt, attribue les sièges
+    <strong>un par un</strong>. À chaque tour, le siège va au parti dont le quotient
+    <code>voix / (sièges déjà obtenus + 1)</code> est le plus élevé.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+voix = df.groupby("nuance")["voix"].sum()
+
+# A toi : attribue 577 sieges un par un.
+# Au depart, chaque parti a 0 siege, donc son quotient vaut ses voix.
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Pourquoi cette méthode existe</div>
+      <p>La méthode évidente serait <code>round(part * 577)</code>.
+      Essaie : tu obtiens <strong>578 sièges</strong>. Avec une troncature,
+      <strong>568</strong>, et neuf sièges dans la nature.</p>
+      <p>Aucune règle d'arrondi ne tombe juste, jamais. C'est pour ça que tous
+      les pays ont dû choisir un <strong>algorithme</strong> plutôt qu'une formule,
+      et que le choix de l'algorithme est un choix politique.</p>
+      <p>D'Hondt favorise légèrement les grands partis. Sainte-Laguë, qui divise
+      par 1, 3, 5, 7 au lieu de 1, 2, 3, 4, favorise les petits.
+      <strong>Change une ligne de ton code et tu changes la majorité.</strong></p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">J'ai les voix obtenues par chaque parti. Répartis 577 sièges à la proportionnelle entre eux, avec pandas.</p>
+      <p style="margin-top:12px">Le code est court, lisible, et il répond exactement
+      à la demande. <strong>Il attribue 578 sièges.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le contrôle de cohérence, réflexe de survie</div>
+      <p>Un total de sièges, un total de parts de marché, une somme de pourcentages,
+      une répartition budgétaire : <strong>dès qu'un résultat doit tomber sur
+      un total connu, vérifie qu'il y tombe.</strong> Une ligne de code,
+      et l'erreur ne passe jamais.</p>
+      <p>C'est le seul garde-fou vraiment universel de tout ce parcours,
+      et celui qu'aucune IA ne posera à ta place, parce qu'elle ne sait pas
+      qu'il y a 577 sièges à l'Assemblée.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Reprends ton code de D'Hondt et transforme-le en fonction
+      <code>repartir(voix, sieges, diviseurs)</code>, où <code>diviseurs</code>
+      décide de la règle. Compare <strong>D'Hondt</strong> (1, 2, 3, 4…)
+      et <strong>Sainte-Laguë</strong> (1, 3, 5, 7…) sur les mêmes voix.</p>
+      <p class="hint" style="margin-top:8px">Puis écris trois phrases : qui gagne
+      des sièges, qui en perd, et pourquoi. C'est exactement le format
+      de la note d'analyse de la séance 16.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-09.html" style="color:var(--orange);font-weight:650">← Séance 9</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = ["pandas"];
+window.FICHIERS = ["donnees/legislatives-2024.csv"];
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=3"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Plusieurs statistiques d'un coup",
+    contexte: "groupby ne sait pas que sommer.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:56, consigne:"Calcule pour chaque nuance la somme, la moyenne et le nombre de départements, dans <code>resume</code>.",
+        ok:['resume = df.groupby("nuance")["voix"].agg(["sum", "mean", "count"])'],
+        indices:["<code>.agg([...])</code> accepte une liste de statistiques.",
+                 '<code>resume = df.groupby("nuance")["voix"].agg(["sum", "mean", "count"])</code>'],
+        pourquoi:"<code>count</code> dit dans combien de départements la nuance se présentait. Une moyenne sans son effectif ne veut rien dire." },
+      { b:1, long:46, consigne:"Affiche les cinq premières lignes, triées par somme décroissante.",
+        ok:['print(resume.sort_values("sum", ascending=False).head(5))'],
+        indices:["On trie sur la colonne <code>sum</code>.",
+                 '<code>print(resume.sort_values("sum", ascending=False).head(5))</code>'],
+        pourquoi:"" },
+    ],
+  },
+  {
+    titre: "Le tableau croisé",
+    contexte: "Du format long au format large, en une commande.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:72, consigne:"Croise <code>departement</code> en lignes et <code>nuance</code> en colonnes, avec la somme des <code>voix</code>, les cases vides à 0. Dans <code>croise</code>.",
+        ok:['croise = df.pivot_table(index="departement", columns="nuance", values="voix", aggfunc="sum", fill_value=0)'],
+        indices:["Quatre arguments : <code>index</code>, <code>columns</code>, <code>values</code>, <code>aggfunc</code>, plus <code>fill_value</code>.",
+                 '<code>croise = df.pivot_table(index="departement", columns="nuance", values="voix", aggfunc="sum", fill_value=0)</code>'],
+        pourquoi:"Sans <code>fill_value=0</code>, les cases manquantes valent NaN et contaminent toute somme qui les traverse." },
+      { b:1, long:22, consigne:"Affiche les dimensions du tableau croisé.",
+        ok:["print(croise.shape)"],
+        indices:["<code>.shape</code>","<code>print(croise.shape)</code>"],
+        pourquoi:"107 départements en lignes, 22 nuances en colonnes." },
+      { b:1, long:44, consigne:"Affiche les six premières lignes, pour les colonnes <code>RN</code>, <code>UG</code> et <code>ENS</code>.",
+        ok:['print(croise[["RN", "UG", "ENS"]].head(6))'],
+        indices:["Une liste de colonnes entre doubles crochets.",
+                 '<code>print(croise[["RN", "UG", "ENS"]].head(6))</code>'],
+        pourquoi:"Les doubles crochets sélectionnent plusieurs colonnes et rendent un tableau. Des crochets simples ne rendraient qu'une colonne." },
+    ],
+  },
+  {
+    titre: "Joindre, et vérifier",
+    contexte: "Les deux contrôles qui doivent suivre tout merge.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:56, consigne:"Réduis à une ligne par département, en gardant <code>code</code>, <code>inscrits</code> et <code>votants</code>, dans <code>deps</code>.",
+        ok:['deps = df.drop_duplicates(subset="code")[["code", "inscrits", "votants"]]'],
+        indices:["On déduplique, puis on sélectionne trois colonnes.",
+                 '<code>deps = df.drop_duplicates(subset="code")[["code", "inscrits", "votants"]]</code>'],
+        pourquoi:"C'est la table de droite de la jointure : elle doit contenir une seule ligne par clé, sinon la jointure multiplie les lignes." },
+      { t: "deps = deps.copy()" },
+      { b:1, long:52, consigne:"Ajoute une colonne <code>participation</code> en pourcentage.",
+        ok:['deps["participation"] = deps["votants"] / deps["inscrits"] * 100'],
+        indices:["Votants sur inscrits, fois 100.",
+                 '<code>deps["participation"] = deps["votants"] / deps["inscrits"] * 100</code>'],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:64, consigne:"Joins <code>df</code> et les colonnes <code>code</code> et <code>participation</code> de <code>deps</code>, sur <code>code</code>, en gardant toutes les lignes de gauche. Dans <code>fusion</code>.",
+        ok:['fusion = df.merge(deps[["code", "participation"]], on="code", how="left")'],
+        indices:["<code>on</code> donne la clé, <code>how=\"left\"</code> garde toutes les lignes de gauche.",
+                 '<code>fusion = df.merge(deps[["code", "participation"]], on="code", how="left")</code>'],
+        pourquoi:"<code>how=\"left\"</code> garantit qu'aucune ligne de résultat ne disparaît, même sans correspondance." },
+      { b:1, long:52, consigne:"Contrôle : affiche le nombre de lignes avant et après la jointure.",
+        ok:['print(len(df), "->", len(fusion))'],
+        indices:["Deux <code>len</code> séparés par une flèche.",
+                 '<code>print(len(df), "->", len(fusion))</code>'],
+        pourquoi:"1057 -> 1057. Si le nombre avait augmenté, la table de droite contenait des doublons et tous les totaux seraient faux." },
+      { b:1, long:52, consigne:"Second contrôle : combien de lignes n'ont trouvé aucune correspondance ?",
+        ok:['print(fusion["participation"].isna().sum())'],
+        indices:["<code>.isna()</code> repère les valeurs manquantes, <code>.sum()</code> les compte.",
+                 '<code>print(fusion["participation"].isna().sum())</code>'],
+        pourquoi:"0. Ces deux contrôles après chaque merge : c'est ce qui aurait évité les neuf départements perdus de la séance 7." },
+    ],
+  },
+  {
+    titre: "La règle de D'Hondt",
+    contexte: "Vingt lignes qui décident de la composition d'un parlement.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: 'voix = df.groupby("nuance")["voix"].sum().to_dict()' },
+      { t: "" },
+      { b:1, long:46, consigne:"Crée <code>sieges</code> : un dictionnaire qui donne <code>0</code> à chaque parti au départ.",
+        ok:["sieges = {parti: 0 for parti in voix}"],
+        indices:["Une compréhension de dictionnaire : <code>{cle: 0 for cle in voix}</code>",
+                 "<code>sieges = {parti: 0 for parti in voix}</code>"],
+        pourquoi:"Chaque parti part de zéro. Son premier quotient vaut donc ses voix divisées par 1." },
+      { t: "" },
+      { b:1, long:26, consigne:"Une boucle qui attribue <code>577</code> sièges, un par un.",
+        ok:["for tour in range(577):"],
+        indices:["<code>range(577)</code> répète 577 fois.","<code>for tour in range(577):</code>"],
+        pourquoi:"Un siège par tour : c'est ce qui garantit qu'on en attribue exactement 577, ni plus ni moins." },
+      { b:1, indent:4, long:64, consigne:"Trouve le parti dont <code>voix / (sieges + 1)</code> est le plus grand, dans <code>gagnant</code>.",
+        ok:["gagnant = max(voix, key=lambda p: voix[p] / (sieges[p] + 1))"],
+        indices:["<code>max</code> accepte une clé de comparaison avec <code>key=</code>",
+                 "<code>gagnant = max(voix, key=lambda p: voix[p] / (sieges[p] + 1))</code>"],
+        pourquoi:"Le <code>+1</code> est tout l'algorithme : il représente le siège qu'on est en train d'attribuer." },
+      { b:1, indent:4, long:34, consigne:"Donne-lui le siège.",
+        ok:["sieges[gagnant] = sieges[gagnant] + 1","sieges[gagnant] += 1"],
+        indices:["Accumulation dans le dictionnaire.","<code>sieges[gagnant] = sieges[gagnant] + 1</code>"],
+        pourquoi:"Son quotient baisse aussitôt, ce qui laisse la place aux autres au tour suivant." },
+      { t: "" },
+      { b:1, long:56, consigne:"Contrôle indispensable : affiche le total des sièges attribués.",
+        ok:["print(sum(sieges.values()), 'sieges attribues')",
+            'print(sum(sieges.values()), "sieges attribues")'],
+        indices:["<code>sum(sieges.values())</code> additionne les sièges.",
+                 '<code>print(sum(sieges.values()), "sieges attribues")</code>'],
+        pourquoi:"577, exactement. C'est ce contrôle que le code de l'IA ne fait pas, et c'est pour ça qu'il en attribue 578 sans le savoir." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=3"></script>
+
+<script>
+/* ---------- Le code de l'IA : la proportion arrondie ---------- */
+(function () {
+  const LIGNES = [
+    "import pandas as pd",
+    "",
+    'voix = df.groupby("nuance")["voix"].sum()',
+    "",
+    "parts = voix / voix.sum()",
+    "sieges = (parts * 577).round().astype(int)",
+    "",
+    "print(sieges.sort_values(ascending=False))",
+  ];
+  const BUGS = [5];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 6</div>' +
+        "<p>Arrondir chaque part indépendamment ne tombe jamais sur le total. " +
+        "Ici, la somme des sièges attribués fait <strong>578</strong>.</p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:10px 0'>" +
+        "arrondi     -> 578 sieges  (un de trop)\n" +
+        "troncature  -> 568 sieges  (neuf manquants)\n" +
+        "D'Hondt     -> 577 sieges  (exactement)</p>" +
+        "<p><strong>Aucune règle d'arrondi ne tombe juste</strong>, et c'est " +
+        "mathématiquement inévitable. C'est précisément pour ça que tous les pays " +
+        "ont adopté un algorithme d'attribution siège par siège.</p>" +
+        "<p style='margin-bottom:0'>Le code de l'IA n'est pas absurde : il répond " +
+        "littéralement à « répartis à la proportionnelle ». <strong>Il manque " +
+        "la connaissance métier</strong> : qu'un parlement a un nombre de sièges " +
+        "fixe, et qu'il existe des règles nommées pour ça.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Le contrôle qui manquait</div>' +
+        "<p style='margin-bottom:0'>Une ligne aurait suffi à révéler le problème :" +
+        "<br><code>print(sieges.sum())</code>. Dès qu'un résultat doit tomber " +
+        "sur un total connu, vérifie qu'il y tombe.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Pose-toi la question " +
+        "du contrôle : <em>si j'additionne tous les sièges attribués, " +
+        "est-ce que je retombe sur 577 ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- La proportionnelle, sur les voix réelles de 2024 ---------- */
+(function () {
+  /* totaux du premier tour des legislatives 2024, recalcules sur le fichier
+     du ministere de l'Interieur livre avec le cours */
+  const VOIX = {
+    RN: 9379092, UG: 8971581, ENS: 6425707, LR: 2106166, UXD: 1251125,
+    DVD: 1172482, DVG: 490898, DVC: 391423, EXG: 366594, REG: 334372,
+    REC: 238934, HOR: 231667, ECO: 182478, UDI: 163072, DIV: 142871,
+    DSV: 90110, EXD: 59679, SOC: 29242, RDG: 12434, FI: 12224,
+    COM: 3125, VEC: 2668,
+  };
+  const REEL = { UG: 178, ENS: 150, RN: 125, LR: 39, DVD: 26, DVG: 12, UDI: 6 };
+  const TEINTE = { RN: "#3c3c8c", UG: "#d4506a", ENS: "#f0a828", LR: "#2563c9",
+                   UXD: "#20204f", DVD: "#7aa5e0", DVG: "#e8a0b4", DVC: "#f5c518" };
+  const TOTAL = Object.values(VOIX).reduce((a, b) => a + b, 0);
+
+  function dhondt(sieges, seuil) {
+    const admis = {};
+    for (const p in VOIX) if (VOIX[p] / TOTAL >= seuil) admis[p] = 0;
+    for (let k = 0; k < sieges; k++) {
+      let best = null, q = -1;
+      for (const p in admis) {
+        const x = VOIX[p] / (admis[p] + 1);
+        if (x > q) { q = x; best = p; }
+      }
+      admis[best]++;
+    }
+    return admis;
+  }
+
+  function maj() {
+    const sieges = +document.getElementById("s-sieges").value;
+    const seuil = parseFloat(document.getElementById("s-seuil").value) / 100;
+    document.getElementById("v-sieges").textContent = sieges;
+    document.getElementById("v-seuil").textContent =
+      (seuil * 100).toString().replace(".", ",") + " %";
+
+    const s = dhondt(sieges, seuil);
+    const classe = Object.entries(s).filter(([, n]) => n > 0)
+      .sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const maxN = classe.length ? classe[0][1] : 1;
+    const majorite = Math.floor(sieges / 2) + 1;
+
+    document.getElementById("barres").innerHTML = classe.map(([p, n]) =>
+      '<div class="barre-p"><span class="nom">' + p + "</span>" +
+      '<span class="piste"><i style="width:' + (n / maxN * 100) + "%;background:" +
+      (TEINTE[p] || "#9a9287") + '"></i></span>' +
+      '<span class="n">' + n + "</span>" +
+      '<span class="reel">' + (REEL[p] !== undefined ? "réel " + REEL[p] : "") + "</span></div>"
+    ).join("");
+
+    const tete = classe[0];
+    const manque = tete ? majorite - tete[1] : majorite;
+    document.getElementById("maj").innerHTML =
+      "Majorité absolue à <strong>" + majorite + " sièges</strong>. " +
+      (manque > 0
+        ? "Le premier groupe en est à <strong>" + manque + "</strong> près : " +
+          "il lui faut une coalition."
+        : "Le premier groupe l'atteint seul.");
+
+    const v = document.getElementById("verdict");
+    const bascule = tete && tete[0] === "RN";
+    v.className = "verdict-p " + (bascule ? "bascule" : "stable");
+    document.getElementById("v-tete").textContent = tete ? tete[0] + " · " + tete[1] + " sièges" : "-";
+    document.getElementById("v-note").innerHTML = bascule
+      ? "Le RN arrive <strong>premier</strong>, alors qu'il est <strong>troisième</strong> " +
+        "avec 125 sièges dans l'Assemblée réellement élue."
+      : "Aucun groupe n'atteint la majorité absolue de " + majorite + " sièges.";
+
+    const n = Object.keys(s).filter((p) => s[p] > 0).length;
+    document.getElementById("v-seuil-note").innerHTML = seuil === 0
+      ? "Sans seuil, <strong>" + n + " nuances</strong> obtiennent au moins un siège. " +
+        "Monte le seuil et regarde leurs sièges se reporter sur les grands partis."
+      : "Avec un seuil à " + (seuil * 100).toString().replace(".", ",") + " %, il ne reste que <strong>" +
+        n + " nuances</strong>. Les voix des éliminés ne disparaissent pas : " +
+        "elles sont <strong>redistribuées</strong> à ceux qui restent.";
+  }
+
+  ["s-sieges", "s-seuil"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", maj));
+  maj();
+})();
+</script>
+
+</body>
+</html>

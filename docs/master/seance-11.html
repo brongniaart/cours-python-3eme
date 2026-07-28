@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 11 - Séries temporelles</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>
+  .alloc { display: grid; grid-template-columns: 1fr 260px; gap: 26px; align-items: start; }
+  @media (max-width: 900px) { .alloc { grid-template-columns: 1fr; } }
+  .kpi3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .kpi3 > div { background: var(--bg-soft); border-radius: 10px; padding: 11px 13px; }
+  .kpi3 .k { font-size: 10.5px; font-weight: 750; letter-spacing: .05em;
+             text-transform: uppercase; color: var(--ink-soft); }
+  .kpi3 .v { font-size: 21px; font-weight: 780; letter-spacing: -.02em; font-family: var(--mono); }
+  .lg { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; margin-top: 10px; }
+  .lg span { display: flex; align-items: center; gap: 6px; }
+  .lg i { width: 13px; height: 3px; border-radius: 2px; display: block; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 11</a>
+  <nav class="steps"><a href="#src">?</a><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+    <a href="#viz">👁</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 11 · 1 h 30</div>
+    <h1>Séries temporelles</h1>
+    <p class="lede">Six ans de cotations, quatre actifs. Tu vas calculer une performance
+    annualisée, une volatilité, une pire perte historique et une corrélation.
+    <strong>Et découvrir que rater les dix meilleures journées sur six ans
+    fait passer un gain de 54 % à 13 %.</strong></p>
+  </div>
+
+  <!-- PROVENANCE -->
+  <section class="etape" id="src">
+    <div class="etape-head"><div class="etape-num">?</div><div>
+      <h2>D'abord : d'où sort ce fichier ?</h2>
+      <div class="etape-meta">5 minutes · et c'est la question la plus importante de la séance</div></div></div>
+
+    <div class="box att" style="background:var(--red-soft);border:1px solid #f5c9c4;border-radius:11px;padding:17px 20px;margin:0 0 18px">
+      <div class="box-title" style="color:var(--red)">⚠️ Ce jeu de données est simulé</div>
+      <p><code>marches.csv</code> contient <strong>1 565 séances de bourse générées</strong>,
+      pas les cotations réelles d'un indice. Les cours des grands indices sont
+      des données propriétaires : on ne les redistribue pas dans un support de cours.</p>
+      <p>Les séries ont été construites pour se <em>comporter</em> comme de vrais marchés :
+      volatilités plausibles, actions et obligations décorrélées, une phase de krach,
+      un rebond. Toutes les méthodes que tu vas apprendre s'appliqueront
+      telles quelles à de vraies cotations.</p>
+      <p style="margin-bottom:0"><strong>Mais les dates ne veulent rien dire.</strong>
+      La pire journée du fichier tombe en novembre 2020. Dans la réalité,
+      c'est mars 2020. Si tu écris « le krach de mars 2020 » à partir de ce fichier,
+      tu inventes.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Pourquoi je commence par là</div>
+      <p>Dans six mois, on te tendra un fichier Excel en te disant « voilà les données ».
+      La première question n'est jamais « quelle moyenne je calcule ». C'est
+      <strong>qui a produit ce fichier, à partir de quoi, et jusqu'où puis-je
+      le faire parler</strong>.</p>
+      <p>Un analyste qui écrit une phrase que ses données ne portent pas ne fait pas
+      une erreur de calcul. Il fait une faute professionnelle, et c'est celle
+      qui coûte une réputation.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Une date n'est pas un texte</h2>
+      <div class="etape-meta">15 minutes · to_datetime, index temporel</div></div></div>
+
+    <p>Tant qu'une date reste une chaîne de caractères, <code>"2024-12-31"</code>
+    vient avant <code>"2024-3-01"</code> dans l'ordre alphabétique.
+    Une seule ligne règle le problème pour toute la séance.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("marches.csv", sep=";")
+print(df["date"].dtype)          # object : du texte
+
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+print(df.index.dtype)            # datetime64 : une vraie date
+
+print(df.shape, "|", df.index.min().date(), "->", df.index.max().date())
+print(df.head(3))
+
+# l'index temporel debloque des selections impossibles autrement
+print(df.loc["2020"].shape, "seances en 2020")
+print(df.loc["2020-03-01":"2020-03-31"].head(3))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Ce que l'index temporel t'offre gratuitement</div>
+      <p><code>df.loc["2020"]</code>, <code>df.resample("ME").last()</code>,
+      <code>df.rolling(60).std()</code>, l'alignement automatique de deux séries
+      qui n'ont pas les mêmes jours de cotation. Rien de tout cela ne fonctionne
+      sur des dates restées en texte.</p>
+      <p>Le réflexe : <strong><code>to_datetime</code> puis <code>set_index</code>
+      dès la ligne qui suit le <code>read_csv</code></strong>, avant toute autre chose.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Les rendements, et les trois chiffres qu'on te demandera</h2>
+      <div class="etape-meta">20 minutes · pct_change, std, annualisation</div></div></div>
+
+    <p>On ne travaille jamais sur les niveaux, toujours sur les <strong>variations</strong>.
+    Un niveau dépend de l'unité de départ ; une variation, non.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv("marches.csv", sep=";")
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+
+rend = df.pct_change().dropna()
+print(rend.head(3).round(4))
+
+# performance totale sur toute la periode
+total = df.iloc[-1] / df.iloc[0] - 1
+print("\ntotal :\n", (total * 100).round(1))
+
+# annualisee : 252 seances de bourse par an
+n = len(rend)
+annuelle = (df.iloc[-1] / df.iloc[0]) ** (252 / n) - 1
+print("\nannualisee :\n", (annuelle * 100).round(1))
+
+# volatilite annualisee : ecart-type quotidien x racine de 252
+vol = rend.std() * np.sqrt(252)
+print("\nvolatilite :\n", (vol * 100).round(1))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Pourquoi racine de 252, et pas 252</div>
+      <p>Les rendements s'additionnent dans le temps, mais les <strong>variances</strong>
+      s'additionnent, pas les écarts-types. Sur 252 jours indépendants,
+      la variance est multipliée par 252, donc l'écart-type par <code>√252 ≈ 15,87</code>.</p>
+      <p>Multiplier la volatilité quotidienne par 252 au lieu de sa racine
+      donne une volatilité <strong>quinze fois trop grande</strong>.
+      C'est une erreur classique, et parfaitement invisible :
+      le nombre sort, il a l'air d'un pourcentage, il est faux.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que ces trois chiffres disent vraiment</div>
+      <p>Sur ce fichier : les actions tech font <strong>+14,7 % par an</strong>
+      contre <strong>+7,2 %</strong> pour les actions européennes. Deux fois mieux.
+      Mais avec une volatilité de <strong>28,9 %</strong> contre <strong>17,5 %</strong>.</p>
+      <p style="margin-bottom:0">Rapportée au risque, la différence s'évapore :
+      0,51 contre 0,41. <strong>Une performance sans son risque n'est pas une information,
+      c'est un argument de vente.</strong></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>La pire perte historique</h2>
+      <div class="etape-meta">15 minutes · cummax, drawdown</div></div></div>
+
+    <p>Le <em>drawdown</em> répond à la seule question que se pose vraiment
+    quelqu'un qui a mis son argent quelque part : <strong>combien j'aurais perdu,
+    au pire, entre le sommet et le creux ?</strong></p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("marches.csv", sep=";")
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+
+# le plus haut atteint jusqu'a chaque date
+sommet = df.cummax()
+
+# de combien on est sous ce sommet, en pourcentage
+baisse = (df / sommet - 1) * 100
+
+print("pire perte :\n", baisse.min().round(1))
+print("\natteinte le :\n", baisse.idxmin())
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ <code>cummax</code> en trois secondes</div>
+      <p><code>cummax</code> fabrique la série des records : à chaque date,
+      le plus haut jamais atteint jusque-là. Elle ne redescend jamais.
+      L'écart entre la courbe et cette ligne de records, c'est le drawdown.</p>
+      <p>Ici : <strong>−37,2 %</strong> sur les actions européennes,
+      <strong>−48,9 %</strong> sur la tech, <strong>−14,1 %</strong> sur les obligations.
+      Le chiffre qu'aucune plaquette commerciale ne met en gros.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Compose ton portefeuille</h2>
+      <div class="etape-meta">le risque n'est pas la moyenne des risques</div></div></div>
+
+    <p>Répartis 100 % entre les quatre actifs. La courbe orange est le portefeuille,
+    recalculé jour par jour sur les 1 565 séances du fichier.</p>
+
+    <p class="hint">Hypothèse du calcul : les poids sont <strong>maintenus chaque jour</strong>,
+    donc le portefeuille est rééquilibré en continu. Sans rééquilibrage, la part
+    qui monte le plus finit par tout dominer et le résultat diffère.
+    Une hypothèse pareille se déclare toujours.</p>
+
+    <div class="widget">
+      <div class="alloc">
+        <div>
+          <canvas id="cv" width="760" height="300" style="width:100%;height:auto"></canvas>
+          <div class="lg">
+            <span><i style="background:#f07818"></i> portefeuille</span>
+            <span><i style="background:#c9c2b8"></i> actions europe</span>
+            <span><i style="background:#8c8a86"></i> obligations</span>
+          </div>
+          <div class="slider-row"><label>Actions Europe <span class="val" id="v-a">40 %</span></label>
+            <input type="range" id="s-a" min="0" max="100" step="5" value="40"></div>
+          <div class="slider-row"><label>Actions Tech <span class="val" id="v-b">20 %</span></label>
+            <input type="range" id="s-b" min="0" max="100" step="5" value="20"></div>
+          <div class="slider-row"><label>Obligations <span class="val" id="v-c">30 %</span></label>
+            <input type="range" id="s-c" min="0" max="100" step="5" value="30"></div>
+          <div class="slider-row"><label>Or <span class="val" id="v-d">10 %</span></label>
+            <input type="range" id="s-d" min="0" max="100" step="5" value="10"></div>
+          <p class="hint" id="somme"></p>
+        </div>
+        <div>
+          <div class="kpi3" style="grid-template-columns:1fr">
+            <div><div class="k">Performance annualisée</div><div class="v" id="k-perf">-</div></div>
+            <div><div class="k">Volatilité</div><div class="v" id="k-vol">-</div></div>
+            <div><div class="k">Pire perte</div><div class="v" id="k-dd" style="color:var(--red)">-</div></div>
+            <div><div class="k">Perf. par unité de risque</div><div class="v" id="k-sh">-</div></div>
+          </div>
+          <p class="hint" id="cmt" style="margin-top:13px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Le seul repas gratuit de la finance</div>
+      <p>Mets 100 % sur les actions tech : volatilité 28,9 %. Mets 100 % sur l'or : 13,3 %.
+      Maintenant, mets 50 % sur chaque. <strong>La volatilité obtenue est plus basse
+      que la moyenne des deux.</strong></p>
+      <p>Ce n'est pas une erreur d'arrondi. Les deux actifs sont corrélés à
+      <strong>−0,23</strong> : quand l'un baisse, l'autre a tendance à monter,
+      et les mouvements s'annulent partiellement. Actions Europe et actions tech,
+      corrélées à <strong>+0,96</strong>, ne s'annulent rien du tout :
+      les mélanger n'apporte aucune protection.</p>
+      <p style="margin-bottom:0"><strong>Diversifier, ce n'est pas posséder beaucoup
+      de choses. C'est posséder des choses qui ne tombent pas ensemble.</strong></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la fiche d'un actif</h2>
+      <div class="etape-meta">25 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Écris une fonction <code>fiche(colonne)</code> qui rend un dictionnaire
+    avec tout ce qu'un comité d'investissement demande.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Les clés attendues</div>
+      <p style="margin-bottom:0"><code>total</code>, <code>annualisee</code>,
+      <code>volatilite</code>, <code>pire_perte</code>, <code>date_pire_perte</code>,
+      <code>meilleur_jour</code>, <code>pire_jour</code>,
+      <code>pct_jours_hausse</code>. Puis affiche les quatre fiches côte à côte
+      dans un <code>DataFrame</code>.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv("marches.csv", sep=";")
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+
+
+def fiche(colonne):
+    serie = df[colonne]
+    # a toi
+    return {}
+
+
+# pd.DataFrame({c: fiche(c) for c in df.columns})
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>15 minutes</strong>. Les valeurs de contrôle,
+      pour <code>actions_europe</code> : total <strong>+54,4 %</strong>,
+      annualisée <strong>7,2 %</strong>, volatilité <strong>17,5 %</strong>,
+      pire perte <strong>−37,2 %</strong>.</p>
+      <p>Le piège attendu : <code>pct_change()</code> laisse un <code>NaN</code>
+      en première ligne. Sans <code>dropna()</code>, le comptage des jours de hausse
+      est faussé d'une unité, et certaines fonctions rendent <code>NaN</code>
+      pour toute la série.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : le coût de rater dix journées</h2>
+      <div class="etape-meta">20 minutes · le calcul qui devrait figurer dans tout contrat d'épargne</div></div></div>
+
+    <p>Un épargnant vend dès que ça baisse et rachète quand ça remonte.
+    En pratique, il rate quelques-unes des meilleures séances, qui arrivent
+    presque toujours juste après les pires. <strong>Combien ça coûte ?</strong></p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+
+df = pd.read_csv("marches.csv", sep=";")
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+
+rend = df["actions_europe"].pct_change().dropna()
+
+# 1. La performance totale en restant investi tout du long
+#    (indice : le produit de tous les (1 + rendement), moins 1)
+
+
+# 2. La meme chose en retirant les 10 meilleures seances
+
+
+# 3. Trace la courbe : performance finale selon le nombre
+#    de meilleures seances ratees, de 0 a 30
+
+      </script></div></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le résultat, avant que tu le calcules</div>
+      <p>Sur ce fichier : <strong>+54,4 %</strong> en restant investi les 1 564 séances.
+      <strong>+13,4 %</strong> en ratant les dix meilleures.
+      <strong>Dix journées sur mille cinq cent soixante-quatre effacent
+      les trois quarts de la performance.</strong></p>
+      <p>Sur les actions tech, c'est encore plus violent :
+      <strong>+133,8 % → +39,2 %</strong>.</p>
+      <p style="margin-bottom:0">C'est l'argument le plus solide qui existe contre
+      le fait d'entrer et sortir du marché. Et il tient en cinq lignes de pandas
+      que tu sais maintenant écrire.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Voici marches.csv avec les cours de quatre actifs de 2019 à 2024. Calcule la performance annualisée et la volatilité de chacun, et commente les résultats.</p>
+      <p style="margin-top:12px">Le code sera juste. <strong>Le commentaire, lui,
+      sera une fiction.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Le second piège, plus discret</div>
+      <p>Sur la volatilité, beaucoup de réponses écrivent
+      <code>rend.std() * 252</code> au lieu de <code>* np.sqrt(252)</code>.
+      Le résultat sort à <strong>278 %</strong> au lieu de 17,5 %.</p>
+      <p style="margin-bottom:0">C'est absurde, et pourtant ça passe : le nombre
+      a la bonne tête, il est dans un tableau bien formaté.
+      <strong>Un ordre de grandeur faux ne se repère qu'en sachant
+      à quoi ressemble le bon.</strong> Une volatilité action, c'est 15 à 30 % par an.
+      Retiens l'ordre de grandeur, pas la formule.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Reprends ta fonction <code>fiche</code> et applique-la à un
+      <strong>portefeuille</strong> plutôt qu'à un actif : 60 % actions Europe,
+      40 % obligations, sans rééquilibrage. Compare sa pire perte à celle
+      des actions seules.</p>
+      <p class="hint" style="margin-top:8px">Puis prépare une phrase de conclusion.
+      La séance 12 porte sur la façon de la mettre en graphique
+      sans mentir avec.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-10.html" style="color:var(--orange);font-weight:650">← Séance 10</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = ["pandas", "numpy"];
+window.FICHIERS = ["donnees/marches.csv"];
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=3"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Un vrai index temporel",
+    contexte: "La ligne qui débloque tout le reste.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("marches.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:42, consigne:"Convertis la colonne <code>date</code> en vraies dates.",
+        ok:['df["date"] = pd.to_datetime(df["date"])'],
+        indices:["<code>pd.to_datetime</code> prend la colonne et la rend convertie.",
+                 '<code>df["date"] = pd.to_datetime(df["date"])</code>'],
+        pourquoi:"Tant que c'est du texte, le tri est alphabétique et aucune sélection par période ne fonctionne." },
+      { b:1, long:32, consigne:"Fais de cette colonne l'index du tableau.",
+        ok:['df = df.set_index("date")'],
+        indices:["<code>set_index</code> rend un nouveau tableau, il faut le réaffecter.",
+                 '<code>df = df.set_index("date")</code>'],
+        pourquoi:"Sans réaffectation, pandas calcule le résultat et le jette. C'est l'oubli le plus fréquent de tout le parcours." },
+      { b:1, long:32, consigne:"Affiche le nombre de séances de l'année 2020.",
+        ok:['print(len(df.loc["2020"]))', 'print(df.loc["2020"].shape[0])'],
+        indices:["Un index temporel accepte <code>.loc[\"2020\"]</code> directement.",
+                 '<code>print(len(df.loc["2020"]))</code>'],
+        pourquoi:"Sélectionner une année entière avec une chaîne de quatre caractères : c'est exactement ce que l'index temporel apporte." },
+    ],
+  },
+  {
+    titre: "Rendements et annualisation",
+    contexte: "Les trois chiffres de toute fiche produit.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "import numpy as np" },
+      { t: 'df = pd.read_csv("marches.csv", sep=";")' },
+      { t: 'df["date"] = pd.to_datetime(df["date"])' },
+      { t: 'df = df.set_index("date")' },
+      { t: "" },
+      { b:1, long:40, consigne:"Calcule les rendements quotidiens, sans la première ligne vide, dans <code>rend</code>.",
+        ok:["rend = df.pct_change().dropna()"],
+        indices:["<code>.pct_change()</code> puis <code>.dropna()</code>",
+                 "<code>rend = df.pct_change().dropna()</code>"],
+        pourquoi:"La première ligne n'a pas de veille : son rendement vaut NaN. Sans <code>dropna</code>, il contamine plusieurs calculs." },
+      { b:1, long:46, consigne:"Calcule la performance totale de chaque actif, dans <code>total</code>.",
+        ok:["total = df.iloc[-1] / df.iloc[0] - 1"],
+        indices:["Dernière ligne sur première ligne, moins 1.",
+                 "<code>total = df.iloc[-1] / df.iloc[0] - 1</code>"],
+        pourquoi:"<code>iloc</code> travaille par position, ce qui reste valable quel que soit le format des dates." },
+      { b:1, long:46, consigne:"Calcule la volatilité annualisée, dans <code>vol</code>.",
+        ok:["vol = rend.std() * np.sqrt(252)"],
+        indices:["Écart-type quotidien fois la racine du nombre de séances par an.",
+                 "<code>vol = rend.std() * np.sqrt(252)</code>"],
+        pourquoi:"Racine de 252, pas 252 : ce sont les variances qui s'additionnent, pas les écarts-types. L'erreur donne un résultat quinze fois trop grand." },
+      { b:1, long:34, consigne:"Affiche les volatilités en pourcentage, arrondies à une décimale.",
+        ok:["print((vol * 100).round(1))"],
+        indices:["Fois 100, puis <code>.round(1)</code>",
+                 "<code>print((vol * 100).round(1))</code>"],
+        pourquoi:"17,5 % pour les actions Europe, 28,9 % pour la tech, 4,8 % pour les obligations. Retiens ces ordres de grandeur." },
+    ],
+  },
+  {
+    titre: "La pire perte",
+    contexte: "Le chiffre que personne ne met sur la plaquette.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("marches.csv", sep=";")' },
+      { t: 'df["date"] = pd.to_datetime(df["date"])' },
+      { t: 'df = df.set_index("date")' },
+      { t: "" },
+      { b:1, long:30, consigne:"Construis la série des plus hauts atteints jusqu'à chaque date, dans <code>sommet</code>.",
+        ok:["sommet = df.cummax()"],
+        indices:["<code>cummax</code> : maximum cumulé.","<code>sommet = df.cummax()</code>"],
+        pourquoi:"Cette série ne redescend jamais. C'est la ligne des records." },
+      { b:1, long:44, consigne:"Calcule l'écart en pourcentage entre la courbe et son sommet, dans <code>baisse</code>.",
+        ok:["baisse = (df / sommet - 1) * 100"],
+        indices:["Cours sur sommet, moins 1, fois 100.",
+                 "<code>baisse = (df / sommet - 1) * 100</code>"],
+        pourquoi:"Toujours négatif ou nul, par construction : on ne peut pas être au-dessus de son propre record." },
+      { b:1, long:34, consigne:"Affiche la pire perte de chaque actif, arrondie à une décimale.",
+        ok:["print(baisse.min().round(1))"],
+        indices:["<code>.min()</code> puis <code>.round(1)</code>",
+                 "<code>print(baisse.min().round(1))</code>"],
+        pourquoi:"−37,2 % sur les actions Europe, −48,9 % sur la tech. Un placement qui perd la moitié de sa valeur en cours de route n'est pas le même produit que sa performance moyenne le laisse croire." },
+      { b:1, long:28, consigne:"Affiche la date à laquelle chaque pire perte a été atteinte.",
+        ok:["print(baisse.idxmin())"],
+        indices:["<code>idxmin</code> rend l'index du minimum, pas sa valeur.",
+                 "<code>print(baisse.idxmin())</code>"],
+        pourquoi:"<code>min</code> donne la valeur, <code>idxmin</code> donne le quand. Les deux sont attendus dans une note." },
+    ],
+  },
+  {
+    titre: "Rater les dix meilleurs jours",
+    contexte: "Cinq lignes contre toute une industrie du market timing.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("marches.csv", sep=";")' },
+      { t: 'df["date"] = pd.to_datetime(df["date"])' },
+      { t: 'df = df.set_index("date")' },
+      { t: 'rend = df["actions_europe"].pct_change().dropna()' },
+      { t: "" },
+      { b:1, long:44, consigne:"Performance totale en restant investi, dans <code>investi</code>.",
+        ok:["investi = (1 + rend).prod() - 1"],
+        indices:["Le produit de tous les (1 + rendement), moins 1.",
+                 "<code>investi = (1 + rend).prod() - 1</code>"],
+        pourquoi:"Les rendements se composent, ils ne s'additionnent pas. <code>.prod()</code> et non <code>.sum()</code>." },
+      { b:1, long:46, consigne:"Récupère les dix plus fortes hausses, dans <code>meilleurs</code>.",
+        ok:["meilleurs = rend.nlargest(10)"],
+        indices:["<code>.nlargest(n)</code> rend les n plus grandes valeurs.",
+                 "<code>meilleurs = rend.nlargest(10)</code>"],
+        pourquoi:"<code>nlargest</code> garde l'index, donc les dates : on saura quand ces journées sont tombées." },
+      { b:1, long:52, consigne:"Retire ces dix séances de <code>rend</code>, dans <code>sans</code>.",
+        ok:["sans = rend.drop(meilleurs.index)"],
+        indices:["<code>.drop()</code> supprime des lignes désignées par leur index.",
+                 "<code>sans = rend.drop(meilleurs.index)</code>"],
+        pourquoi:"On enlève les dates, pas les valeurs : c'est pour ça qu'on avait besoin que <code>nlargest</code> conserve l'index." },
+      { b:1, long:62, consigne:"Affiche les deux performances en pourcentage, arrondies à une décimale.",
+        ok:["print(round(investi * 100, 1), round(((1 + sans).prod() - 1) * 100, 1))"],
+        indices:["Même formule que pour <code>investi</code>, appliquée à <code>sans</code>.",
+                 "<code>print(round(investi * 100, 1), round(((1 + sans).prod() - 1) * 100, 1))</code>"],
+        pourquoi:"54,4 % contre 13,4 %. Dix séances sur 1 564 pèsent les trois quarts de la performance, et personne ne sait à l'avance lesquelles." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=3"></script>
+
+<script>
+/* ---------- Le code de l'IA : le commentaire inventé ---------- */
+(function () {
+  const LIGNES = [
+    "import pandas as pd, numpy as np",
+    "",
+    'df = pd.read_csv("marches.csv", sep=";", parse_dates=["date"], index_col="date")',
+    "rend = df.pct_change().dropna()",
+    "",
+    "annuelle = (df.iloc[-1] / df.iloc[0]) ** (252 / len(rend)) - 1",
+    "vol = rend.std() * np.sqrt(252)",
+    "",
+    "print((annuelle * 100).round(1))",
+    "print((vol * 100).round(1))",
+    "",
+    "# La chute de mars 2020 liee au COVID est nettement visible",
+    "# sur les actions, tandis que l'or joue son role de valeur refuge.",
+  ];
+  const BUGS = [11, 12];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - lignes 12 et 13</div>' +
+        "<p><strong>Tout le code est correct.</strong> C'est le commentaire " +
+        "qui est faux, et c'est bien plus grave qu'un bug : un bug plante, " +
+        "une phrase inventée se retrouve dans une note d'analyse.</p>" +
+        "<p>Ce fichier est <strong>simulé</strong>. Il n'y a pas de COVID dedans. " +
+        "La pire séance des actions Europe tombe en <strong>novembre 2020</strong>, " +
+        "pas en mars. L'IA n'a pas regardé les dates : elle a reconnu " +
+        "« cours de bourse, 2019-2024 » et a récité ce qu'elle sait de cette période.</p>" +
+        "<p style='margin-bottom:0'><strong>Ce n'est pas une hallucination sur les chiffres, " +
+        "c'est une hallucination sur le contexte</strong> - et c'est la plus difficile " +
+        "à repérer, parce que tout le reste de la réponse est juste.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Ta parade</div>' +
+        "<p style='margin-bottom:0'>Ne demande jamais un commentaire sans donner la provenance " +
+        "des données. Et vérifie toute affirmation datée : " +
+        "<code>rend[\"actions_europe\"].idxmin()</code> aurait suffi " +
+        "à démolir la phrase en une seconde.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Indice : " +
+        "<strong>le problème n'est pas dans le calcul.</strong> " +
+        "Relis ce que la réponse <em>affirme</em>, et demande-toi si le fichier " +
+        "peut le prouver.</p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Portefeuille interactif, calcule sur le vrai fichier ---------- */
+(function () {
+  const COLS = ["actions_europe", "actions_tech", "obligations", "or"];
+  let SERIES = null;
+
+  fetch("donnees/marches.csv?v=3")
+    .then((r) => r.text())
+    .then((txt) => {
+      /* le fichier est en fins de ligne Windows : on retire les \r */
+      const l = txt.replace(/\r/g, "").trim().split("\n");
+      const head = l[0].split(";");
+      const idx = COLS.map((c) => head.indexOf(c));
+      SERIES = COLS.map(() => []);
+      for (let i = 1; i < l.length; i++) {
+        const p = l[i].split(";");
+        idx.forEach((k, j) => SERIES[j].push(parseFloat(p[k])));
+      }
+      maj();
+    })
+    .catch(() => {
+      document.getElementById("cmt").textContent =
+        "Le fichier de cotations n'a pas pu être chargé.";
+    });
+
+  const cv = document.getElementById("cv");
+  const ct = cv.getContext("2d");
+
+  function courbe(poids) {
+    const n = SERIES[0].length;
+    const out = new Array(n);
+    out[0] = 100;
+    for (let i = 1; i < n; i++) {
+      let r = 0;
+      for (let j = 0; j < 4; j++) {
+        r += poids[j] * (SERIES[j][i] / SERIES[j][i - 1] - 1);
+      }
+      out[i] = out[i - 1] * (1 + r);
+    }
+    return out;
+  }
+
+  function stats(v) {
+    const n = v.length;
+    const r = [];
+    for (let i = 1; i < n; i++) r.push(v[i] / v[i - 1] - 1);
+    const m = r.reduce((a, b) => a + b, 0) / r.length;
+    const va = r.reduce((a, b) => a + (b - m) * (b - m), 0) / (r.length - 1);
+    const vol = Math.sqrt(va * 252);
+    const ann = Math.pow(v[n - 1] / v[0], 252 / r.length) - 1;
+    let peak = v[0], dd = 0;
+    for (const x of v) { if (x > peak) peak = x; const d = x / peak - 1; if (d < dd) dd = d; }
+    return { ann: ann, vol: vol, dd: dd };
+  }
+
+  function tracer(port) {
+    const w = cv.width, h = cv.height, pad = 8;
+    ct.clearRect(0, 0, w, h);
+    const refs = [
+      { v: SERIES[0], c: "#c9c2b8", e: 1.5 },
+      { v: SERIES[2], c: "#8c8a86", e: 1.5 },
+      { v: port, c: "#f07818", e: 2.6 },
+    ];
+    let lo = Infinity, hi = -Infinity;
+    refs.forEach((s) => s.v.forEach((x) => { if (x < lo) lo = x; if (x > hi) hi = x; }));
+    const n = port.length;
+    refs.forEach((s) => {
+      ct.beginPath();
+      ct.strokeStyle = s.c;
+      ct.lineWidth = s.e;
+      ct.lineJoin = "round";
+      for (let i = 0; i < n; i++) {
+        const x = pad + (i / (n - 1)) * (w - 2 * pad);
+        const y = h - pad - ((s.v[i] - lo) / (hi - lo)) * (h - 2 * pad);
+        i ? ct.lineTo(x, y) : ct.moveTo(x, y);
+      }
+      ct.stroke();
+    });
+  }
+
+  function pc(x) { return (x * 100).toFixed(1).replace(".", ",") + " %"; }
+
+  function maj() {
+    if (!SERIES) return;
+    const brut = ["s-a", "s-b", "s-c", "s-d"].map((id) => +document.getElementById(id).value);
+    ["v-a", "v-b", "v-c", "v-d"].forEach((id, j) =>
+      (document.getElementById(id).textContent = brut[j] + " %"));
+    const s = brut.reduce((a, b) => a + b, 0);
+    document.getElementById("somme").innerHTML = s === 100
+      ? "Total : <strong>100 %</strong>"
+      : "Total : <strong>" + s + " %</strong>. Les poids sont ramenés à 100 % pour le calcul.";
+    if (s === 0) return;
+    const poids = brut.map((x) => x / s);
+
+    const port = courbe(poids);
+    const st = stats(port);
+    tracer(port);
+
+    document.getElementById("k-perf").textContent = pc(st.ann);
+    document.getElementById("k-vol").textContent = pc(st.vol);
+    document.getElementById("k-dd").textContent = pc(st.dd);
+    document.getElementById("k-sh").textContent = (st.ann / st.vol).toFixed(2).replace(".", ",");
+
+    const actions = poids[0] + poids[1];
+    document.getElementById("cmt").innerHTML = actions > 0.85
+      ? "Presque tout en actions : la performance est là, la pire perte aussi."
+      : actions < 0.25
+      ? "Très peu d'actions : la courbe est calme, mais elle monte peu. " +
+        "Le risque évité est aussi de la performance abandonnée."
+      : "Regarde la pire perte plutôt que la performance : c'est elle qui décide " +
+        "si quelqu'un tient son placement jusqu'au bout.";
+  }
+
+  ["s-a", "s-b", "s-c", "s-d"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", maj));
+})();
+</script>
+
+</body>
+</html>
