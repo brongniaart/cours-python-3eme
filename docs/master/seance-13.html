@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 13 - La carte électorale</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=4">
+<style>
+  .carto { display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
+  @media (max-width: 900px) { .carto { grid-template-columns: 1fr; } }
+  #svgmap { width: 100%; height: auto; display: block; }
+  #svgmap path { stroke: #fff; stroke-width: .6; cursor: pointer;
+                 transition: opacity .12s; }
+  #svgmap path:hover { opacity: .72; stroke: #2b2722; stroke-width: 1.2; }
+  .modes { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
+  .modes button { font: inherit; font-size: 13.5px; font-weight: 650;
+    padding: 7px 13px; border-radius: 8px; border: 1px solid var(--line);
+    background: #fff; color: var(--ink-soft); cursor: pointer; }
+  .modes button.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .infobulle { background: var(--bg-soft); border-radius: 12px; padding: 15px 17px;
+               min-height: 210px; }
+  .infobulle h4 { margin: 0 0 3px; font-size: 18px; letter-spacing: -.015em; }
+  .infobulle .sous { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 11px; }
+  .infobulle .ligne { display: flex; align-items: center; gap: 8px;
+                      font-size: 13.5px; margin-bottom: 5px; }
+  .infobulle .ligne i { width: 9px; height: 9px; border-radius: 2px; display: block; }
+  .infobulle .ligne b { margin-left: auto; font-family: var(--mono); }
+  .echelle { display: flex; align-items: center; gap: 9px; margin-top: 12px; font-size: 12.5px; }
+  .echelle .bande { flex: 1; height: 11px; border-radius: 3px; }
+  .btn-mini { font: inherit; font-size: 13px; font-weight: 650; padding: 6px 12px;
+    border-radius: 8px; border: 1px solid var(--line); background: #fff;
+    color: var(--ink-soft); cursor: pointer; }
+  #cv3d { background: linear-gradient(#fbf9f5, #f2eee6); border-radius: 12px; }
+  #cv3d:active { cursor: grabbing; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">geopandas est volumineux, comptez une trentaine de secondes</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 13</a>
+  <nav class="steps"><a href="#viz">👁</a><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+    <a href="#relief">⛰</a><a href="#e4">4</a><a href="#defi">★</a>
+    <a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 13 · 1 h 30</div>
+    <h1>La carte électorale</h1>
+    <p class="lede">La France en rouge et bleu, les scores au survol du curseur.
+    C'est le graphique le plus regardé de toute soirée électorale.
+    <strong>C'est aussi celui qui trompe le plus, parce qu'une carte montre
+    des surfaces alors qu'on vote avec des personnes.</strong></p>
+  </div>
+
+  <!-- VISUALISATION EN PREMIER -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Voilà ce que tu construis aujourd'hui</h2>
+      <div class="etape-meta">survole un département</div></div></div>
+
+    <div class="widget">
+      <div class="modes">
+        <button data-m="rn" class="on">Score du RN</button>
+        <button data-m="ug">Score du bloc de gauche</button>
+        <button data-m="part">Participation</button>
+        <button data-m="tete">Nuance en tête</button>
+      </div>
+      <div class="carto">
+        <div>
+          <svg id="svgmap" viewBox="0 0 560 560" role="img"
+               aria-label="Carte des départements français"></svg>
+          <div class="echelle" id="echelle"></div>
+        </div>
+        <div>
+          <div class="infobulle" id="bulle">
+            <h4>Survole la carte</h4>
+            <div class="sous">96 départements métropolitains</div>
+            <p class="hint" style="margin:0">Les résultats affichés sont ceux
+            du <strong>premier tour des législatives de 2024</strong>,
+            publiés par le ministère de l'Intérieur.</p>
+          </div>
+          <p class="hint" id="legende-note" style="margin-top:12px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box att" style="background:var(--red-soft);border:1px solid #f5c9c4;border-radius:11px;padding:17px 20px;margin:20px 0">
+      <div class="box-title" style="color:var(--red)">⚠️ Le piège de toute carte électorale</div>
+      <p>Passe en mode <strong>« nuance en tête »</strong>. Le RN arrive premier dans
+      <strong>54 des 96 départements</strong> métropolitains, soit 56 % d'entre eux,
+      et l'œil retient « la France est majoritairement RN ».</p>
+      <p>Ces 54 départements regroupent <strong>49,8 % des inscrits</strong>.
+      Autrement dit : à peu près la moitié, pas une domination.</p>
+      <p style="margin-bottom:0">Regarde Paris sur la carte : un point.
+      <strong>1 365 376 inscrits</strong>, soit <strong>22,8 fois la Lozère</strong>,
+      qui occupe pourtant vingt fois plus de place à l'écran.
+      Une carte donne à chaque électeur un poids proportionnel
+      aux kilomètres carrés autour de lui. <strong>Ce n'est pas comme ça
+      qu'on compte les voix.</strong></p>
+    </div>
+  </section>
+
+  <!-- RELIEF 3D -->
+  <section class="etape" id="relief">
+    <div class="etape-head"><div class="etape-num">⛰️</div><div>
+      <h2>La même carte, en relief</h2>
+      <div class="etape-meta">fais-la tourner · le mode « électeurs » est le plus parlant</div></div></div>
+
+    <p>Une carte plate donne à chaque département la place que lui font ses
+    kilomètres carrés. En relief, on peut ajouter une <strong>seconde dimension</strong> :
+    la couleur dit une chose, la hauteur en dit une autre.</p>
+
+    <div class="widget">
+      <div class="modes" id="modes3d">
+        <button data-m="rn" class="on">Hauteur = score du RN</button>
+        <button data-m="part">Hauteur = participation</button>
+        <button data-m="ins">Hauteur = électeurs inscrits</button>
+      </div>
+      <canvas id="cv3d" width="1000" height="620"
+              style="width:100%;height:auto;cursor:grab;touch-action:none"></canvas>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:10px">
+        <button id="tourne" class="btn-mini">⏸ Arrêter la rotation</button>
+        <span class="hint" style="margin:0">Clique-glisse pour tourner. Survole un département.</span>
+      </div>
+      <div id="bulle3d" class="hint" style="margin-top:10px;min-height:22px"></div>
+    </div>
+
+    <div class="box defi" id="note3d">
+      <div class="box-title">🔥 Passe en mode « électeurs inscrits »</div>
+      <p>La hauteur devient le nombre d'électeurs, la couleur reste la nuance
+      arrivée en tête. <strong>Paris, les Hauts-de-Seine, le Nord et les
+      Bouches-du-Rhône deviennent des tours</strong>, et la diagonale rurale
+      s'aplatit à ras du sol.</p>
+      <p style="margin-bottom:0">C'est la même information que la carte plate,
+      lue autrement : les grandes surfaces colorées portent peu de monde.
+      <strong>La carte plate n'était pas fausse, elle était mal pondérée.</strong></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Une carte est un tableau avec une colonne en plus</h2>
+      <div class="etape-meta">15 minutes · geopandas, GeoDataFrame</div></div></div>
+
+    <p>C'est toute l'idée de geopandas, et elle rend le reste évident :
+    un <code>GeoDataFrame</code> est un <code>DataFrame</code> normal,
+    avec une colonne <code>geometry</code> qui contient des formes.
+    <strong>Tout ce que tu sais faire depuis la séance 9 fonctionne dessus.</strong></p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import geopandas as gpd
+
+carte = gpd.read_file("departements.geojson")
+
+print(type(carte))
+print(carte.shape)
+print(carte.columns.tolist())
+print(carte.crs)              # le systeme de coordonnees
+
+print(carte.head(3))
+
+# une colonne geometry, et rien de plus mysterieux
+print(carte.geometry.iloc[0].geom_type)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Le CRS, en trois phrases</div>
+      <p>La Terre est ronde, l'écran est plat : il faut une convention pour passer
+      de l'une à l'autre. <code>EPSG:4326</code>, c'est longitude et latitude brutes,
+      la convention du GPS.</p>
+      <p style="margin-bottom:0">Elle déforme les surfaces : plus on monte vers le nord,
+      plus les choses paraissent grandes. Pour la France, la convention officielle
+      est <code>EPSG:2154</code> (Lambert 93), qui préserve les distances.
+      <strong>Deux couches dans deux CRS différents ne se superposeront jamais
+      correctement</strong>, et c'est la première chose à vérifier
+      quand une carte a l'air aberrante.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>La jointure, encore elle</h2>
+      <div class="etape-meta">15 minutes · et deux pièges d'affilée</div></div></div>
+
+    <p>Le fichier des résultats et le fichier des contours viennent de deux
+    administrations différentes. Ils ne codent pas les départements pareil.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import geopandas as gpd
+import pandas as pd
+
+carte = gpd.read_file("departements.geojson")
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+print(sorted(df["code"].astype(str).unique())[:6])
+print(sorted(carte["code"].unique())[:6])
+
+# "1" et "01" ne sont pas le meme texte
+df["code"] = df["code"].astype(str).str.zfill(2)
+
+tot = df.groupby("code")["voix"].transform("sum")
+df["part"] = df["voix"] / tot * 100
+rn = df[df["nuance"] == "RN"][["code", "part"]]
+
+carte = carte.merge(rn, on="code", how="left")
+
+print(len(carte), "departements")
+print(carte["part"].isna().sum(), "sans score RN")
+print(carte[carte["part"].isna()]["nom"].tolist())
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Deux pièges, et un seul est un bug</div>
+      <p><strong>Le bug :</strong> sans <code>zfill(2)</code>, la jointure trouve
+      <strong>87 départements sur 96</strong>. Neuf disparaissent, sans erreur,
+      sans avertissement. Ils apparaîtront en gris sur la carte, et tu mettras
+      dix minutes à comprendre pourquoi la Savoie est blanche.</p>
+      <p style="margin-bottom:0"><strong>Ce qui n'est pas un bug :</strong> même après
+      correction, il reste <strong>un</strong> <code>NaN</code>. C'est la
+      <strong>Creuse</strong>, où le RN ne présentait pas de candidat au premier tour :
+      c'est la nuance <code>UXD</code> qui y arrive en tête avec 20 403 voix.
+      La donnée n'est pas manquante par accident, <strong>elle est absente
+      parce que la réalité était absente</strong>. Ces deux cas se traitent
+      de façon opposée, et rien dans le fichier ne les distingue.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>La choroplèthe</h2>
+      <div class="etape-meta">20 minutes · colorier, et choisir l'échelle</div></div></div>
+
+    <p>Une ligne suffit à colorier. Le travail est ailleurs : dans le choix
+    de la palette et des bornes.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import geopandas as gpd
+import pandas as pd
+import matplotlib.pyplot as plt
+
+carte = gpd.read_file("departements.geojson")
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+df["code"] = df["code"].astype(str).str.zfill(2)
+tot = df.groupby("code")["voix"].transform("sum")
+df["part"] = df["voix"] / tot * 100
+carte = carte.merge(df[df["nuance"] == "RN"][["code", "part"]], on="code", how="left")
+
+fig, ax = plt.subplots(figsize=(7, 7))
+
+carte.plot(column="part", cmap="RdBu_r", ax=ax,
+           edgecolor="white", linewidth=0.35,
+           vmin=0, vmax=55,
+           legend=True,
+           legend_kwds={"label": "score du RN, en % des exprimes",
+                        "shrink": 0.6},
+           missing_kwds={"color": "#e6e2db", "label": "pas de candidat"})
+
+ax.set_axis_off()
+ax.set_title("Legislatives 2024, premier tour", loc="left", weight="bold")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Trois décisions, et pas une seule n'est technique</div>
+      <p><strong>La palette.</strong> <code>RdBu_r</code> est <em>divergente</em> :
+      elle a un milieu. Une palette divergente n'a de sens que s'il existe
+      un point neutre réel (0 %, 50 %, la moyenne). Pour une grandeur qui
+      n'en a pas, prends une palette <em>séquentielle</em>
+      (<code>Blues</code>, <code>YlOrRd</code>) : du clair au foncé, sans milieu.</p>
+      <p><strong>Les bornes.</strong> <code>vmin</code> et <code>vmax</code>.
+      Sans elles, matplotlib s'ajuste aux données, et deux cartes de deux années
+      différentes deviennent incomparables alors qu'elles se ressemblent.
+      <strong>Fixe-les, toujours.</strong></p>
+      <p style="margin-bottom:0"><strong>Le traitement des manquants.</strong>
+      <code>missing_kwds</code> avec un gris neutre et une étiquette.
+      Un département laissé en blanc se lit comme un score nul, ce qui est faux.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la carte de la participation</h2>
+      <div class="etape-meta">25 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Même méthode, autre question : <em>où s'est-on déplacé pour voter ?</em></p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le cahier des charges</div>
+      <p style="margin-bottom:0">Une palette <strong>séquentielle</strong>
+      (la participation n'a pas de point neutre). Des bornes fixées à la main.
+      Une légende avec son unité. Un titre qui énonce la conclusion.
+      Et, en dessous, la liste des cinq départements les plus mobilisés
+      et des cinq les moins mobilisés.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import geopandas as gpd
+import pandas as pd
+import matplotlib.pyplot as plt
+
+carte = gpd.read_file("departements.geojson")
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+df["code"] = df["code"].astype(str).str.zfill(2)
+
+# 1. Une ligne par departement, avec la participation
+
+
+# 2. La jointure, et ses deux controles
+
+
+# 3. La carte
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>15 minutes</strong>. Valeurs de contrôle :
+      la participation la plus haute est en <strong>Lozère (75,0 %)</strong>,
+      la plus basse en <strong>Seine-Saint-Denis (60,6 %)</strong>.
+      Zéro <code>NaN</code> attendu cette fois : tous les départements
+      ont des inscrits.</p>
+      <p><strong>Le piège de l'échelle :</strong> l'écart va de 60,6 à 75,0.
+      S'il laisse matplotlib choisir, toute la palette s'étale sur ces quinze points
+      et la carte hurle des contrastes énormes. C'est <em>exactement</em>
+      l'axe tronqué de la séance 12, transposé aux couleurs.
+      Qu'il essaie <code>vmin=0, vmax=100</code> pour voir : la carte devient
+      uniformément terne, et c'est tout aussi malhonnête dans l'autre sens.
+      <strong>Le bon choix se discute, et c'est le sujet de la discussion.</strong></p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : rends ta carte interactive</h2>
+      <div class="etape-meta">20 minutes · folium</div></div></div>
+
+    <p>La carte de matplotlib est une image. Celle de <strong>folium</strong>
+    est une vraie page web : on zoome, on survole, on clique.
+    C'est ce que publient les rédactions.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+# folium ne fait pas partie des paquets livres avec Pyodide :
+# on l'installe a la volee. Compte une dizaine de secondes.
+import micropip
+await micropip.install("folium")
+
+import folium
+import geopandas as gpd
+import pandas as pd
+
+carte = gpd.read_file("departements.geojson")
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+df["code"] = df["code"].astype(str).str.zfill(2)
+tot = df.groupby("code")["voix"].transform("sum")
+df["part"] = df["voix"] / tot * 100
+carte = carte.merge(df[df["nuance"] == "RN"][["code", "part"]], on="code", how="left")
+
+m = folium.Map(location=[46.6, 2.4], zoom_start=6, tiles="cartodbpositron")
+
+folium.Choropleth(
+    geo_data=carte.to_json(),
+    data=carte,
+    columns=["code", "part"],
+    key_on="feature.properties.code",
+    fill_color="RdBu_r",
+    nan_fill_color="#e6e2db",
+    legend_name="score du RN, en % des exprimes",
+).add_to(m)
+
+# a toi : ajoute une infobulle au survol avec folium.GeoJson
+# et son argument tooltip=folium.GeoJsonTooltip(fields=[...])
+
+print("carte prete :", type(m))
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Où voir le résultat</div>
+      <p>Dans le navigateur, <code>m</code> ne s'affiche pas : folium produit
+      une page HTML complète, et cette page-ci en est déjà une.
+      <strong>C'est dans ton VS Code de la séance 8 que ça prend son sens</strong> :
+      <code>m.save("carte.html")</code>, puis tu ouvres le fichier.
+      Il est autonome, tu peux l'envoyer par mail.</p>
+      <p style="margin-bottom:0">Ici, contente-toi de vérifier que le code
+      s'exécute sans erreur et que l'objet est construit. La séance 15
+      te donnera le bon outil pour publier tout ça.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Fais une carte de France colorée par la nuance arrivée en tête dans chaque département aux législatives 2024, et conclus en une phrase.</p>
+      <p style="margin-top:12px">Le code tourne. La carte est belle.
+      <strong>La phrase de conclusion est un contresens.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le cartogramme, et pourquoi on le voit peu</div>
+      <p>Il existe une réponse technique au problème : le <strong>cartogramme</strong>,
+      une carte où la surface de chaque territoire est proportionnelle
+      à sa population plutôt qu'à ses kilomètres carrés. La France y devient
+      méconnaissable, l'Île-de-France énorme, la diagonale rurale minuscule.</p>
+      <p style="margin-bottom:0">Il est plus juste, et presque personne ne l'utilise,
+      parce qu'il est illisible pour un lecteur qui cherche son département.
+      <strong>La solution honnête et pratique tient en une ligne de légende :
+      dire ce que la carte montre, et dire ce qu'elle ne montre pas.</strong></p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Va chercher les contours d'un autre pays. <a href="https://www.naturalearthdata.com/"
+      target="_blank" rel="noopener" style="color:var(--orange)">Natural Earth</a>
+      ou le portail open data du pays feront l'affaire.
+      Charge le fichier avec <code>gpd.read_file</code>, affiche les contours,
+      et regarde le CRS.</p>
+      <p class="hint" style="margin-top:8px">Tu n'as pas besoin de données à colorier
+      pour l'instant. Le but est de savoir <strong>trouver et ouvrir</strong>
+      un fichier de contours, parce que c'est la première étape
+      de ton projet final.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-12.html" style="color:var(--orange);font-weight:650">← Séance 12</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = ["pandas", "numpy", "matplotlib", "geopandas", "micropip"];
+window.FICHIERS = ["donnees/departements.geojson", "donnees/legislatives-2024.csv"];
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=4"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Ouvrir un fichier de contours",
+    contexte: "Un GeoDataFrame, c'est un DataFrame avec une colonne de formes.",
+    lignes: [
+      { t: "import geopandas as gpd" },
+      { t: "" },
+      { b:1, long:52, consigne:"Charge <code>departements.geojson</code> dans <code>carte</code>.",
+        ok:['carte = gpd.read_file("departements.geojson")'],
+        indices:["<code>gpd.read_file</code> devine le format tout seul.",
+                 '<code>carte = gpd.read_file("departements.geojson")</code>'],
+        pourquoi:"La même fonction ouvre du GeoJSON, du Shapefile ou du GeoPackage. Tu n'as pas à savoir lequel on t'a donné." },
+      { b:1, long:26, consigne:"Affiche ses dimensions.",
+        ok:["print(carte.shape)"],
+        indices:["<code>.shape</code>", "<code>print(carte.shape)</code>"],
+        pourquoi:"96 lignes, 3 colonnes : les 96 départements métropolitains, avec code, nom et geometry." },
+      { b:1, long:26, consigne:"Affiche son système de coordonnées.",
+        ok:["print(carte.crs)"],
+        indices:["<code>.crs</code>", "<code>print(carte.crs)</code>"],
+        pourquoi:"EPSG:4326, longitude et latitude. Deux couches dans deux CRS différents ne se superposeront jamais correctement." },
+    ],
+  },
+  {
+    titre: "La jointure carte plus données",
+    contexte: "Le zfill de la séance 7, appliqué là où ça compte.",
+    lignes: [
+      { t: "import geopandas as gpd" },
+      { t: "import pandas as pd" },
+      { t: 'carte = gpd.read_file("departements.geojson")' },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:56, consigne:"Mets les codes du CSV sur deux caractères, avec un zéro devant si besoin.",
+        ok:['df["code"] = df["code"].astype(str).str.zfill(2)'],
+        indices:["<code>.astype(str)</code> puis <code>.str.zfill(2)</code>",
+                 '<code>df["code"] = df["code"].astype(str).str.zfill(2)</code>'],
+        pourquoi:"Sans cette ligne, la jointure ne trouve que 87 départements sur 96. Silencieusement." },
+      { b:1, long:60, consigne:"Calcule le total des voix par département, dans <code>tot</code>, aligné sur <code>df</code>.",
+        ok:['tot = df.groupby("code")["voix"].transform("sum")'],
+        indices:["<code>transform</code> rend une série de la même longueur que <code>df</code>.",
+                 '<code>tot = df.groupby("code")["voix"].transform("sum")</code>'],
+        pourquoi:"<code>transform</code> au lieu de <code>sum</code> : le résultat garde une valeur par ligne, ce qui permet de diviser directement." },
+      { b:1, long:44, consigne:"Ajoute la colonne <code>part</code>, la part de chaque nuance dans son département.",
+        ok:['df["part"] = df["voix"] / tot * 100'],
+        indices:["Voix sur total, fois 100.",
+                 '<code>df["part"] = df["voix"] / tot * 100</code>'],
+        pourquoi:"" },
+      { b:1, long:76, consigne:"Joins à <code>carte</code> les colonnes <code>code</code> et <code>part</code> des seules lignes RN.",
+        ok:['carte = carte.merge(df[df["nuance"] == "RN"][["code", "part"]], on="code", how="left")'],
+        indices:["Un filtre sur la nuance, deux colonnes, puis <code>merge(..., on=\"code\", how=\"left\")</code>",
+                 '<code>carte = carte.merge(df[df["nuance"] == "RN"][["code", "part"]], on="code", how="left")</code>'],
+        pourquoi:"<code>how=\"left\"</code> garde les 96 départements même sans correspondance : un département sans candidat RN doit rester sur la carte." },
+      { b:1, long:44, consigne:"Contrôle : combien de départements n'ont pas de score RN ?",
+        ok:['print(carte["part"].isna().sum())'],
+        indices:["<code>.isna().sum()</code>", '<code>print(carte["part"].isna().sum())</code>'],
+        pourquoi:"1, et c'est normal : la Creuse, où le RN ne présentait pas de candidat. Une donnée absente pour une bonne raison, pas un bug." },
+    ],
+  },
+  {
+    titre: "Colorier honnêtement",
+    contexte: "Une ligne pour la carte, trois décisions pour la rendre lisible.",
+    lignes: [
+      { t: "import matplotlib.pyplot as plt" },
+      { t: "# carte contient deja la colonne part" },
+      { t: "" },
+      { b:1, long:46, consigne:"Crée une figure carrée de 7 sur 7 pouces.",
+        ok:["fig, ax = plt.subplots(figsize=(7, 7))"],
+        indices:["<code>plt.subplots(figsize=(7, 7))</code>",
+                 "<code>fig, ax = plt.subplots(figsize=(7, 7))</code>"],
+        pourquoi:"Une carte de France tient dans un carré. Un format allongé laisserait du vide des deux côtés." },
+      { b:1, long:86, consigne:"Colorie sur la colonne <code>part</code> avec la palette <code>RdBu_r</code>, bornes 0 et 55, bordures blanches.",
+        ok:['carte.plot(column="part", cmap="RdBu_r", ax=ax, vmin=0, vmax=55, edgecolor="white")'],
+        indices:["<code>column</code>, <code>cmap</code>, <code>ax</code>, <code>vmin</code>, <code>vmax</code>, <code>edgecolor</code>",
+                 '<code>carte.plot(column="part", cmap="RdBu_r", ax=ax, vmin=0, vmax=55, edgecolor="white")</code>'],
+        pourquoi:"<code>vmin</code> et <code>vmax</code> fixés à la main : sans eux, deux cartes de deux scrutins différents ne se comparent plus." },
+      { b:1, long:26, consigne:"Retire les axes, qui n'ont aucun sens sur une carte.",
+        ok:["ax.set_axis_off()"],
+        indices:["<code>set_axis_off</code>", "<code>ax.set_axis_off()</code>"],
+        pourquoi:"Des graduations en degrés de longitude n'apprennent rien à personne et volent de la place." },
+      { b:1, long:66, consigne:"Ajoute un titre aligné à gauche, en gras : « Legislatives 2024, premier tour ».",
+        ok:['ax.set_title("Legislatives 2024, premier tour", loc="left", weight="bold")'],
+        indices:['<code>loc="left"</code>, <code>weight="bold"</code>',
+                 '<code>ax.set_title("Legislatives 2024, premier tour", loc="left", weight="bold")</code>'],
+        pourquoi:"Une carte finit toujours par circuler seule, sans le texte qui l'accompagnait. Le titre doit suffire." },
+    ],
+  },
+  {
+    titre: "Ce que la carte ne montre pas",
+    contexte: "Le chiffre qui doit accompagner toute carte électorale.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: 'df["code"] = df["code"].astype(str).str.zfill(2)' },
+      { t: "" },
+      { b:1, long:66, consigne:"Trie par code puis par voix décroissantes, dans <code>tri</code>.",
+        ok:['tri = df.sort_values(["code", "voix"], ascending=[True, False])'],
+        indices:["Deux colonnes, deux sens de tri.",
+                 '<code>tri = df.sort_values(["code", "voix"], ascending=[True, False])</code>'],
+        pourquoi:"" },
+      { b:1, long:48, consigne:"Garde la première ligne de chaque département, dans <code>tete</code>.",
+        ok:['tete = tri.groupby("code").head(1)'],
+        indices:["<code>.groupby(\"code\").head(1)</code>",
+                 '<code>tete = tri.groupby("code").head(1)</code>'],
+        pourquoi:"Après le tri, la première ligne de chaque groupe est celle qui a le plus de voix." },
+      { b:1, long:52, consigne:"Compte dans combien de départements chaque nuance arrive en tête.",
+        ok:['print(tete["nuance"].value_counts())'],
+        indices:["<code>value_counts</code>", '<code>print(tete["nuance"].value_counts())</code>'],
+        pourquoi:"Le RN en tête dans 54 départements métropolitains. C'est le chiffre que la carte donne à voir." },
+      { b:1, long:76, consigne:"Et maintenant la part des inscrits que représentent les départements où le RN est en tête.",
+        ok:['print(tete[tete["nuance"] == "RN"]["inscrits"].sum() / tete["inscrits"].sum() * 100)'],
+        indices:["Somme des inscrits des départements RN, sur la somme totale.",
+                 '<code>print(tete[tete["nuance"] == "RN"]["inscrits"].sum() / tete["inscrits"].sum() * 100)</code>'],
+        pourquoi:"Autour de 50 % en métropole. La carte disait « majorité du territoire », les inscrits disent « la moitié des électeurs ». Les deux phrases sont vraies, une seule répond à la question posée." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=4"></script>
+
+<script>
+/* ---------- Le code de l'IA : surface contre population ---------- */
+(function () {
+  const LIGNES = [
+    "import geopandas as gpd, pandas as pd, matplotlib.pyplot as plt",
+    "",
+    'carte = gpd.read_file("departements.geojson")',
+    'df = pd.read_csv("legislatives-2024.csv", sep=";")',
+    'df["code"] = df["code"].astype(str).str.zfill(2)',
+    "",
+    'tri = df.sort_values(["code", "voix"], ascending=[True, False])',
+    'tete = tri.groupby("code").head(1)[["code", "nuance"]]',
+    'carte = carte.merge(tete, on="code", how="left")',
+    "",
+    'carte.plot(column="nuance", categorical=True, legend=True, edgecolor="white")',
+    "",
+    "# Conclusion : le RN domine largement le territoire francais,",
+    "# arrivant en tete dans la majorite des departements.",
+  ];
+  const BUGS = [11, 12];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - lignes 12 et 13</div>' +
+        "<p>Le code est juste, <code>zfill</code> compris. La carte est correcte. " +
+        "<strong>C'est la conclusion qui glisse</strong> : « domine le territoire » " +
+        "n'est pas « domine l'électorat », et la phrase suivante laisse croire " +
+        "que c'est la même chose.</p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:10px 0'>" +
+        "departements ou le RN est en tete   54 sur 96   56,2 %\n" +
+        "part des inscrits de ces departements            49,8 %\n" +
+        "sieges obtenus a l'Assemblee        125 sur 577  21,7 %</p>" +
+        "<p style='margin-bottom:0'>Trois chiffres exacts, trois histoires différentes. " +
+        "<strong>Choisir lequel on met en avant, c'est déjà une position politique</strong>, " +
+        "et l'IA en choisit un sans savoir qu'elle le fait.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 La phrase juste</div>' +
+        "<p style='margin-bottom:0'>« Le RN arrive en tête dans 54 des 96 départements " +
+        "métropolitains, qui regroupent près de la moitié des inscrits. » " +
+        "Même longueur, aucune ambiguïté, et personne ne peut te la reprocher " +
+        "en réunion.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte, et il n'y a " +
+        "<strong>aucun bug dans ce code</strong>. Le problème est ailleurs : " +
+        "cherche l'endroit où on passe du calcul à l'affirmation.</p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- La carte interactive : geojson + resultats, joints dans le navigateur ---------- */
+(function () {
+  const TEINTE_TETE = {
+    RN: "#3c3c8c", UG: "#d4506a", ENS: "#f0a828", LR: "#2563c9",
+    UXD: "#20204f", DVD: "#7aa5e0", DVG: "#e8a0b4", REG: "#4bab8a",
+    DVC: "#f5c518", HOR: "#f0d060", LDVD: "#7aa5e0",
+  };
+  const MODES = {
+    rn:   { lab: "Score du RN",             min: 0,  max: 55, pal: "rb", u: " %" },
+    ug:   { lab: "Score du bloc de gauche", min: 0,  max: 55, pal: "rb", u: " %" },
+    part: { lab: "Participation",           min: 58, max: 76, pal: "vt", u: " %" },
+    tete: { lab: "Nuance en tête",          pal: "cat" },
+  };
+
+  let DATA = {};      // code -> {nom, inscrits, votants, part, tete, nuances:[[n,pct],...]}
+  let mode = "rn";
+  const svg = document.getElementById("svgmap");
+
+  function couleur(m, v) {
+    if (v === null || v === undefined || Number.isNaN(v)) return "#e6e2db";
+    const cfg = MODES[m];
+    let t = (v - cfg.min) / (cfg.max - cfg.min);
+    t = Math.max(0, Math.min(1, t));
+    if (cfg.pal === "rb") {
+      // bleu clair -> blanc -> rouge sombre
+      return t < 0.5
+        ? melange([222, 235, 247], [247, 247, 247], t * 2)
+        : melange([247, 247, 247], [165, 15, 21], (t - 0.5) * 2);
+    }
+    return melange([237, 245, 240], [14, 100, 62], t);
+  }
+  function melange(a, b, t) {
+    return "rgb(" + a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(",") + ")";
+  }
+
+  function peindre() {
+    svg.querySelectorAll("path").forEach((p) => {
+      const d = DATA[p.dataset.code];
+      if (!d) { p.setAttribute("fill", "#e6e2db"); return; }
+      if (mode === "tete") {
+        p.setAttribute("fill", TEINTE_TETE[d.tete] || "#9a9287");
+      } else {
+        const v = mode === "part" ? d.participation : d[mode];
+        p.setAttribute("fill", couleur(mode, v === undefined ? null : v));
+      }
+    });
+    legende();
+  }
+
+  function legende() {
+    const e = document.getElementById("echelle");
+    const n = document.getElementById("legende-note");
+    if (mode === "tete") {
+      const vus = {};
+      Object.values(DATA).forEach((d) => (vus[d.tete] = (vus[d.tete] || 0) + 1));
+      e.innerHTML = Object.entries(vus).sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => '<span style="display:flex;align-items:center;gap:5px">' +
+          '<i style="width:11px;height:11px;border-radius:2px;display:block;background:' +
+          (TEINTE_TETE[k] || "#9a9287") + '"></i>' + k + " (" + v + ")</span>").join("");
+      e.style.flexWrap = "wrap";
+      n.innerHTML = "Chaque département compte pour un carré, quelle que soit " +
+        "sa population. <strong>C'est là qu'une carte ment.</strong>";
+      return;
+    }
+    const cfg = MODES[mode];
+    const arret = [];
+    for (let i = 0; i <= 10; i++) {
+      arret.push(couleur(mode, cfg.min + (cfg.max - cfg.min) * (i / 10)) + " " + i * 10 + "%");
+    }
+    e.style.flexWrap = "nowrap";
+    e.innerHTML = "<span>" + cfg.min + cfg.u + "</span>" +
+      '<span class="bande" style="background:linear-gradient(to right,' + arret.join(",") + ')"></span>' +
+      "<span>" + cfg.max + cfg.u + "</span>";
+    n.innerHTML = "Bornes fixées à la main, de " + cfg.min + cfg.u + " à " +
+      cfg.max + cfg.u + ". <strong>Laisser l'ordinateur les choisir change " +
+      "complètement l'impression visuelle</strong>, sans changer une seule donnée.";
+  }
+
+  function bulle(code) {
+    const d = DATA[code];
+    const b = document.getElementById("bulle");
+    if (!d) { return; }
+    const lignes = d.nuances.slice(0, 5).map(([n, p]) =>
+      '<div class="ligne"><i style="background:' + (TEINTE_TETE[n] || "#9a9287") + '"></i>' +
+      n + "<b>" + p.toFixed(1).replace(".", ",") + " %</b></div>").join("");
+    b.innerHTML =
+      "<h4>" + d.nom + "</h4>" +
+      '<div class="sous">' + d.inscrits.toLocaleString("fr-FR") + " inscrits · participation " +
+      d.participation.toFixed(1).replace(".", ",") + " %</div>" + lignes;
+  }
+
+  Promise.all([
+    fetch("donnees/departements.geojson?v=4").then((r) => r.json()),
+    fetch("donnees/legislatives-2024.csv?v=4").then((r) => r.text()),
+  ]).then(([geo, csv]) => {
+    /* --- les resultats, par departement --- */
+    const l = csv.replace(/\r/g, "").trim().split("\n");
+    const h = l[0].split(";");
+    const brut = {};
+    for (let i = 1; i < l.length; i++) {
+      const p = l[i].split(";");
+      const o = {};
+      h.forEach((k, j) => (o[k] = p[j]));
+      // le fichier code les departements en "1", le geojson en "01"
+      const code = o.code.padStart(2, "0");
+      if (!brut[code]) {
+        brut[code] = { nom: o.departement, inscrits: +o.inscrits,
+                       votants: +o.votants, v: {} };
+      }
+      brut[code].v[o.nuance] = (brut[code].v[o.nuance] || 0) + +o.voix;
+    }
+    for (const c in brut) {
+      const b = brut[c];
+      const tot = Object.values(b.v).reduce((a, x) => a + x, 0);
+      const nuances = Object.entries(b.v).map(([n, x]) => [n, x / tot * 100])
+        .sort((a, b2) => b2[1] - a[1]);
+      DATA[c] = {
+        nom: b.nom, inscrits: b.inscrits,
+        participation: b.votants / b.inscrits * 100,
+        rn: b.v.RN === undefined ? null : b.v.RN / tot * 100,
+        ug: b.v.UG === undefined ? null : b.v.UG / tot * 100,
+        tete: nuances[0][0], nuances: nuances,
+      };
+    }
+
+    /* --- les contours, projetes --- */
+    const LAT0 = 46.6, k = Math.cos(LAT0 * Math.PI / 180);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const chemins = [];
+    geo.features.forEach((f) => {
+      const polys = f.geometry.type === "Polygon"
+        ? [f.geometry.coordinates] : f.geometry.coordinates;
+      let d = "";
+      polys.forEach((poly) => {
+        poly.forEach((ring) => {
+          ring.forEach((pt, i) => {
+            const x = pt[0] * k, y = -pt[1];
+            if (x < x0) x0 = x; if (x > x1) x1 = x;
+            if (y < y0) y0 = y; if (y > y1) y1 = y;
+            d += (i ? "L" : "M") + x.toFixed(4) + " " + y.toFixed(4);
+          });
+          d += "Z";
+        });
+      });
+      chemins.push({ code: f.properties.code, nom: f.properties.nom, d: d });
+    });
+
+    const marge = 8, taille = 560 - marge * 2;
+    const ech = Math.min(taille / (x1 - x0), taille / (y1 - y0));
+    const dx = marge + (taille - (x1 - x0) * ech) / 2;
+    const dy = marge + (taille - (y1 - y0) * ech) / 2;
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("transform",
+      "translate(" + dx + "," + dy + ") scale(" + ech + ") translate(" + -x0 + "," + -y0 + ")");
+    g.setAttribute("stroke-width", (0.6 / ech).toFixed(4));
+    chemins.forEach((c) => {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      p.setAttribute("d", c.d);
+      p.dataset.code = c.code;
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "title");
+      t.textContent = c.nom;
+      p.appendChild(t);
+      p.addEventListener("mouseenter", () => bulle(c.code));
+      p.addEventListener("click", () => bulle(c.code));
+      g.appendChild(p);
+    });
+    svg.appendChild(g);
+    peindre();
+
+    // la carte en relief reutilise les memes donnees
+    window.__CARTE = { data: DATA, geo: geo };
+    window.dispatchEvent(new Event("carte-prete"));
+  }).catch((e) => {
+    document.getElementById("bulle").innerHTML =
+      "<h4>Carte indisponible</h4><p class='hint'>Les fichiers de données " +
+      "n'ont pas pu être chargés.</p>";
+    console.warn(e);
+  });
+
+  document.querySelectorAll(".modes button").forEach((b) =>
+    b.addEventListener("click", () => {
+      document.querySelectorAll(".modes button").forEach((x) => x.classList.remove("on"));
+      b.classList.add("on");
+      mode = b.dataset.m;
+      peindre();
+    }));
+})();
+</script>
+
+<script>
+/* ---------- La carte en relief : prismes extrudes, peintre du fond vers l'avant ---------- */
+(function () {
+  const cv = document.getElementById("cv3d");
+  const ct = cv.getContext("2d");
+  const TEINTE_TETE = {
+    RN: "#3c3c8c", UG: "#d4506a", ENS: "#f0a828", LR: "#2563c9",
+    UXD: "#20204f", DVD: "#7aa5e0", DVG: "#e8a0b4", REG: "#4bab8a",
+    DVC: "#f5c518", HOR: "#f0d060",
+  };
+
+  /* --- reglages de la scene --- */
+  let yaw = -0.32;          // rotation autour de la verticale
+  const PENTE = 0.52;       // aplatissement : 1 = vue de face, 0 = vue du dessus
+  const HAUT = 125;         // hauteur maximale d'un prisme, en pixels
+  let mode = "rn";
+  let anime = true;
+  let survole = null;
+  let PRISMES = [];         // [{code, anneaux:[[x,y],...], h, teinte, cx, cy}]
+  let cx0 = 0, cy0 = 0, ech = 1;
+
+  /* --- simplification de Douglas-Peucker : moins de points, meme silhouette --- */
+  function dp(pts, eps) {
+    if (pts.length < 3) return pts;
+    let imax = 0, dmax = 0;
+    const [ax, ay] = pts[0], [bx, by] = pts[pts.length - 1];
+    const dx = bx - ax, dy = by - ay;
+    const norme = Math.hypot(dx, dy) || 1e-9;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const d = Math.abs((pts[i][0] - ax) * dy - (pts[i][1] - ay) * dx) / norme;
+      if (d > dmax) { dmax = d; imax = i; }
+    }
+    if (dmax <= eps) return [pts[0], pts[pts.length - 1]];
+    return dp(pts.slice(0, imax + 1), eps).slice(0, -1)
+      .concat(dp(pts.slice(imax), eps));
+  }
+
+  /* un anneau est ferme : ses deux extremites sont confondues, ce qui met
+     Douglas-Peucker en defaut. On le coupe en deux chaines ouvertes d'abord. */
+  function dpAnneau(ring, eps) {
+    const p = ring.slice(0, -1);
+    if (p.length < 6) return ring;
+    let loin = 0, dmax = -1;
+    for (let i = 1; i < p.length; i++) {
+      const d = Math.hypot(p[i][0] - p[0][0], p[i][1] - p[0][1]);
+      if (d > dmax) { dmax = d; loin = i; }
+    }
+    const a = dp(p.slice(0, loin + 1), eps);
+    const b = dp(p.slice(loin).concat([p[0]]), eps);
+    const out = a.slice(0, -1).concat(b);
+    return out;
+  }
+
+  /* les anneaux GeoJSON n'ont pas de sens de parcours garanti : on les met tous
+     dans le meme sens, sans quoi les normales alternent et les murs zebrent */
+  function orienter(ring) {
+    let aire = 0;
+    for (let i = 0; i < ring.length - 1; i++) {
+      aire += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+    }
+    return aire < 0 ? ring.slice().reverse() : ring;
+  }
+
+  /* toutes les couleurs circulent en [r, g, b] : on peut les eclaircir librement */
+  function hexRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function css(rgb, k) {
+    const f = (x) => Math.max(0, Math.min(255, Math.round(x * (k || 1))));
+    return "rgb(" + f(rgb[0]) + "," + f(rgb[1]) + "," + f(rgb[2]) + ")";
+  }
+  function melange(a, b, t) {
+    return a.map((x, i) => Math.round(x + (b[i] - x) * t));
+  }
+  function teinteVal(m, v) {
+    if (v === null || v === undefined || Number.isNaN(v)) return [207, 201, 192];
+    if (m === "rn") {
+      return melange([255, 247, 221], [141, 24, 22], Math.max(0, Math.min(1, v / 55)));
+    }
+    if (m === "part") {
+      return melange([236, 246, 240], [10, 82, 52],
+                     Math.max(0, Math.min(1, (v - 58) / 18)));
+    }
+    return [154, 146, 135];
+  }
+
+  /* --- construction des prismes pour le mode courant --- */
+  function batir() {
+    const C = window.__CARTE;
+    if (!C) return;
+    const bornes = { rn: [0, 55], part: [58, 76], ins: [0, 1900000] };
+    PRISMES = [];
+    C.geo.features.forEach((f) => {
+      const d = C.data[f.properties.code];
+      if (!d) return;
+      const valeur = mode === "rn" ? d.rn : mode === "part" ? d.participation : d.inscrits;
+      const [lo, hi] = bornes[mode];
+      const t = valeur === null || valeur === undefined
+        ? 0 : Math.max(0, Math.min(1, (valeur - lo) / (hi - lo)));
+      const teinte = mode === "ins"
+        ? hexRgb(TEINTE_TETE[d.tete] || "#9a9287")
+        : teinteVal(mode, valeur);
+      const polys = f.geometry.type === "Polygon"
+        ? [f.geometry.coordinates] : f.geometry.coordinates;
+      const anneaux = [];
+      polys.forEach((p) => {
+        const brut = p[0].map((c) => [c[0] * 0.687, -c[1]]);   // 0.687 = cos(46,6 deg)
+        const s = dpAnneau(brut, 0.005);
+        if (s.length > 3) anneaux.push(orienter(s));
+      });
+      if (!anneaux.length) return;
+      let sx = 0, sy = 0, n = 0;
+      anneaux[0].forEach((p) => { sx += p[0]; sy += p[1]; n++; });
+      PRISMES.push({
+        code: f.properties.code, nom: d.nom, anneaux: anneaux,
+        h: t, teinte: teinte, cx: sx / n, cy: sy / n,
+        valeur: valeur, d: d,
+      });
+    });
+    cadrer();
+  }
+
+  function cadrer() {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    PRISMES.forEach((p) => p.anneaux.forEach((a) => a.forEach(([x, y]) => {
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+    })));
+    cx0 = (x0 + x1) / 2; cy0 = (y0 + y1) / 2;
+    const diag = Math.hypot(x1 - x0, y1 - y0);
+    ech = (Math.min(cv.width, cv.height / PENTE) * 0.94) / diag;
+  }
+
+  /* --- projection oblique : u vers la droite, v vers le fond --- */
+  function proj(x, y, z) {
+    const dx = x - cx0, dy = y - cy0;
+    const c = Math.cos(yaw), s = Math.sin(yaw);
+    const u = dx * c - dy * s;
+    const v = dx * s + dy * c;
+    return [cv.width / 2 + u * ech,
+            cv.height / 2 + 96 + v * ech * PENTE - z * HAUT];
+  }
+  function prof(x, y) {
+    return (x - cx0) * Math.sin(yaw) + (y - cy0) * Math.cos(yaw);
+  }
+
+  function dessiner() {
+    ct.clearRect(0, 0, cv.width, cv.height);
+    if (!PRISMES.length) return;
+
+    // un socle au niveau zero : les interstices entre prismes lisent comme
+    // du sol, et non comme des trous
+    ct.beginPath();
+    PRISMES.forEach((p) => p.anneaux.forEach((ring) => {
+      ring.forEach(([x, y], i) => {
+        const q = proj(x, y, 0);
+        i ? ct.lineTo(q[0], q[1]) : ct.moveTo(q[0], q[1]);
+      });
+      ct.closePath();
+    }));
+    ct.fillStyle = "#ded7cc";
+    ct.fill();
+
+    // du plus lointain au plus proche
+    const ordre = PRISMES.slice().sort((a, b) => prof(a.cx, a.cy) - prof(b.cx, b.cy));
+
+    ordre.forEach((p) => {
+      const vise = survole === p.code;
+      const kSurvol = vise ? 1.18 : 1;
+
+      // murs : seuls ceux tournes vers la camera, eclaires par une lumiere fixe
+      const cs = Math.cos(yaw), sn = Math.sin(yaw);
+      p.anneaux.forEach((ring) => {
+        for (let i = 0; i < ring.length - 1; i++) {
+          const [x1, y1] = ring[i], [x2, y2] = ring[i + 1];
+          const dx = x2 - x1, dy = y2 - y1;
+          const l = Math.hypot(dx, dy) || 1e-9;
+          const nx = dy / l, ny = -dx / l;              // normale sortante
+          const nv = nx * sn + ny * cs;                 // vers le fond
+          if (nv > -0.02) continue;                     // mur cache par le prisme
+          const nu = nx * cs - ny * sn;                 // vers la droite
+          const lum = 0.50 + 0.42 * Math.max(0, nu * -0.5 + -nv * 0.87);
+          const a = proj(x1, y1, 0), b = proj(x2, y2, 0);
+          const c2 = proj(x2, y2, p.h), d2 = proj(x1, y1, p.h);
+          ct.beginPath();
+          ct.moveTo(a[0], a[1]); ct.lineTo(b[0], b[1]);
+          ct.lineTo(c2[0], c2[1]); ct.lineTo(d2[0], d2[1]);
+          ct.closePath();
+          ct.fillStyle = css(p.teinte, lum * kSurvol);
+          ct.fill();
+          // le canvas laisse une couture claire entre deux remplissages voisins :
+          // un contour de la meme couleur la referme
+          ct.strokeStyle = ct.fillStyle;
+          ct.lineWidth = 1;
+          ct.stroke();
+        }
+      });
+
+      // toit
+      ct.beginPath();
+      p.anneaux.forEach((ring) => {
+        ring.forEach(([x, y], i) => {
+          const q = proj(x, y, p.h);
+          i ? ct.lineTo(q[0], q[1]) : ct.moveTo(q[0], q[1]);
+        });
+        ct.closePath();
+      });
+      ct.fillStyle = css(p.teinte, kSurvol);
+      ct.fill();
+      ct.strokeStyle = vise ? "#2b2722" : "rgba(255,255,255,.85)";
+      ct.lineWidth = vise ? 1.8 : 0.7;
+      ct.stroke();
+    });
+  }
+
+  /* --- survol : on teste le toit projete --- */
+  function dansToit(p, mx, my) {
+    for (const ring of p.anneaux) {
+      let dedans = false;
+      for (let i = 0, j = ring.length - 2; i < ring.length - 1; j = i++) {
+        const a = proj(ring[i][0], ring[i][1], p.h);
+        const b = proj(ring[j][0], ring[j][1], p.h);
+        if ((a[1] > my) !== (b[1] > my) &&
+            mx < ((b[0] - a[0]) * (my - a[1])) / (b[1] - a[1] || 1e-9) + a[0]) {
+          dedans = !dedans;
+        }
+      }
+      if (dedans) return true;
+    }
+    return false;
+  }
+
+  const bulle = document.getElementById("bulle3d");
+  cv.addEventListener("mousemove", (e) => {
+    if (glisse) return;
+    const r = cv.getBoundingClientRect();
+    const mx = (e.clientX - r.left) * (cv.width / r.width);
+    const my = (e.clientY - r.top) * (cv.height / r.height);
+    // du plus proche au plus lointain : le premier touche gagne
+    const ordre = PRISMES.slice().sort((a, b) => prof(b.cx, b.cy) - prof(a.cx, a.cy));
+    const trouve = ordre.find((p) => dansToit(p, mx, my));
+    const code = trouve ? trouve.code : null;
+    if (code !== survole) { survole = code; dessiner(); }
+    if (!trouve) { bulle.innerHTML = ""; return; }
+    const d = trouve.d;
+    const val = mode === "ins"
+      ? d.inscrits.toLocaleString("fr-FR") + " inscrits · en tête : " + d.tete
+      : mode === "rn"
+      ? "RN " + (d.rn === null ? "pas de candidat" : d.rn.toFixed(1).replace(".", ",") + " %")
+      : "participation " + d.participation.toFixed(1).replace(".", ",") + " %";
+    bulle.innerHTML = "<strong>" + d.nom + "</strong> · " + val;
+  });
+  cv.addEventListener("mouseleave", () => {
+    if (survole !== null) { survole = null; dessiner(); }
+    bulle.innerHTML = "";
+  });
+
+  /* --- rotation a la souris --- */
+  let glisse = false, xDepart = 0, yawDepart = 0;
+  cv.addEventListener("pointerdown", (e) => {
+    glisse = true; xDepart = e.clientX; yawDepart = yaw;
+    anime = false; majBouton();
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener("pointermove", (e) => {
+    if (!glisse) return;
+    yaw = yawDepart + (e.clientX - xDepart) * 0.006;
+    dessiner();
+  });
+  cv.addEventListener("pointerup", () => (glisse = false));
+  cv.addEventListener("pointercancel", () => (glisse = false));
+
+  const btn = document.getElementById("tourne");
+  function majBouton() {
+    btn.textContent = anime ? "⏸ Arrêter la rotation" : "▶ Reprendre la rotation";
+  }
+  btn.addEventListener("click", () => { anime = !anime; majBouton(); });
+
+  document.querySelectorAll("#modes3d button").forEach((b) =>
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#modes3d button").forEach((x) => x.classList.remove("on"));
+      b.classList.add("on");
+      mode = b.dataset.m;
+      batir(); dessiner();
+    }));
+
+  function boucle() {
+    if (anime && !glisse) { yaw += 0.0022; dessiner(); }
+    requestAnimationFrame(boucle);
+  }
+
+  function demarrer() { batir(); dessiner(); boucle(); }
+  if (window.__CARTE) demarrer();
+  else window.addEventListener("carte-prete", demarrer, { once: true });
+})();
+</script>
+
+</body>
+</html>
