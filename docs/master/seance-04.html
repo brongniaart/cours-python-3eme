@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 4 - Ranger un portefeuille</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>
+  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
+  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
+  .etape-num { background: #1f6feb; }
+  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
+  .box.prof .box-title { color: #2b4b7e; }
+
+  .pf { display: grid; grid-template-columns: 1fr 290px; gap: 28px; align-items: start; }
+  @media (max-width: 900px) { .pf { grid-template-columns: 1fr; } }
+  .ligne-pf { display: flex; align-items: center; gap: 12px; padding: 9px 0;
+    border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .ligne-pf .nom { width: 96px; font-weight: 650; }
+  .ligne-pf .barre { flex: 1; height: 20px; background: var(--bg-soft);
+    border-radius: 5px; overflow: hidden; }
+  .ligne-pf .barre i { display: block; height: 100%; background: #1f6feb; }
+  .ligne-pf .poids { width: 54px; text-align: right; font-family: var(--mono); font-size: 13px; color: var(--ink-soft); }
+  .ligne-pf .rdt { width: 66px; text-align: right; font-family: var(--mono); font-weight: 700; }
+  .ligne-pf.star .nom { color: #b8560c; }
+  .ligne-pf.star .barre i { background: #f0a828; }
+
+  .carte-r { border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px;
+    background: #fff; margin-bottom: 12px; }
+  .carte-r span { font-size: 11.5px; font-weight: 750; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-soft); display: block; }
+  .carte-r b { font-size: 28px; font-weight: 780; letter-spacing: -.02em; }
+  .carte-r.faux { background: var(--red-soft); border-color: #f5c9c4; }
+  .carte-r.faux b { color: var(--red); }
+  .carte-r.vrai { background: var(--green-soft); border-color: #bfe3d3; }
+  .carte-r.vrai b { color: var(--green); }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 4</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 4 · 1 h 30</div>
+    <h1>Ranger un portefeuille</h1>
+    <p class="lede">Cinq lignes en portefeuille, rendements connus. Quel est le rendement
+    de l'ensemble ? Presque tout le monde fait la moyenne des cinq.
+    <strong>Sur le portefeuille d'aujourd'hui, ça donne 16,4 % au lieu de 4,4 %</strong> —
+    une erreur d'un facteur quatre, dans le bon sens pour celui qui la commet.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Manipuler un portefeuille entier : le valoriser, calculer les poids,
+    trouver la meilleure et la pire ligne, mesurer la concentration.
+    Et surtout, produire un rendement <strong>pondéré</strong> — celui qu'on peut
+    présenter sans se faire corriger.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Une boîte à compartiments</h2>
+      <div class="etape-meta">15 minutes · listes, index, outils tout prêts</div></div></div>
+
+    <p>Cinq lignes, cinq valeurs. Avec ce que tu sais, il faudrait cinq variables
+    et cinq noms. Une <strong>liste</strong> les range dans une seule boîte
+    à cases numérotées.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+valeurs = [22000, 1500, 5200, 800, 4500]
+
+print(valeurs)
+print(valeurs[0])
+print(valeurs[4])
+
+print(len(valeurs))
+print(sum(valeurs))
+print(max(valeurs))
+print(min(valeurs))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 La numérotation commence à zéro</div>
+      <p>La première case porte le numéro <code>0</code>, la dernière porte
+      <code>len(valeurs) - 1</code>. Essaie <code>valeurs[5]</code> :
+      <code>IndexError: list index out of range</code>.</p>
+      <p>Cette erreur, contrairement à celles des séances précédentes,
+      <strong>plante bruyamment</strong>. C'est une bonne nouvelle : les erreurs
+      qui plantent coûtent toujours moins cher que celles qui passent.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Pourquoi la moyenne simple ment</h2>
+      <div class="etape-meta">fais grossir la petite ligne qui performe</div></div></div>
+
+    <p>Le portefeuille contient une petite ligne à <strong>+42 %</strong>.
+    Fais varier son poids et regarde les deux chiffres à droite.
+    <strong>L'un ne bouge jamais.</strong></p>
+
+    <div class="widget">
+      <div class="pf">
+        <div>
+          <div id="pf-lignes"></div>
+          <div class="slider-row" style="margin-top:20px">
+            <label>Montant investi sur la ligne à +42 % <span class="val" id="v-star">1 500 €</span></label>
+            <input type="range" id="s-star" min="500" max="30000" step="500" value="1500">
+          </div>
+        </div>
+        <div>
+          <div class="carte-r faux">
+            <span>Moyenne des rendements</span>
+            <b id="r-simple"></b>
+            <div class="hint" style="margin-top:4px">ce que fait l'intuition</div>
+          </div>
+          <div class="carte-r vrai">
+            <span>Rendement pondéré</span>
+            <b id="r-pond"></b>
+            <div class="hint" style="margin-top:4px">le vrai rendement du portefeuille</div>
+          </div>
+          <p class="hint" id="r-note"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi c'est une erreur qui se voit en entretien</div>
+      <p>La moyenne simple traite une position de 800 € comme une position de 22 000 €.
+      Elle est <strong>aveugle à la taille</strong>, donc elle ne décrit aucun
+      portefeuille réel.</p>
+      <p>Et l'erreur va presque toujours dans le sens flatteur : les petites lignes
+      spéculatives affichent les plus gros pourcentages, et ce sont elles qui tirent
+      la moyenne simple vers le haut. C'est aussi comme ça qu'on maquille
+      une performance sans mentir sur un seul chiffre.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Parcourir, et pondérer</h2>
+      <div class="etape-meta">20 minutes · for sur une liste, range(len(...))</div></div></div>
+
+    <p>Deux façons de parcourir. Quand tu veux seulement les valeurs,
+    <code>for v in valeurs</code>. Quand tu dois lire <strong>deux listes en parallèle</strong>,
+    il te faut les numéros : <code>for i in range(len(valeurs))</code>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+valeurs = [22000, 1500, 5200, 800, 4500]
+rendements = [3.1, 42.0, -6.5, 38.0, 5.2]
+
+total = sum(valeurs)
+
+# la moyenne simple : aveugle a la taille
+print(sum(rendements) / len(rendements))
+
+# le rendement pondere
+pondere = 0
+for i in range(len(valeurs)):
+    poids = valeurs[i] / total
+    pondere = pondere + poids * rendements[i]
+
+print(round(pondere, 2))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La ligne qui porte tout</div>
+      <p><code>pondere = pondere + poids * rendements[i]</code> est une accumulation,
+      comme en séance 3 — mais chaque terme est <strong>pesé</strong> avant d'être ajouté.</p>
+      <p>C'est la structure de presque tout calcul financier agrégé : indice boursier,
+      inflation, taux moyen d'un portefeuille de crédits. À chaque fois,
+      une somme pondérée. Si tu ne devais retenir qu'une boucle de la séance,
+      c'est celle-là.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Nommer plutôt que numéroter</h2>
+      <div class="etape-meta">15 minutes · le dictionnaire</div></div></div>
+
+    <p>Qui se souvient que la case 3 est Orange ? Un <strong>dictionnaire</strong>
+    range par nom : accolades, et des paires <code>clé : valeur</code>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+portefeuille = {
+    "Total": 22000,
+    "LVMH": 1500,
+    "Sanofi": 5200,
+    "Orange": 800,
+    "Air Liquide": 4500,
+}
+
+print(portefeuille["Total"])
+print(len(portefeuille))
+print(sum(portefeuille.values()))
+
+for ligne in portefeuille:
+    poids = portefeuille[ligne] / sum(portefeuille.values()) * 100
+    print(f"{ligne} : {round(poids, 1)} %")
+
+print(portefeuille.get("Tesla", 0))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Le piège du parcours</div>
+      <p>Dans <code>for ligne in portefeuille</code>, la variable <code>ligne</code>
+      contient la <strong>clé</strong>, jamais la valeur. Fais un
+      <code>print(ligne)</code> tout seul : tu verras défiler les noms, sans les montants.</p>
+      <p>Pour avoir le montant, il faut le redemander : <code>portefeuille[ligne]</code>.
+      C'est l'erreur numéro un sur les dictionnaires.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Liste ou dictionnaire ?</div>
+      <p><strong>Liste</strong> quand l'ordre compte et que les éléments sont
+      interchangeables : une série de cours, une suite de flux, une file de dossiers.</p>
+      <p><strong>Dictionnaire</strong> quand chaque valeur a une identité :
+      un montant par ligne, un taux par pays, un score par contrepartie.</p>
+      <p>Le test qui ne trompe pas : si tu as envie de dire « le truc de Untel »,
+      c'est un dictionnaire.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : le rapport de portefeuille</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>À partir des deux listes, produis le rapport qu'un gérant présente
+    à son client.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Ce que doit contenir le rapport</div>
+      <ol style="margin-bottom:0">
+        <li>La valeur totale du portefeuille</li>
+        <li>Chaque ligne avec son montant, son poids en %, et son rendement</li>
+        <li>Le rendement <strong>pondéré</strong> de l'ensemble</li>
+        <li>La meilleure et la pire ligne</li>
+        <li>Le poids de la plus grosse position, avec une alerte si elle dépasse 40 %</li>
+      </ol>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+lignes = ["Total", "LVMH", "Sanofi", "Orange", "Air Liquide"]
+valeurs = [22000, 1500, 5200, 800, 4500]
+rendements = [3.1, 42.0, -6.5, 38.0, 5.2]
+
+# 1. La valeur totale
+
+
+# 2. Le detail ligne par ligne
+
+
+# 3. Le rendement pondere, la meilleure et la pire ligne
+
+
+# 4. L'alerte de concentration
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. Pour retrouver le nom de la
+      meilleure ligne, l'astuce est <code>rendements.index(max(rendements))</code> :
+      ça donne le <em>numéro</em> de la case, qu'on utilise ensuite dans
+      <code>lignes[...]</code>. Ne la donne que s'il bute vraiment.</p>
+      <p>S'il finit vite : « trie le rapport de la plus grosse ligne à la plus petite ».
+      Il découvrira qu'il ne peut pas trier deux listes en parallèle sans les lier —
+      et c'est exactement pour ça que pandas existe, en séance 9.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : la règle des 5 %</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Beaucoup de mandats de gestion interdisent qu'une ligne dépasse un certain
+    poids. Écris un contrôle qui liste <strong>toutes</strong> les lignes au-dessus
+    de 10 % du portefeuille, et calcule combien il faudrait vendre sur chacune
+    pour revenir dans les clous.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Le piège de ce défi</div>
+      <p>Quand tu vends une partie d'une ligne, <strong>le total du portefeuille
+      baisse aussi</strong> — donc le poids des autres lignes monte mécaniquement.
+      Un contrôle naïf, ligne par ligne, ne converge pas.</p>
+      <p>C'est un vrai problème de gestion, et il n'a pas de solution en une formule.
+      Signale-le dans ton code, même si tu ne le résous pas : repérer qu'un modèle
+      est plus subtil qu'il n'en a l'air vaut mieux que de livrer un chiffre faux.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">J'ai un portefeuille avec les montants investis par ligne et le rendement de chaque ligne. Écris-moi un programme Python qui calcule le rendement global du portefeuille.</p>
+      <p style="margin-top:12px">Le prompt mentionne explicitement les montants.
+      Le code les charge, les affiche… <strong>et ne s'en sert jamais pour le calcul.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le test qui prend dix secondes</div>
+      <p>Face à tout agrégat produit par une machine, pose-toi une question :
+      <strong>est-ce que le résultat doit bouger si je change la taille des positions ?</strong>
+      Si oui, et qu'il ne bouge pas, la pondération a été oubliée.</p>
+      <p>Ce test vaut pour un rendement de portefeuille, un taux moyen de crédits,
+      un panier d'inflation, une satisfaction client agrégée par région.
+      C'est la même erreur à chaque fois, et elle est invisible dans le code.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Un <strong>panier d'inflation</strong> : cinq postes de dépenses
+      (logement, alimentation, transport, santé, loisirs), leur poids dans le budget,
+      et la hausse de prix de chacun. Calcule l'inflation ressentie par ce ménage.</p>
+      <p class="hint" style="margin-top:8px">Puis change les poids pour simuler
+      un ménage modeste, dont le logement pèse 45 % au lieu de 25 %. Deux ménages,
+      la même inflation officielle, deux inflations vécues très différentes.
+      C'est exactement le débat public sur l'indice des prix.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-03.html" style="color:var(--orange);font-weight:650">← Séance 3</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-05.html" style="color:var(--orange);font-weight:650">Séance 5 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=2"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Valoriser le portefeuille",
+    contexte: "Une liste, et les quatre outils qui vont avec.",
+    lignes: [
+      { b:1, long:34, consigne:"Crée la liste <code>valeurs</code> avec <code>22000, 1500, 5200, 800, 4500</code>.",
+        ok:["valeurs = [22000, 1500, 5200, 800, 4500]"],
+        indices:["Des crochets, des virgules entre les valeurs.",
+                 "<code>valeurs = [22000, 1500, 5200, 800, 4500]</code>"],
+        pourquoi:"Une seule boîte, cinq montants. Sans liste, il faudrait cinq variables et le code ne marcherait plus dès la sixième ligne." },
+      { t: "" },
+      { b:1, long:26, consigne:"Range la valeur totale du portefeuille dans <code>total</code>.",
+        ok:["total = sum(valeurs)"],
+        indices:["L'outil qui additionne toute une liste s'appelle <code>sum</code>.",
+                 "<code>total = sum(valeurs)</code>"],
+        pourquoi:"<code>sum</code> marche avec 5 lignes comme avec 500 : rien à changer si le portefeuille grandit." },
+      { b:1, long:30, consigne:"Affiche <code>5 lignes, 34000 EUR au total</code>.",
+        ok:['print(f"{len(valeurs)} lignes, {total} EUR au total")'],
+        indices:["<code>len</code> compte les cases, et tu as déjà le total.",
+                 '<code>print(f"{len(valeurs)} lignes, {total} EUR au total")</code>'],
+        pourquoi:"" },
+      { b:1, long:36, consigne:"Affiche <code>Plus grosse ligne : 22000 EUR</code>.",
+        ok:['print(f"Plus grosse ligne : {max(valeurs)} EUR")'],
+        indices:["<code>max</code> donne la plus grande valeur de la liste.",
+                 '<code>print(f"Plus grosse ligne : {max(valeurs)} EUR")</code>'],
+        pourquoi:"<code>max</code> donne la valeur, pas son nom. Retenir cette distinction évite beaucoup de confusion." },
+    ],
+  },
+  {
+    titre: "Le rendement pondéré",
+    contexte: "Deux listes lues en parallèle. Le calcul central de la séance.",
+    lignes: [
+      { t: "valeurs = [22000, 1500, 5200, 800, 4500]" },
+      { t: "rendements = [3.1, 42.0, -6.5, 38.0, 5.2]" },
+      { t: "total = sum(valeurs)" },
+      { t: "" },
+      { b:1, long:14, consigne:"Crée l'accumulateur <code>pondere</code>, à zéro.",
+        ok:["pondere = 0"],
+        indices:["Comme tout accumulateur, avant la boucle.","<code>pondere = 0</code>"],
+        pourquoi:"" },
+      { b:1, long:26, consigne:"Une boucle qui donne les <strong>numéros</strong> des cases, de 0 à la fin.",
+        ok:["for i in range(len(valeurs)):"],
+        indices:["<code>range(len(valeurs))</code> donne 0, 1, 2, 3, 4.",
+                 "<code>for i in range(len(valeurs)):</code>"],
+        pourquoi:"Il faut le numéro, pas la valeur : c'est le seul moyen de lire les deux listes en même temps." },
+      { b:1, indent:4, long:28, consigne:"Calcule le <code>poids</code> de la ligne : son montant divisé par le total.",
+        ok:["poids = valeurs[i] / total"],
+        indices:["Le montant de la case <code>i</code>, divisé par le total.",
+                 "<code>poids = valeurs[i] / total</code>"],
+        pourquoi:"Un poids entre 0 et 1. La somme de tous les poids fait exactement 1 : c'est le contrôle à faire si le résultat semble bizarre." },
+      { b:1, indent:4, long:36, consigne:"Ajoute la contribution de cette ligne à <code>pondere</code>.",
+        ok:["pondere = pondere + poids * rendements[i]","pondere += poids * rendements[i]"],
+        indices:["Le poids multiplié par le rendement de la même case.",
+                 "<code>pondere = pondere + poids * rendements[i]</code>"],
+        pourquoi:"Somme pondérée : chaque terme pèse selon sa taille. C'est la structure de presque tout agrégat financier." },
+      { t: "" },
+      { b:1, long:46, consigne:"Affiche les deux chiffres : <code>Simple 16.36 % contre pondere 4.45 %</code>, arrondis à 2 décimales.",
+        ok:['print(f"Simple {round(sum(rendements) / len(rendements), 2)} % contre pondere {round(pondere, 2)} %")'],
+        indices:["La moyenne simple, c'est <code>sum(rendements) / len(rendements)</code>.",
+                 '<code>print(f"Simple {round(sum(rendements) / len(rendements), 2)} % contre pondere {round(pondere, 2)} %")</code>'],
+        pourquoi:"Un facteur presque quatre entre les deux. C'est l'écart que ton élève de master doit savoir repérer d'un coup d'œil." },
+    ],
+  },
+  {
+    titre: "Nommer les lignes",
+    contexte: "Le dictionnaire, et le piège de son parcours.",
+    lignes: [
+      { b:1, long:44, consigne:"Crée le dictionnaire <code>portefeuille</code> avec <code>Total</code> à 22000 et <code>LVMH</code> à 1500.",
+        ok:['portefeuille = {"Total": 22000, "LVMH": 1500}'],
+        indices:["Des accolades, et deux points entre la clé et la valeur.",
+                 '<code>portefeuille = {"Total": 22000, "LVMH": 1500}</code>'],
+        pourquoi:"Les noms sont du texte, donc entre guillemets. Les montants sont des nombres, donc sans." },
+      { b:1, long:32, consigne:"Ajoute <code>Sanofi</code> à <code>5200</code>.",
+        ok:['portefeuille["Sanofi"] = 5200'],
+        indices:["Comme si la clé existait déjà : on lui range une valeur.",
+                 '<code>portefeuille["Sanofi"] = 5200</code>'],
+        pourquoi:"Si la clé n'existe pas, elle est créée ; si elle existe, la valeur est remplacée. Une seule écriture pour les deux cas." },
+      { t: "" },
+      { b:1, long:24, consigne:"Une boucle qui parcourt <code>portefeuille</code>, en appelant chaque élément <code>ligne</code>.",
+        ok:["for ligne in portefeuille:"],
+        indices:["Comme sur une liste.","<code>for ligne in portefeuille:</code>"],
+        pourquoi:"Attention : <code>ligne</code> contient le NOM, pas le montant." },
+      { b:1, indent:4, long:36, consigne:"Affiche <code>Total : 22000 EUR</code>. Il te faut le nom <strong>et</strong> le montant.",
+        ok:['print(f"{ligne} : {portefeuille[ligne]} EUR")'],
+        indices:["Le nom c'est <code>ligne</code>, le montant se redemande : <code>portefeuille[ligne]</code>",
+                 '<code>print(f"{ligne} : {portefeuille[ligne]} EUR")</code>'],
+        pourquoi:"C'est LE piège du dictionnaire : la boucle donne les clés, jamais les valeurs." },
+      { t: "" },
+      { b:1, long:42, consigne:"Affiche le montant investi sur <code>Tesla</code> <strong>sans faire planter</strong> le programme : affiche <code>0</code> si la ligne n'existe pas.",
+        ok:['print(portefeuille.get("Tesla", 0))'],
+        indices:["<code>.get()</code> cherche sans planter, avec une valeur de secours en second argument.",
+                 '<code>print(portefeuille.get("Tesla", 0))</code>'],
+        pourquoi:"Avec <code>portefeuille[\"Tesla\"]</code>, le programme s'arrête sur un <code>KeyError</code>. Sur un rapport quotidien automatisé, ça veut dire aucun rapport ce matin-là." },
+    ],
+  },
+  {
+    titre: "Meilleure ligne, pire ligne, concentration",
+    contexte: "Retrouver un nom à partir d'une valeur, et contrôler le risque.",
+    lignes: [
+      { t: 'lignes = ["Total", "LVMH", "Sanofi", "Orange", "Air Liquide"]' },
+      { t: "valeurs = [22000, 1500, 5200, 800, 4500]" },
+      { t: "rendements = [3.1, 42.0, -6.5, 38.0, 5.2]" },
+      { t: "" },
+      { b:1, long:36, consigne:"Trouve le <strong>numéro de case</strong> du meilleur rendement, dans <code>i_max</code>.",
+        ok:["i_max = rendements.index(max(rendements))"],
+        indices:["<code>max</code> donne la valeur, <code>.index()</code> donne sa position.",
+                 "<code>i_max = rendements.index(max(rendements))</code>"],
+        pourquoi:"C'est le pont entre les deux listes : une fois le numéro connu, on peut lire le nom correspondant." },
+      { b:1, long:44, consigne:"Affiche <code>Meilleure : LVMH a 42.0 %</code>, en utilisant ce numéro.",
+        ok:['print(f"Meilleure : {lignes[i_max]} a {rendements[i_max]} %")'],
+        indices:["Le même numéro sert dans les deux listes.",
+                 '<code>print(f"Meilleure : {lignes[i_max]} a {rendements[i_max]} %")</code>'],
+        pourquoi:"Deux listes parallèles ne tiennent que si elles restent dans le même ordre. C'est fragile, et c'est exactement ce que pandas viendra régler." },
+      { t: "" },
+      { b:1, long:38, consigne:"Calcule le <code>poids_max</code> de la plus grosse position, <strong>en pourcentage</strong>.",
+        ok:["poids_max = max(valeurs) / sum(valeurs) * 100"],
+        indices:["La plus grosse valeur, divisée par le total, fois 100.",
+                 "<code>poids_max = max(valeurs) / sum(valeurs) * 100</code>"],
+        pourquoi:"64,7 % sur une seule ligne : la plupart des mandats de gestion l'interdisent." },
+      { b:1, long:26, consigne:"Si ce poids dépasse <code>40</code>…",
+        ok:["if poids_max > 40:"],
+        indices:["Un <code>if</code> avec <code>&gt;</code> et deux points.","<code>if poids_max &gt; 40:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:44, consigne:"Affiche <code>Alerte concentration : 64.7 %</code>, arrondi à une décimale.",
+        ok:['print(f"Alerte concentration : {round(poids_max, 1)} %")'],
+        indices:["Une f-string avec <code>round(poids_max, 1)</code>.",
+                 '<code>print(f"Alerte concentration : {round(poids_max, 1)} %")</code>'],
+        pourquoi:"Un rapport qui signale ses propres risques vaut infiniment plus qu'un rapport qui se contente de chiffrer." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=2"></script>
+
+<script>
+/* ---------- Le code de l'IA : moyenne simple au lieu de pondérée ---------- */
+(function () {
+  const LIGNES = [
+    "montants = [22000, 1500, 5200, 800, 4500]",
+    "rendements = [3.1, 42.0, -6.5, 38.0, 5.2]",
+    "",
+    'print(f"Valeur du portefeuille : {sum(montants)} EUR")',
+    "",
+    "rendement_global = sum(rendements) / len(rendements)",
+    "",
+    'print(f"Rendement global : {round(rendement_global, 2)} %")',
+  ];
+  const BUGS = [5];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 6</div>' +
+        "<p>La moyenne des rendements <strong>ignore complètement les montants</strong>. " +
+        "Les 22 000 € de Total pèsent autant que les 800 € d'Orange.</p>" +
+        "<p>Résultat annoncé : <strong>16,36 %</strong>. Résultat réel : <strong>4,45 %</strong>. " +
+        "Presque quatre fois trop, et dans le sens flatteur - ce sont les petites lignes " +
+        "spéculatives qui affichent les gros pourcentages.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        "total = sum(montants)\n" +
+        "rendement_global = 0\n\n" +
+        "for i in range(len(montants)):\n" +
+        "    poids = montants[i] / total\n" +
+        "    rendement_global += poids * rendements[i]</p>" +
+        "<p style='margin-bottom:0'>Remarque la ligne 4 : l'IA <em>utilise</em> les montants " +
+        "pour afficher la valeur du portefeuille, puis les oublie pour le rendement. " +
+        "Elle avait tout ce qu'il fallait sous la main.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Pose-toi la question du widget : " +
+        "<em>si je fais passer une ligne de 800 € à 30 000 €, est-ce que ce résultat bouge ? " +
+        "Et est-ce qu'il devrait ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- La moyenne simple est aveugle à la taille ---------- */
+(function () {
+  const NOMS = ["Total", "LVMH", "Sanofi", "Orange", "Air Liquide"];
+  const BASE = [22000, 1500, 5200, 800, 4500];
+  const RDT = [3.1, 42.0, -6.5, 38.0, 5.2];
+  const STAR = 1;   // la ligne à +42 %
+
+  const eur = (n) => Math.round(n).toLocaleString("fr-FR") + " €";
+  const pct = (n) => n.toFixed(2).replace(".", ",") + " %";
+
+  function maj() {
+    const v = BASE.slice();
+    v[STAR] = +document.getElementById("s-star").value;
+    document.getElementById("v-star").textContent = eur(v[STAR]);
+
+    const total = v.reduce((s, x) => s + x, 0);
+    const simple = RDT.reduce((s, x) => s + x, 0) / RDT.length;
+    const pondere = v.reduce((s, x, i) => s + (x / total) * RDT[i], 0);
+    const maxV = Math.max(...v);
+
+    document.getElementById("pf-lignes").innerHTML = NOMS.map((nom, i) =>
+      '<div class="ligne-pf' + (i === STAR ? " star" : "") + '">' +
+      '<span class="nom">' + nom + "</span>" +
+      '<span class="barre"><i style="width:' + (v[i] / maxV * 100) + '%"></i></span>' +
+      '<span class="poids">' + (v[i] / total * 100).toFixed(1) + " %</span>" +
+      '<span class="rdt" style="color:' + (RDT[i] < 0 ? "var(--red)" : "var(--green)") + '">' +
+        (RDT[i] > 0 ? "+" : "") + RDT[i] + " %</span></div>"
+    ).join("");
+
+    document.getElementById("r-simple").textContent = pct(simple);
+    document.getElementById("r-pond").textContent = pct(pondere);
+
+    const ecart = Math.abs(simple - pondere);
+    const n = document.getElementById("r-note");
+    if (ecart < 0.6) {
+      n.innerHTML = "🎯 <strong>Les deux se rejoignent</strong> : quand toutes les lignes " +
+        "pèsent à peu près pareil, la moyenne simple devient enfin correcte. " +
+        "C'est le seul cas où elle l'est.";
+    } else {
+      n.innerHTML = "La moyenne simple reste bloquée à <strong>" + pct(simple) + "</strong> " +
+        "quoi que tu fasses : elle ne regarde jamais les montants. " +
+        "Écart actuel : <strong style='color:var(--red)'>" + ecart.toFixed(2).replace(".", ",") +
+        " points</strong>.";
+    }
+  }
+
+  document.getElementById("s-star").addEventListener("input", maj);
+  maj();
+})();
+</script>
+
+</body>
+</html>

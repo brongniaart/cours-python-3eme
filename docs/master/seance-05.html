@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 5 - Ta boîte à outils</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>
+  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
+  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
+  .etape-num { background: #1f6feb; }
+  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
+  .box.prof .box-title { color: #2b4b7e; }
+
+  .van { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
+  @media (max-width: 900px) { .van { grid-template-columns: 1fr; } }
+  .carte-v { border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px;
+    background: #fff; margin-bottom: 12px; }
+  .carte-v span { font-size: 11.5px; font-weight: 750; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-soft); display: block; }
+  .carte-v b { font-size: 27px; font-weight: 780; letter-spacing: -.02em; }
+  .carte-v.pos { background: var(--green-soft); border-color: #bfe3d3; }
+  .carte-v.pos b { color: var(--green); }
+  .carte-v.neg { background: var(--red-soft); border-color: #f5c9c4; }
+  .carte-v.neg b { color: var(--red); }
+  .carte-v.tri b { color: #1f6feb; }
+  .flux { display: flex; gap: 6px; margin-bottom: 16px; }
+  .flux div { flex: 1; text-align: center; font-family: var(--mono); font-size: 12.5px;
+    padding: 7px 4px; border-radius: 7px; background: var(--bg-soft); color: var(--ink-soft); }
+  .flux div.inv { background: #fdecea; color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 5</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#e3">3</a>
+    <a href="#viz">👁</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 5 · 1 h 30</div>
+    <h1>Ta boîte à outils</h1>
+    <p class="lede">Tu as déjà écrit la formule de la mensualité trois fois.
+    Trois occasions de te tromper, et trois endroits à corriger le jour où
+    la convention de taux change. <strong>Aujourd'hui, tu l'écris une dernière fois</strong> —
+    et tu la réutilises jusqu'à la fin du parcours.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Fabriquer tes propres outils : mensualité, coût du crédit, VAN, taux de
+    croissance annuel. Et surtout comprendre pourquoi un modèle découpé en fonctions
+    est <strong>défendable</strong> devant un comité, alors qu'un bloc de 80 lignes
+    ne l'est pas.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Définir, puis appeler</h2>
+      <div class="etape-meta">15 minutes · def et return</div></div></div>
+
+    <p><code>def</code> donne un nom à un bloc de calcul. Le bloc ne s'exécute pas
+    tout de suite : il attend qu'on l'appelle. Et <code>return</code>
+    <strong>rend</strong> le résultat au programme.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+def mensualite(capital, taux_annuel, annees):
+    t = taux_annuel / 12
+    n = annees * 12
+    return capital * t / (1 - (1 + t) ** -n)
+
+
+print(round(mensualite(200000, 0.035, 20)))
+print(round(mensualite(200000, 0.045, 20)))
+print(round(mensualite(300000, 0.035, 25)))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Trois scénarios, une seule formule. La conversion en taux mensuel
+    est <strong>enfermée dans la fonction</strong> : l'erreur d'unités de la séance 3
+    ne peut plus se reproduire, parce qu'il n'y a plus qu'un seul endroit où elle
+    pourrait vivre.</p>
+
+    <div class="box bug">
+      <div class="box-title">🐛 print ou return ?</div>
+      <p>Remplace <code>return</code> par <code>print</code> et essaie
+      <code>total = mensualite(200000, 0.035, 20) * 240</code>.</p>
+      <p><code>TypeError: unsupported operand type(s) for *: 'NoneType' and 'int'</code>.
+      Une fonction sans <code>return</code> ne rend rien — littéralement
+      <code>None</code>. <strong>Un outil qui calcule doit rendre, pas afficher.</strong></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Des outils qui s'appellent entre eux</h2>
+      <div class="etape-meta">15 minutes · composition et valeurs par défaut</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+def mensualite(capital, taux_annuel, annees):
+    t = taux_annuel / 12
+    n = annees * 12
+    return capital * t / (1 - (1 + t) ** -n)
+
+
+def cout_credit(capital, taux_annuel=0.035, annees=20):
+    m = mensualite(capital, taux_annuel, annees)
+    return m * annees * 12 - capital
+
+
+print(round(cout_credit(200000)))
+print(round(cout_credit(200000, 0.045)))
+print(round(cout_credit(200000, annees=25)))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Les deux idées de cette étape</div>
+      <p><strong>Les valeurs par défaut.</strong> <code>taux_annuel=0.035</code>
+      fixe une hypothèse standard qu'on peut écraser au besoin. C'est très exactement
+      un jeu d'hypothèses de référence — et le fait de pouvoir en dévier
+      sans réécrire la fonction, c'est ce qui permet l'analyse de scénarios.</p>
+      <p><strong>Nommer l'argument à l'appel.</strong> <code>cout_credit(200000, annees=25)</code>
+      saute le deuxième paramètre. Ça évite les appels illisibles du type
+      <code>cout_credit(200000, 0.035, 25, True, False)</code>, où plus personne
+      ne sait ce que signifie le quatrième argument.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>La fonction qui décide d'un investissement</h2>
+      <div class="etape-meta">20 minutes · la VAN</div></div></div>
+
+    <p>Un euro dans cinq ans vaut moins qu'un euro aujourd'hui. La
+    <strong>valeur actuelle nette</strong> ramène tous les flux futurs à aujourd'hui,
+    et les additionne. Positive : le projet crée de la valeur. Négative : il en détruit.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+def van(flux, taux):
+    total = 0
+    for i in range(len(flux)):
+        total = total + flux[i] / (1 + taux) ** i
+    return total
+
+
+projet = [-100000, 30000, 35000, 40000, 45000]
+
+print(round(van(projet, 0.00)))
+print(round(van(projet, 0.08)))
+print(round(van(projet, 0.17)))
+print(round(van(projet, 0.25)))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Pourquoi la boucle commence à zéro</div>
+      <p>Le flux de la case <code>0</code> est l'investissement d'aujourd'hui.
+      Divisé par <code>(1 + taux) ** 0</code>, c'est-à-dire par 1 :
+      <strong>il n'est pas actualisé</strong>, ce qui est exactement ce qu'on veut.</p>
+      <p>C'est pour ça que <code>range</code> commençant à 0 tombe si bien ici.
+      L'indice de la liste <em>est</em> le nombre d'années d'actualisation.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>La courbe qui donne le TRI</h2>
+      <div class="etape-meta">le point où le projet cesse d'être rentable</div></div></div>
+
+    <p>La VAN baisse quand le taux d'actualisation monte. <strong>L'endroit où elle
+    coupe zéro, c'est le taux de rentabilité interne</strong> : le coût du capital
+    maximum que le projet peut supporter.</p>
+
+    <div class="widget">
+      <div class="van">
+        <div>
+          <div class="flux" id="v-flux"></div>
+          <canvas id="courbe" width="720" height="300" style="width:100%;background:#fff;border:1px solid var(--line);border-radius:10px"></canvas>
+          <div class="slider-row" style="margin-top:18px">
+            <label>Taux d'actualisation <span class="val" id="v-taux">8,0 %</span></label>
+            <input type="range" id="s-taux" min="0" max="30" step="0.5" value="8">
+          </div>
+          <div class="slider-row">
+            <label>Investissement initial <span class="val" id="v-inv">100 000 €</span></label>
+            <input type="range" id="s-inv" min="60000" max="160000" step="5000" value="100000">
+          </div>
+        </div>
+        <div>
+          <div class="carte-v" id="c-van">
+            <span>VAN au taux retenu</span><b id="k-van"></b>
+          </div>
+          <div class="carte-v tri"><span>Taux de rentabilité interne</span><b id="k-tri"></b></div>
+          <p class="hint" id="k-note"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que ça veut dire en réunion</div>
+      <p>Un projet dont le TRI est de 17 % survit tant que le coût du capital
+      reste en dessous. Si les taux montent et que le financement passe à 18 %,
+      <strong>le projet détruit de la valeur</strong> — sans que rien n'ait changé
+      dans le projet lui-même.</p>
+      <p>Fais bouger l'investissement initial : tu verras le TRI s'effondrer bien
+      plus vite que l'intuition ne le suggère. C'est pour ça qu'en conseil,
+      la première question sur un business plan porte toujours sur le montant
+      d'investissement, pas sur les revenus attendus.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : ta boîte à outils</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Écris quatre fonctions que tu réutiliseras jusqu'à la séance 15.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Les quatre outils</div>
+      <ul style="margin-bottom:0">
+        <li><code>mensualite(capital, taux_annuel, annees)</code></li>
+        <li><code>cout_credit(capital, taux_annuel, annees)</code> — utilise la précédente</li>
+        <li><code>van(flux, taux)</code></li>
+        <li><code>cagr(valeur_debut, valeur_fin, annees)</code> — le taux de croissance
+        annuel moyen, c'est-à-dire <code>(fin / debut) ** (1 / annees) - 1</code></li>
+      </ul>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+# Tes quatre outils, puis un petit test de chacun.
+# Un outil qu'on ne teste pas est un outil auquel on ne peut pas se fier.
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. Impose une chose :
+      <strong>chaque fonction doit être testée juste après son écriture</strong>,
+      avec un cas dont il connaît la réponse. <code>cagr(100, 200, 10)</code>
+      doit donner environ 7,2 % — la règle des 72, retrouvée par le calcul.</p>
+      <p>S'il finit vite : « ajoute une fonction <code>tri(flux)</code> qui trouve
+      le taux annulant la VAN ». Il devra faire varier le taux dans une boucle
+      jusqu'à changer de signe. C'est le défi ci-dessous.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : trouver le TRI sans formule</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Le TRI n'a pas de formule fermée : on ne peut pas l'isoler. On le
+    <strong>cherche</strong>. Fais monter le taux de 0 à 100 % par pas de 0,1 %,
+    et arrête-toi dès que la VAN devient négative.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+projet = [-100000, 30000, 35000, 40000, 45000]
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Ce que ce défi t'apprend vraiment</div>
+      <p>Beaucoup de grandeurs financières se calculent comme ça : on ne les isole pas,
+      on les cherche. Taux implicite d'une obligation, volatilité implicite d'une option,
+      taux d'actualisation d'un plan de retraite.</p>
+      <p><strong>Un ordinateur qui essaie mille valeurs en une milliseconde remplace
+      une formule qui n'existe pas.</strong> C'est une façon de penser qui te servira
+      bien au-delà de Python.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Écris-moi une fonction Python qui calcule le rendement annuel moyen d'un placement à partir de la liste de ses rendements annuels.</p>
+      <p style="margin-top:12px">Le code est propre, la fonction est bien nommée,
+      elle rend une valeur. <strong>Et elle annonce +5 % par an sur un placement
+      qui a perdu de l'argent.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 L'erreur la plus rentable de la finance</div>
+      <p>La moyenne arithmétique des rendements est <strong>toujours supérieure ou égale</strong>
+      à la moyenne géométrique, et l'écart grandit avec la volatilité. Autrement dit :
+      plus un fonds est volatil, plus l'erreur le flatte.</p>
+      <p>Ce n'est pas un hasard si cette confusion survit si bien dans les documents
+      commerciaux. La règle : <strong>un rendement moyen ne s'additionne jamais,
+      il se compose</strong>.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Reprends ta boîte à outils et ajoute <code>comparer_projets(projet_a, projet_b, taux)</code>
+      qui rend le nom du meilleur des deux et l'écart de VAN.</p>
+      <p class="hint" style="margin-top:8px">Puis teste-la avec deux projets
+      dont le classement <strong>s'inverse</strong> selon le taux d'actualisation.
+      Ils existent : un projet qui rapporte tôt et un qui rapporte tard.
+      Trouve le taux de bascule, et tu auras compris pourquoi le choix
+      du coût du capital est politique autant que technique.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-04.html" style="color:var(--orange);font-weight:650">← Séance 4</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=2"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Ta première fonction",
+    contexte: "Définir un outil, puis s'en servir plusieurs fois.",
+    lignes: [
+      { b:1, long:44, consigne:"Définis <code>mensualite</code> avec trois réglages : <code>capital</code>, <code>taux_annuel</code>, <code>annees</code>.",
+        ok:["def mensualite(capital, taux_annuel, annees):"],
+        indices:["<code>def</code>, le nom, les trois réglages entre parenthèses, deux points.",
+                 "<code>def mensualite(capital, taux_annuel, annees):</code>"],
+        pourquoi:"Les trois réglages sont des cases vides : elles n'existent que le temps de l'appel." },
+      { b:1, indent:4, long:26, consigne:"Convertis en taux mensuel, dans <code>t</code>.",
+        ok:["t = taux_annuel / 12"],
+        indices:["Le taux annuel divisé par 12.","<code>t = taux_annuel / 12</code>"],
+        pourquoi:"La conversion vit désormais à l'intérieur de la fonction : l'erreur d'unités de la séance 3 ne peut plus se reproduire ailleurs." },
+      { b:1, indent:4, long:24, consigne:"Calcule le nombre de mois, dans <code>n</code>.",
+        ok:["n = annees * 12"],
+        indices:["Les années fois 12.","<code>n = annees * 12</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:40, consigne:"<strong>Rends</strong> la mensualité : <code>capital * t / (1 - (1 + t) ** -n)</code>.",
+        ok:["return capital * t / (1 - (1 + t) ** -n)"],
+        indices:["Le mot pour rendre une valeur est <code>return</code>.",
+                 "<code>return capital * t / (1 - (1 + t) ** -n)</code>"],
+        pourquoi:"Avec <code>return</code>, le résultat revient au programme et reste utilisable. Avec <code>print</code>, il serait perdu." },
+      { t: "" },
+      { b:1, long:44, consigne:"Affiche la mensualité pour <code>200000</code> à <code>0.035</code> sur <code>20</code> ans, arrondie.",
+        ok:["print(round(mensualite(200000, 0.035, 20)))"],
+        indices:["On appelle la fonction directement à l'intérieur de <code>round</code>.",
+                 "<code>print(round(mensualite(200000, 0.035, 20)))</code>"],
+        pourquoi:"1160 €. Tu retrouves le chiffre de la séance 3, mais en une ligne réutilisable au lieu de six." },
+    ],
+  },
+  {
+    titre: "Un outil qui en appelle un autre",
+    contexte: "Et des hypothèses par défaut, pour les scénarios.",
+    lignes: [
+      { t: "def mensualite(capital, taux_annuel, annees):" },
+      { t: "    t = taux_annuel / 12" },
+      { t: "    n = annees * 12" },
+      { t: "    return capital * t / (1 - (1 + t) ** -n)" },
+      { t: "" },
+      { b:1, long:50, consigne:"Définis <code>cout_credit</code> avec <code>capital</code>, puis <code>taux_annuel</code> valant <strong>0.035 par défaut</strong> et <code>annees</code> valant <strong>20 par défaut</strong>.",
+        ok:["def cout_credit(capital, taux_annuel=0.035, annees=20):"],
+        indices:["Une valeur par défaut s'écrit avec <code>=</code> dans la définition.",
+                 "<code>def cout_credit(capital, taux_annuel=0.035, annees=20):</code>"],
+        pourquoi:"Ces valeurs par défaut sont ton jeu d'hypothèses de référence. On peut en dévier à l'appel sans réécrire la fonction." },
+      { b:1, indent:4, long:44, consigne:"Appelle l'autre fonction et range le résultat dans <code>m</code>.",
+        ok:["m = mensualite(capital, taux_annuel, annees)"],
+        indices:["On passe les trois réglages reçus.",
+                 "<code>m = mensualite(capital, taux_annuel, annees)</code>"],
+        pourquoi:"Un outil qui utilise un autre outil : c'est comme ça que se construisent tous les modèles un peu sérieux." },
+      { b:1, indent:4, long:38, consigne:"Rends le coût du crédit : le total remboursé moins le capital.",
+        ok:["return m * annees * 12 - capital"],
+        indices:["La mensualité fois le nombre de mois, moins le capital emprunté.",
+                 "<code>return m * annees * 12 - capital</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:38, consigne:"Affiche le coût pour <code>200000</code>, <strong>sans préciser</strong> le taux ni la durée.",
+        ok:["print(round(cout_credit(200000)))"],
+        indices:["Les valeurs par défaut s'appliquent : un seul argument suffit.",
+                 "<code>print(round(cout_credit(200000)))</code>"],
+        pourquoi:"78 381 €, sans avoir à retaper les hypothèses standard." },
+      { b:1, long:44, consigne:"Affiche maintenant le coût sur <code>25</code> ans, en <strong>nommant</strong> l'argument pour sauter le taux.",
+        ok:["print(round(cout_credit(200000, annees=25)))"],
+        indices:["On écrit <code>annees=25</code> à l'appel pour sauter le deuxième paramètre.",
+                 "<code>print(round(cout_credit(200000, annees=25)))</code>"],
+        pourquoi:"100 374 €. Nommer l'argument rend l'appel lisible : personne n'a besoin de compter les virgules pour comprendre." },
+    ],
+  },
+  {
+    titre: "La valeur actuelle nette",
+    contexte: "L'outil qui décide si un projet crée de la valeur.",
+    lignes: [
+      { b:1, long:26, consigne:"Définis <code>van</code> avec <code>flux</code> et <code>taux</code>.",
+        ok:["def van(flux, taux):"],
+        indices:["Deux réglages : la liste des flux et le taux d'actualisation.",
+                 "<code>def van(flux, taux):</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:14, consigne:"L'accumulateur <code>total</code>, à zéro.",
+        ok:["total = 0"],
+        indices:["Avant la boucle.","<code>total = 0</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:24, consigne:"Une boucle sur les <strong>numéros</strong> des cases de <code>flux</code>.",
+        ok:["for i in range(len(flux)):"],
+        indices:["<code>range(len(flux))</code> donne 0, 1, 2…",
+                 "<code>for i in range(len(flux)):</code>"],
+        pourquoi:"Ici le numéro de case EST le nombre d'années d'actualisation. C'est pour ça que commencer à 0 tombe si bien." },
+      { b:1, indent:8, long:40, consigne:"Ajoute le flux actualisé : le flux divisé par <code>(1 + taux) ** i</code>.",
+        ok:["total = total + flux[i] / (1 + taux) ** i","total += flux[i] / (1 + taux) ** i"],
+        indices:["Chaque flux est divisé par le facteur d'actualisation de son année.",
+                 "<code>total = total + flux[i] / (1 + taux) ** i</code>"],
+        pourquoi:"À l'année 0, on divise par 1 : l'investissement initial n'est pas actualisé, ce qui est exactement la convention." },
+      { b:1, indent:4, long:16, consigne:"Rends le total.",
+        ok:["return total"],
+        indices:["<code>return total</code>","<code>return total</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { t: "projet = [-100000, 30000, 35000, 40000, 45000]" },
+      { b:1, long:36, consigne:"Affiche la VAN du projet à <code>0.08</code>, arrondie.",
+        ok:["print(round(van(projet, 0.08)))"],
+        indices:["On appelle la fonction dans <code>round</code>.",
+                 "<code>print(round(van(projet, 0.08)))</code>"],
+        pourquoi:"VAN positive à 8 % : au coût du capital retenu, le projet crée de la valeur. Le TRI est plus haut, on le cherchera au défi." },
+    ],
+  },
+  {
+    titre: "Le taux de croissance annuel",
+    contexte: "Le calcul que l'IA rate à la fin de la séance. Fais-le juste, toi.",
+    lignes: [
+      { b:1, long:44, consigne:"Définis <code>cagr</code> avec <code>debut</code>, <code>fin</code> et <code>annees</code>.",
+        ok:["def cagr(debut, fin, annees):"],
+        indices:["Trois réglages.","<code>def cagr(debut, fin, annees):</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:40, consigne:"Rends <code>(fin / debut) ** (1 / annees) - 1</code>.",
+        ok:["return (fin / debut) ** (1 / annees) - 1"],
+        indices:["La racine n-ième s'écrit comme une puissance <code>1 / annees</code>.",
+                 "<code>return (fin / debut) ** (1 / annees) - 1</code>"],
+        pourquoi:"C'est une moyenne géométrique : elle compose au lieu d'additionner. La différence avec la moyenne arithmétique fait tout le sujet du bloc IA." },
+      { t: "" },
+      { b:1, long:44, consigne:"Affiche le taux pour un capital passé de <code>100</code> à <code>200</code> en <code>10</code> ans, en pourcentage arrondi à 1 décimale.",
+        ok:["print(round(cagr(100, 200, 10) * 100, 1))"],
+        indices:["Le résultat est en décimal : multiplie par 100 pour l'afficher en pourcentage.",
+                 "<code>print(round(cagr(100, 200, 10) * 100, 1))</code>"],
+        pourquoi:"7,2 % : c'est très exactement la règle des 72 retrouvée par le calcul. 72 / 7,2 = 10 ans pour doubler." },
+      { t: "" },
+      { t: "# le controle qui demasque la moyenne arithmetique" },
+      { b:1, long:46, consigne:"Un placement fait <code>+50 %</code> puis <code>-50 %</code>. Affiche sa valeur finale à partir de <code>100</code>.",
+        ok:["print(100 * 1.5 * 0.5)"],
+        indices:["Deux multiplications successives, pas une addition de pourcentages.",
+                 "<code>print(100 * 1.5 * 0.5)</code>"],
+        pourquoi:"75 €. La moyenne arithmétique annoncerait 0 % de rendement moyen, alors qu'on a perdu un quart du capital. C'est exactement le piège du bloc suivant." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=2"></script>
+
+<script>
+/* ---------- Le code de l'IA : moyenne arithmétique au lieu de géométrique ---------- */
+(function () {
+  const LIGNES = [
+    "def rendement_annuel_moyen(rendements):",
+    '    """Rend le rendement annuel moyen d\'une serie de rendements."""',
+    "    return sum(rendements) / len(rendements)",
+    "",
+    "",
+    "historique = [0.50, -0.50, 0.30, -0.10]",
+    "",
+    "moyen = rendement_annuel_moyen(historique)",
+    'print(f"Rendement annuel moyen : {round(moyen * 100, 2)} %")',
+  ];
+  const BUGS = [2];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 3</div>' +
+        "<p>Des rendements ne s'<strong>additionnent</strong> pas, ils se " +
+        "<strong>composent</strong>. La fonction fait une moyenne arithmétique " +
+        "et annonce <strong>+5 % par an</strong>.</p>" +
+        "<p>La réalité : 1,50 × 0,50 × 1,30 × 0,90 = <strong>0,8775</strong>. " +
+        "Le placement a <strong>perdu 12,25 %</strong> sur quatre ans, " +
+        "soit <strong>−3,2 % par an</strong>. Huit points d'écart, du bon côté.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        "def rendement_annuel_moyen(rendements):\n" +
+        "    cumul = 1\n" +
+        "    for r in rendements:\n" +
+        "        cumul = cumul * (1 + r)\n" +
+        "    return cumul ** (1 / len(rendements)) - 1</p>" +
+        "<p style='margin-bottom:0'>C'est exactement ton <code>cagr</code> " +
+        "de l'exercice 4, appliqué à une série. Le contrôle qui démasque " +
+        "l'erreur tient en une ligne : <strong>+50 % puis −50 % ne fait pas 0 %, " +
+        "ça fait −25 %.</strong></p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Prends un cas simple : " +
+        "<em>un placement qui fait +50 % puis −50 %. Que dit cette fonction, " +
+        "et que dirait ton portefeuille ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- La courbe de VAN et le TRI ---------- */
+(function () {
+  const cv = document.getElementById("courbe");
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+  const M = { g: 66, d: 16, h: 18, b: 30 };
+  const REVENUS = [30000, 35000, 40000, 45000];
+
+  const eur = (n) => (n < 0 ? "-" : "") + Math.abs(Math.round(n)).toLocaleString("fr-FR") + " €";
+
+  const van = (flux, t) =>
+    flux.reduce((s, f, i) => s + f / Math.pow(1 + t, i), 0);
+
+  function tri(flux) {
+    // si la VAN est deja negative a taux nul, le projet ne rembourse jamais :
+    // il n'existe aucun TRI, et surtout pas zero
+    if (van(flux, 0) <= 0) return null;
+    let t = 0;
+    while (t < 2 && van(flux, t) > 0) t += 0.0005;
+    return t >= 2 ? null : t;
+  }
+
+  function dessiner() {
+    const inv = +document.getElementById("s-inv").value;
+    const taux = parseFloat(document.getElementById("s-taux").value) / 100;
+    const flux = [-inv].concat(REVENUS);
+
+    document.getElementById("v-inv").textContent = eur(inv);
+    document.getElementById("v-taux").textContent =
+      (taux * 100).toFixed(1).replace(".", ",") + " %";
+
+    document.getElementById("v-flux").innerHTML = flux.map((f, i) =>
+      '<div class="' + (i === 0 ? "inv" : "") + '">A' + i + "<br>" + eur(f) + "</div>"
+    ).join("");
+
+    const vanActuelle = van(flux, taux);
+    const t = tri(flux);
+
+    const carte = document.getElementById("c-van");
+    carte.className = "carte-v " + (vanActuelle >= 0 ? "pos" : "neg");
+    document.getElementById("k-van").textContent = eur(vanActuelle);
+    document.getElementById("k-tri").textContent =
+      t === null ? "aucun" : (t * 100).toFixed(1).replace(".", ",") + " %";
+
+    document.getElementById("k-note").innerHTML = t === null
+      ? "Le projet ne rembourse jamais son investissement : la VAN est négative à tout taux."
+      : vanActuelle >= 0
+        ? "Le projet supporte un coût du capital jusqu'à <strong>" +
+          (t * 100).toFixed(1).replace(".", ",") + " %</strong>. Au-delà, il détruit de la valeur."
+        : "Le taux retenu dépasse le TRI de <strong>" +
+          ((taux - t) * 100).toFixed(1).replace(".", ",") + " points</strong> : le projet est à rejeter.";
+
+    // la courbe
+    const tMax = 0.35;
+    const vals = [];
+    for (let k = 0; k <= 100; k++) vals.push(van(flux, (k / 100) * tMax));
+    const hi = Math.max(...vals, 0), lo = Math.min(...vals, 0);
+    const x = (tt) => M.g + (tt / tMax) * (W - M.g - M.d);
+    const y = (v) => H - M.b - ((v - lo) / (hi - lo || 1)) * (H - M.h - M.b);
+
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+    ctx.font = "11px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#9a9287"; ctx.textAlign = "right";
+    ctx.strokeStyle = "#eee9e0"; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const v = lo + ((hi - lo) / 4) * i, yy = y(v);
+      ctx.beginPath(); ctx.moveTo(M.g, yy); ctx.lineTo(W - M.d, yy); ctx.stroke();
+      ctx.fillText(Math.round(v / 1000) + "k", M.g - 8, yy + 4);
+    }
+
+    // l'axe zéro
+    ctx.strokeStyle = "#c9c1b5"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(M.g, y(0)); ctx.lineTo(W - M.d, y(0)); ctx.stroke();
+
+    ctx.beginPath();
+    vals.forEach((v, k) => {
+      const xx = x((k / 100) * tMax), yy = y(v);
+      k ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy);
+    });
+    ctx.strokeStyle = "#1f6feb"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.stroke();
+
+    // le TRI
+    if (t !== null && t <= tMax) {
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = "#0e8a55"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x(t), M.h); ctx.lineTo(x(t), H - M.b); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#0e8a55";
+      ctx.beginPath(); ctx.arc(x(t), y(0), 6, 0, 6.283); ctx.fill();
+      ctx.font = "700 13px -apple-system, Segoe UI, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("TRI " + (t * 100).toFixed(1).replace(".", ",") + " %", x(t) + 10, M.h + 16);
+    }
+
+    // le point du taux retenu
+    ctx.fillStyle = vanActuelle >= 0 ? "#1f6feb" : "#d13a2c";
+    ctx.beginPath(); ctx.arc(x(Math.min(taux, tMax)), y(vanActuelle), 6, 0, 6.283); ctx.fill();
+
+    ctx.fillStyle = "#9a9287"; ctx.textAlign = "center";
+    ctx.font = "11px -apple-system, Segoe UI, sans-serif";
+    for (let p = 0; p <= 35; p += 5) ctx.fillText(p + " %", x(p / 100), H - 10);
+  }
+
+  ["s-taux", "s-inv"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", dessiner));
+  dessiner();
+})();
+</script>
+
+</body>
+</html>
