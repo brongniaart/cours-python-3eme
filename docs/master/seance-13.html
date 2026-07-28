@@ -7,7 +7,7 @@
 <title>Séance 13 - La carte électorale</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=4">
+<link rel="stylesheet" href="../assets/style.css?v=5">
 <style>
   .carto { display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
   @media (max-width: 900px) { .carto { grid-template-columns: 1fr; } }
@@ -495,7 +495,7 @@ window.FICHIERS = ["donnees/departements.geojson", "donnees/legislatives-2024.cs
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-<script src="../assets/moteur.js?v=4"></script>
+<script src="../assets/moteur.js?v=5"></script>
 
 <script>
 window.EXERCICES = [
@@ -614,7 +614,7 @@ window.EXERCICES = [
   },
 ];
 </script>
-<script src="../assets/exercices.js?v=4"></script>
+<script src="../assets/exercices.js?v=5"></script>
 
 <script>
 /* ---------- Le code de l'IA : surface contre population ---------- */
@@ -781,8 +781,8 @@ window.EXERCICES = [
   }
 
   Promise.all([
-    fetch("donnees/departements.geojson?v=4").then((r) => r.json()),
-    fetch("donnees/legislatives-2024.csv?v=4").then((r) => r.text()),
+    fetch("donnees/departements.geojson?v=5").then((r) => r.json()),
+    fetch("donnees/legislatives-2024.csv?v=5").then((r) => r.text()),
   ]).then(([geo, csv]) => {
     /* --- les resultats, par departement --- */
     const l = csv.replace(/\r/g, "").trim().split("\n");

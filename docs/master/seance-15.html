@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 15 - Ton analyse devient une appli</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=5">
+<style>
+  /* une maquette d'application Streamlit, pour voir la cible */
+  .app { border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+         background: #fff; display: grid; grid-template-columns: 232px 1fr; }
+  @media (max-width: 760px) { .app { grid-template-columns: 1fr; } }
+  .app .cote { background: #f4f1ec; padding: 16px 15px; border-right: 1px solid var(--line); }
+  .app .cote h5 { margin: 0 0 12px; font-size: 13px; letter-spacing: .04em;
+                  text-transform: uppercase; color: var(--ink-soft); }
+  .app .corps { padding: 20px 22px; }
+  .app .corps h4 { margin: 0 0 4px; font-size: 21px; letter-spacing: -.02em; }
+  .app .sous { color: var(--ink-soft); font-size: 13.5px; margin-bottom: 16px; }
+  .app label { display: block; font-size: 13px; font-weight: 650; margin: 12px 0 4px; }
+  .app select, .app input[type=range] { width: 100%; }
+  .app select { font: inherit; font-size: 13.5px; padding: 6px 8px;
+                border-radius: 7px; border: 1px solid var(--line); background: #fff; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .metrics > div { border-left: 3px solid var(--orange); padding-left: 11px; }
+  .metrics .k { font-size: 11px; color: var(--ink-soft); font-weight: 650; }
+  .metrics .v { font-size: 22px; font-weight: 780; letter-spacing: -.02em; font-family: var(--mono); }
+  .rerun { font-size: 12.5px; color: var(--ink-soft); font-family: var(--mono);
+           background: var(--bg-soft); border-radius: 7px; padding: 7px 11px; margin-top: 14px; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  @media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+  .compare > div { background: var(--bg-soft); border-radius: 11px; padding: 15px 17px; }
+  .compare h4 { margin: 0 0 6px; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 15</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#panel">↔</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 15 · 1 h 30</div>
+    <h1>Ton analyse devient une appli</h1>
+    <p class="lede">Jusqu'ici, ton travail vivait dans un notebook que personne
+    d'autre n'ouvrira. <strong>Aujourd'hui il devient une page web avec des curseurs,
+    qu'un directeur manipule tout seul pendant que tu réponds à ses questions.</strong>
+    Il faut environ quarante lignes.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Écrire une application Streamlit, comprendre son modèle d'exécution
+    (qui surprend tout le monde la première fois), la faire tourner en local
+    et la mettre en ligne gratuitement.</p>
+  </div>
+
+  <div class="box att" style="background:#fdf3e6;border:1px solid #f0d9b8;border-radius:11px;padding:16px 19px;margin-bottom:22px">
+    <div class="box-title">⚠️ Cette séance se fait dans VS Code, pas ici</div>
+    <p style="margin-bottom:0">Streamlit démarre un vrai serveur web : il ne peut
+    pas tourner dans cette page. Tout le code ci-dessous se tape dans l'environnement
+    de la <a href="seance-08.html" style="color:var(--orange);font-weight:650">séance 8</a>.
+    La maquette plus bas te montre exactement ce que tu obtiendras.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>L'environnement, proprement</h2>
+      <div class="etape-meta">15 minutes · venv, requirements, run</div></div></div>
+
+    <p>Un projet, un environnement, un fichier qui liste les dépendances.
+    C'est la routine de départ de tout ce que tu feras après ce cours.</p>
+
+    <div class="term"><span class="c"># un dossier, un environnement isolé</span>
+<span class="p">$</span> <span class="c">mkdir appli-elections && cd appli-elections</span>
+<span class="p">$</span> <span class="c">python3 -m venv .venv</span>
+<span class="p">$</span> <span class="c">source .venv/bin/activate</span>
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="c">pip install streamlit pandas geopandas matplotlib</span>
+
+<span class="c"># figer les versions : sans ça, ton appli marche chez toi et nulle part ailleurs</span>
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="c">pip freeze &gt; requirements.txt</span>
+
+<span class="c"># lancer</span>
+<span class="o">(.venv)</span> <span class="p">$</span> <span class="c">streamlit run appli.py</span>
+
+<span class="s">  You can now view your Streamlit app in your browser.</span>
+<span class="s">  Local URL: http://localhost:8501</span></div>
+
+    <div class="box defi">
+      <div class="box-title">💡 <code>requirements.txt</code>, la ligne qui sauve</div>
+      <p>Sans lui, la seule façon de réinstaller ton projet ailleurs est de se
+      souvenir de ce qu'on avait installé. Avec lui, c'est
+      <code>pip install -r requirements.txt</code>.</p>
+      <p style="margin-bottom:0">C'est aussi ce que lira l'hébergeur quand tu mettras
+      l'appli en ligne. <strong>Pas de requirements.txt, pas de déploiement.</strong></p>
+    </div>
+  </section>
+
+  <!-- MAQUETTE -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>La cible</h2>
+      <div class="etape-meta">une maquette fidèle de ce que tu vas construire</div></div></div>
+
+    <p>Voici, dans cette page, une reproduction de l'application.
+    Bouge les commandes de gauche : <strong>c'est exactement le comportement
+    que Streamlit te donne, avec le code de l'étape 2.</strong></p>
+
+    <div class="app">
+      <div class="cote">
+        <h5>Paramètres</h5>
+        <label for="a-nuance">Nuance</label>
+        <select id="a-nuance">
+          <option value="RN">RN</option>
+          <option value="UG">UG - bloc de gauche</option>
+          <option value="ENS">ENS - Ensemble</option>
+          <option value="LR">LR</option>
+        </select>
+        <label for="a-min">Participation minimale <span id="a-min-v" style="font-weight:400">58 %</span></label>
+        <input type="range" id="a-min" min="58" max="76" step="1" value="58">
+        <label for="a-n">Nombre de départements <span id="a-n-v" style="font-weight:400">12</span></label>
+        <input type="range" id="a-n" min="5" max="25" step="1" value="12">
+      </div>
+      <div class="corps">
+        <h4>Législatives 2024, premier tour</h4>
+        <div class="sous">Source : ministère de l'Intérieur · Licence Ouverte 2.0</div>
+        <div class="metrics">
+          <div><div class="k">Départements retenus</div><div class="v" id="m-n">-</div></div>
+          <div><div class="k">Score moyen</div><div class="v" id="m-moy">-</div></div>
+          <div><div class="k">Meilleur score</div><div class="v" id="m-max">-</div></div>
+        </div>
+        <canvas id="a-cv" width="640" height="290" style="width:100%;height:auto"></canvas>
+        <div class="rerun" id="a-rerun">le script s'est exécuté 1 fois</div>
+      </div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Regarde le compteur en bas de la maquette</div>
+      <p>Il monte d'une unité à chaque fois que tu touches une commande.
+      Ce n'est pas un détail d'implémentation, <strong>c'est le modèle d'exécution
+      de Streamlit</strong> : à chaque interaction, ton script est réexécuté
+      <em>en entier</em>, du premier <code>import</code> à la dernière ligne.</p>
+      <p style="margin-bottom:0">Il n'y a pas de « au clic, fais ceci ».
+      Il n'y a que « voici à quoi ressemble la page pour ces valeurs ».
+      C'est déroutant pendant dix minutes, puis c'est ce qui rend Streamlit
+      si simple. <strong>Et ça a une conséquence énorme, qui est le sujet
+      de l'étape 3.</strong></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>L'application, en quarante lignes</h2>
+      <div class="etape-meta">25 minutes · le fichier appli.py</div></div></div>
+
+    <div class="panel ref" style="max-width:none"><div class="panel-label"><span class="tag"></span> appli.py</div>
+      <div data-ref><script type="text/python">
+import pandas as pd
+import matplotlib.pyplot as plt
+import streamlit as st
+
+st.set_page_config(page_title="Legislatives 2024", layout="wide")
+
+
+@st.cache_data
+def charger():
+    df = pd.read_csv("legislatives-2024.csv", sep=";")
+    df["code"] = df["code"].astype(str).str.zfill(2)
+    total = df.groupby("code")["voix"].transform("sum")
+    df["part"] = df["voix"] / total * 100
+    df["participation"] = df["votants"] / df["inscrits"] * 100
+    return df
+
+
+df = charger()
+
+st.sidebar.header("Parametres")
+nuance = st.sidebar.selectbox("Nuance", ["RN", "UG", "ENS", "LR"])
+mini = st.sidebar.slider("Participation minimale", 58, 76, 58)
+combien = st.sidebar.slider("Nombre de departements", 5, 25, 12)
+
+sel = df[(df["nuance"] == nuance) & (df["participation"] >= mini)]
+top = sel.nlargest(combien, "part")
+
+st.title("Legislatives 2024, premier tour")
+st.caption("Source : ministere de l'Interieur, Licence Ouverte 2.0")
+
+g, m, d = st.columns(3)
+g.metric("Departements retenus", len(sel))
+m.metric("Score moyen", f"{sel['part'].mean():.1f} %")
+d.metric("Meilleur score", f"{sel['part'].max():.1f} %")
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ordonne = top.sort_values("part")
+ax.barh(ordonne["departement"], ordonne["part"], color="#f07818")
+ax.set_xlabel("part des exprimes, en %")
+ax.set_title(f"{nuance} : {combien} meilleurs departements", loc="left", weight="bold")
+st.pyplot(fig)
+
+with st.expander("Voir le tableau"):
+    st.dataframe(top[["departement", "part", "participation"]])
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Les seuls éléments de vocabulaire à retenir</div>
+      <p><code>st.sidebar.slider</code>, <code>st.selectbox</code> : des commandes
+      qui <strong>renvoient directement une valeur</strong>. Pas de callback,
+      pas d'événement : la ligne rend le nombre que l'utilisateur a choisi.</p>
+      <p><code>st.metric</code>, <code>st.pyplot</code>, <code>st.dataframe</code>,
+      <code>st.map</code> : afficher. <code>st.columns</code> : mettre côte à côte.
+      <code>st.expander</code> : replier ce qui n'est pas essentiel.</p>
+      <p style="margin-bottom:0"><strong>Avec ces sept fonctions, tu couvres
+      quatre-vingt-dix pour cent des applications d'analyse.</strong>
+      Le reste de la documentation peut attendre que tu en aies besoin.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2><code>@st.cache_data</code>, la ligne non négociable</h2>
+      <div class="etape-meta">15 minutes · et pourquoi elle est invisible au début</div></div></div>
+
+    <p>Puisque le script entier se réexécute à chaque clic, <strong>le fichier
+    est relu à chaque clic</strong>. Sur 1 057 lignes, personne ne s'en aperçoit.
+    Sur dix millions, l'application devient inutilisable.</p>
+
+    <div class="compare">
+      <div>
+        <h4>Sans le décorateur</h4>
+        <p class="hint" style="margin:0">Chaque mouvement de curseur relit le CSV,
+        refait le <code>groupby</code>, recalcule les parts.
+        <strong>Le travail est refait à l'identique, des dizaines de fois par minute.</strong></p>
+      </div>
+      <div>
+        <h4>Avec <code>@st.cache_data</code></h4>
+        <p class="hint" style="margin:0">Streamlit garde le résultat en mémoire.
+        La fonction ne tourne qu'au premier appel, et à chaque fois que
+        <strong>ses arguments changent</strong>. Le reste du temps, elle rend
+        le résultat déjà calculé.</p>
+      </div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Le piège du cache, celui qui fait perdre une soirée</div>
+      <p>Le cache rend <strong>le même objet</strong> à tout le monde.
+      Si ton code écrit dedans après l'avoir reçu, la modification survit
+      à la réexécution et contamine tous les appels suivants.</p>
+      <p style="font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:10px 0">df = charger()
+df["part"] = df["part"] * 100   <span style="color:#f0a828"># erreur : on modifie l'objet du cache</span>
+                                <span style="color:#f0a828"># a chaque clic, on multiplie encore par 100</span></p>
+      <p style="margin-bottom:0"><strong>La règle : ce qui sort du cache
+      est en lecture seule.</strong> Si tu dois le modifier,
+      <code>df = charger().copy()</code>.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : ta carte devient une appli</h2>
+      <div class="etape-meta">25 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Reprends la choroplèthe de la séance 13 et mets-la dans une application
+    où l'utilisateur choisit ce qu'il veut voir.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le cahier des charges</div>
+      <p style="margin-bottom:0">Un <code>selectbox</code> pour la nuance à cartographier.
+      Un <code>slider</code> pour les bornes de couleur (<code>vmin</code>, <code>vmax</code>).
+      Trois <code>st.metric</code> : score national, département le plus haut,
+      département le plus bas. La carte en <code>st.pyplot</code>.
+      Le chargement du GeoJSON <strong>et</strong> du CSV dans une fonction
+      décorée par <code>@st.cache_data</code>.</p>
+    </div>
+
+    <div class="term"><span class="c"># le squelette, à compléter dans VS Code</span>
+<span class="p">$</span> <span class="c">touch carte_appli.py</span>
+<span class="p">$</span> <span class="c">streamlit run carte_appli.py</span>
+
+<span class="s">  Streamlit recharge la page à chaque sauvegarde du fichier :</span>
+<span class="s">  garde VS Code et le navigateur côte à côte.</span></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>15 minutes</strong>. Trois points de vigilance,
+      tous déjà rencontrés : le <code>zfill(2)</code> de la séance 13,
+      les bornes de couleur fixées à la main de la séance 12,
+      et la Creuse en gris via <code>missing_kwds</code>.</p>
+      <p style="margin-bottom:0"><strong>Le contrôle :</strong> bouger un curseur
+      doit être instantané. Si ça met une seconde, le décorateur manque
+      ou il est posé au mauvais endroit. C'est le meilleur test de compréhension
+      de toute la séance.</p>
+    </div>
+  </section>
+
+  <!-- PANEL -->
+  <section class="etape" id="panel">
+    <div class="etape-head"><div class="etape-num">↔️</div><div>
+      <h2>Et Panel, alors ?</h2>
+      <div class="etape-meta">10 minutes · pourquoi je t'ai fait apprendre l'autre</div></div></div>
+
+    <p>Streamlit n'est pas seul. <strong>Panel</strong>, développé dans l'écosystème
+    HoloViz, répond au même besoin avec une philosophie opposée.</p>
+
+    <div class="compare">
+      <div>
+        <h4>Streamlit</h4>
+        <p class="hint" style="margin:0 0 8px">Tout le script se rejoue à chaque
+        interaction. Simple à écrire, simple à lire, difficile à optimiser
+        quand l'application grossit.</p>
+        <p class="hint" style="margin:0"><strong>Pour :</strong> prototypes,
+        tableaux de bord d'analyse, démonstrations, applications internes.
+        C'est-à-dire l'immense majorité de ce que tu produiras.</p>
+      </div>
+      <div>
+        <h4>Panel</h4>
+        <p class="hint" style="margin:0 0 8px">On déclare quel composant dépend
+        de quel paramètre. Seul ce qui a changé est recalculé.
+        Plus verbeux, mais un contrôle fin.</p>
+        <p class="hint" style="margin:0"><strong>Pour :</strong> applications
+        lourdes, tableaux liés entre eux, intégration dans un notebook Jupyter,
+        gros volumes de données.</p>
+      </div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Ma recommandation, sans détour</div>
+      <p><strong>Commence par Streamlit, et n'en bouge pas tant que tu n'es pas
+      gêné.</strong> Le jour où tu attendras devant ton propre tableau de bord,
+      tu sauras pourquoi Panel existe, et tu l'apprendras en une après-midi.</p>
+      <p style="margin-bottom:0">Ce qui compte en entretien, ce n'est pas de connaître
+      les deux. C'est de savoir <strong>dire en une phrase ce qui les sépare</strong> :
+      Streamlit rejoue tout, Panel recalcule ce qui dépend de ce qui a changé.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Mettre en ligne, gratuitement</div>
+      <p>Ton dépôt GitHub avec <code>appli.py</code>, <code>requirements.txt</code>
+      et tes données. Puis <strong>Streamlit Community Cloud</strong>
+      (<code>share.streamlit.io</code>), qui lit le dépôt et sert l'application
+      à une adresse publique.</p>
+      <p style="margin-bottom:0">C'est un lien que tu peux mettre sur un CV,
+      et c'est nettement plus convaincant qu'une ligne
+      « maîtrise de Python » dans la rubrique compétences.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Fais-moi une appli Streamlit qui charge legislatives-2024.csv et affiche un graphique filtrable par nuance.</p>
+      <p style="margin-top:12px">Le code marche parfaitement sur ce fichier.
+      <strong>Il s'écroulera sur le suivant.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 La leçon générale</div>
+      <p>Une IA optimise pour « ça marche quand je lance ».
+      <strong>Elle ne connaît ni la taille de ton fichier, ni le nombre
+      de personnes qui utiliseront l'appli, ni le fait qu'un directeur
+      va bouger le curseur trente fois d'affilée.</strong></p>
+      <p style="margin-bottom:0">Le contexte d'usage n'est jamais dans le prompt,
+      et c'est presque toujours lui qui décide de la bonne architecture.
+      Dis-le : « fichier de 8 millions de lignes, une dizaine d'utilisateurs
+      simultanés ». La réponse change du tout au tout.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong>
+    Ce code se lance depuis un terminal, pas depuis cette page.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la dernière séance</h2><div class="etape-meta">1 heure</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Mets ton application en ligne sur Streamlit Community Cloud, et envoie-moi
+      le lien. Dépôt GitHub, <code>requirements.txt</code>, données incluses.</p>
+      <p class="hint" style="margin-top:8px">Compte une demi-heure la première fois,
+      dont vingt minutes à cause d'une version manquante dans le
+      <code>requirements.txt</code>. C'est un passage obligé,
+      et c'est mieux de le vivre maintenant que la veille d'une soutenance.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 La séance 16</div>
+      <p style="margin-bottom:0">Le projet final. Tu choisis un sujet,
+      tu vas chercher tes propres données, et tu produis
+      <strong>une note d'une page plus une application</strong>.
+      Les cinq sujets proposés sont sur la page de la dernière séance :
+      va les lire avant, il te faudra en choisir un.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-14.html" style="color:var(--orange);font-weight:650">← Séance 14</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = [];
+window.FICHIERS = [];
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=5"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Le squelette de l'appli",
+    contexte: "Cinq lignes, et la page existe.",
+    fige: true,
+    lignes: [
+      { t: "import pandas as pd" },
+      { b:1, long:34, consigne:"Importe Streamlit sous son alias habituel.",
+        ok:["import streamlit as st"],
+        indices:["L'alias conventionnel est <code>st</code>.",
+                 "<code>import streamlit as st</code>"],
+        pourquoi:"Tout le monde écrit <code>st</code> : garde la convention, ton code sera lisible par n'importe qui." },
+      { t: "" },
+      { b:1, long:56, consigne:"Configure la page : titre « Legislatives 2024 » et mise en page large.",
+        ok:['st.set_page_config(page_title="Legislatives 2024", layout="wide")'],
+        indices:["<code>st.set_page_config(page_title=..., layout=\"wide\")</code>",
+                 '<code>st.set_page_config(page_title="Legislatives 2024", layout="wide")</code>'],
+        pourquoi:"Cette ligne doit être la première commande Streamlit du fichier, sinon elle lève une erreur." },
+      { b:1, long:52, consigne:"Affiche le titre « Legislatives 2024, premier tour ».",
+        ok:['st.title("Legislatives 2024, premier tour")'],
+        indices:["<code>st.title</code>", '<code>st.title("Legislatives 2024, premier tour")</code>'],
+        pourquoi:"" },
+      { b:1, long:66, consigne:"Ajoute la source en petit dessous : « Source : ministere de l'Interieur ».",
+        ok:['st.caption("Source : ministere de l\'Interieur")'],
+        indices:["<code>st.caption</code> pour le texte discret.",
+                 "<code>st.caption(\"Source : ministere de l'Interieur\")</code>"],
+        pourquoi:"La source sur la page elle-même, jamais dans un coin du dépôt. Une capture d'écran circule sans son contexte." },
+    ],
+  },
+  {
+    titre: "Le cache, et pourquoi",
+    contexte: "La ligne qui sépare une démo d'une application.",
+    fige: true,
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "import streamlit as st" },
+      { t: "" },
+      { b:1, long:26, consigne:"Le décorateur qui met le résultat en mémoire.",
+        ok:["@st.cache_data"],
+        indices:["Un décorateur commence par une arobase.", "<code>@st.cache_data</code>"],
+        pourquoi:"Sans lui, le fichier est relu à chaque mouvement de curseur, parce que Streamlit rejoue le script entier." },
+      { b:1, long:24, consigne:"Définis la fonction <code>charger</code>, sans argument.",
+        ok:["def charger():"],
+        indices:["<code>def charger():</code>", "<code>def charger():</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:56, consigne:"Lis le CSV, séparateur point-virgule, dans <code>df</code>.",
+        ok:['df = pd.read_csv("legislatives-2024.csv", sep=";")'],
+        indices:['<code>pd.read_csv(..., sep=";")</code>',
+                 '<code>df = pd.read_csv("legislatives-2024.csv", sep=";")</code>'],
+        pourquoi:"" },
+      { b:1, indent:4, long:20, consigne:"Renvoie le tableau.",
+        ok:["return df"],
+        indices:["<code>return df</code>", "<code>return df</code>"],
+        pourquoi:"Ce qui sort du cache est partagé : ne le modifie jamais sans <code>.copy()</code> d'abord." },
+      { t: "" },
+      { b:1, long:30, consigne:"Appelle la fonction et garde le résultat dans <code>df</code>.",
+        ok:["df = charger()"],
+        indices:["<code>df = charger()</code>", "<code>df = charger()</code>"],
+        pourquoi:"Au premier passage, la fonction s'exécute. Aux suivants, Streamlit rend directement le résultat mémorisé." },
+    ],
+  },
+  {
+    titre: "Les commandes de la barre latérale",
+    contexte: "Un widget renvoie une valeur, tout simplement.",
+    fige: true,
+    lignes: [
+      { t: "import streamlit as st" },
+      { t: "" },
+      { b:1, long:36, consigne:"Un en-tête « Parametres » dans la barre latérale.",
+        ok:['st.sidebar.header("Parametres")'],
+        indices:["<code>st.sidebar.</code> devant, et <code>header</code>.",
+                 '<code>st.sidebar.header("Parametres")</code>'],
+        pourquoi:"Tout ce qui est préfixé par <code>st.sidebar</code> part à gauche. Les réglages à gauche, les résultats à droite : c'est la convention." },
+      { b:1, long:70, consigne:"Un menu déroulant « Nuance » avec RN, UG et ENS, dans <code>nuance</code>.",
+        ok:['nuance = st.sidebar.selectbox("Nuance", ["RN", "UG", "ENS"])'],
+        indices:["<code>selectbox(label, liste)</code>",
+                 '<code>nuance = st.sidebar.selectbox("Nuance", ["RN", "UG", "ENS"])</code>'],
+        pourquoi:"Le widget <strong>renvoie</strong> la valeur choisie. Pas de callback, pas d'événement : la variable contient directement le choix." },
+      { b:1, long:76, consigne:"Un curseur « Participation minimale » de 58 à 76, démarrant à 58, dans <code>mini</code>.",
+        ok:['mini = st.sidebar.slider("Participation minimale", 58, 76, 58)'],
+        indices:["<code>slider(label, mini, maxi, defaut)</code>",
+                 '<code>mini = st.sidebar.slider("Participation minimale", 58, 76, 58)</code>'],
+        pourquoi:"Les trois nombres sont le minimum, le maximum et la valeur de départ." },
+      { t: "" },
+      { b:1, long:44, consigne:"Affiche ce que l'utilisateur a choisi, pour vérifier.",
+        ok:["st.write(nuance, mini)"],
+        indices:["<code>st.write</code> affiche à peu près n'importe quoi.",
+                 "<code>st.write(nuance, mini)</code>"],
+        pourquoi:"<code>st.write</code> est le couteau suisse : texte, nombre, tableau, figure. Parfait pour déboguer, à remplacer par du plus précis ensuite." },
+    ],
+  },
+  {
+    titre: "Afficher les résultats",
+    contexte: "Trois indicateurs, une figure, un tableau repliable.",
+    fige: true,
+    lignes: [
+      { t: "import streamlit as st" },
+      { t: "import matplotlib.pyplot as plt" },
+      { t: "# sel contient les lignes filtrees" },
+      { t: "" },
+      { b:1, long:36, consigne:"Trois colonnes côte à côte, dans <code>g</code>, <code>m</code> et <code>d</code>.",
+        ok:["g, m, d = st.columns(3)"],
+        indices:["<code>st.columns(3)</code> rend trois objets.",
+                 "<code>g, m, d = st.columns(3)</code>"],
+        pourquoi:"" },
+      { b:1, long:52, consigne:"Dans la première : l'indicateur « Departements retenus », avec le nombre de lignes de <code>sel</code>.",
+        ok:['g.metric("Departements retenus", len(sel))'],
+        indices:["<code>g.metric(label, valeur)</code>",
+                 '<code>g.metric("Departements retenus", len(sel))</code>'],
+        pourquoi:"On appelle <code>metric</code> sur la colonne, pas sur <code>st</code> : c'est ce qui la place au bon endroit." },
+      { t: "" },
+      { t: "fig, ax = plt.subplots(figsize=(8, 4))" },
+      { t: 'ax.barh(sel["departement"], sel["part"], color="#f07818")' },
+      { b:1, long:24, consigne:"Affiche la figure dans la page.",
+        ok:["st.pyplot(fig)"],
+        indices:["<code>st.pyplot(fig)</code>", "<code>st.pyplot(fig)</code>"],
+        pourquoi:"On passe <code>fig</code>, l'objet figure : c'est pour ça qu'on écrit <code>fig, ax = plt.subplots()</code> depuis la séance 12." },
+      { t: "" },
+      { b:1, long:44, consigne:"Ouvre un bloc repliable intitulé « Voir le tableau ».",
+        ok:['with st.expander("Voir le tableau"):'],
+        indices:["<code>with st.expander(titre):</code>",
+                 '<code>with st.expander("Voir le tableau"):</code>'],
+        pourquoi:"Le détail replié plutôt que supprimé : le lecteur pressé voit la conclusion, le lecteur méfiant peut vérifier." },
+      { b:1, indent:4, long:32, consigne:"Affiche le tableau <code>sel</code> dedans.",
+        ok:["st.dataframe(sel)"],
+        indices:["<code>st.dataframe(sel)</code>", "<code>st.dataframe(sel)</code>"],
+        pourquoi:"<code>st.dataframe</code> est triable et défilable, contrairement à <code>st.table</code> qui est figé." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=5"></script>
+
+<script>
+/* ---------- Le code de l'IA : pas de cache ---------- */
+(function () {
+  const LIGNES = [
+    "import pandas as pd",
+    "import streamlit as st",
+    "import matplotlib.pyplot as plt",
+    "",
+    'df = pd.read_csv("legislatives-2024.csv", sep=";")',
+    'total = df.groupby("code")["voix"].transform("sum")',
+    'df["part"] = df["voix"] / total * 100',
+    "",
+    'nuance = st.selectbox("Nuance", sorted(df["nuance"].unique()))',
+    'sel = df[df["nuance"] == nuance]',
+    "",
+    "fig, ax = plt.subplots()",
+    'ax.barh(sel["departement"], sel["part"])',
+    "st.pyplot(fig)",
+  ];
+  const BUGS = [4];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 5</div>' +
+        "<p>La lecture du fichier est <strong>au niveau du script</strong>, " +
+        "sans <code>@st.cache_data</code>. Or Streamlit rejoue tout le script " +
+        "à chaque interaction : <strong>le CSV est relu, et le " +
+        "<code>groupby</code> refait, à chaque mouvement de curseur.</strong></p>" +
+        "<p>Sur 1 057 lignes, invisible. Sur huit millions, chaque clic coûte " +
+        "plusieurs secondes, et l'application devient inutilisable au moment " +
+        "précis où elle commence à servir à quelque chose.</p>" +
+        "<p style='margin-bottom:0'>C'est le défaut le plus fréquent des applications " +
+        "Streamlit générées, et il est <strong>indétectable sur un fichier " +
+        "d'exemple</strong>. Personne ne le voit pendant la démo.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 La correction</div>' +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:8px 0'>" +
+        "@st.cache_data\n" +
+        "def charger():\n" +
+        '    df = pd.read_csv("legislatives-2024.csv", sep=";")\n' +
+        '    total = df.groupby("code")["voix"].transform("sum")\n' +
+        '    df["part"] = df["voix"] / total * 100\n' +
+        "    return df\n\n" +
+        "df = charger()</p>" +
+        "<p style='margin-bottom:0'>Tout ce qui est <strong>lourd et indépendant " +
+        "des commandes</strong> va dans une fonction décorée. " +
+        "Tout ce qui dépend des commandes reste dehors. " +
+        "C'est la seule règle d'architecture de Streamlit.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Souviens-toi que " +
+        "<strong>le script entier est rejoué à chaque clic</strong>, " +
+        "et cherche ce qui coûte cher à refaire pour rien.</p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- La maquette de l'appli : meme comportement que Streamlit ---------- */
+(function () {
+  let DEPS = [];      // [{nom, part:{nuance:pct}, participation}]
+  let tours = 0;
+
+  fetch("donnees/legislatives-2024.csv?v=5")
+    .then((r) => r.text())
+    .then((txt) => {
+      const l = txt.replace(/\r/g, "").trim().split("\n");
+      const h = l[0].split(";");
+      const par = {};
+      for (let i = 1; i < l.length; i++) {
+        const p = l[i].split(";"), o = {};
+        h.forEach((k, j) => (o[k] = p[j]));
+        if (!par[o.code]) {
+          par[o.code] = { nom: o.departement, v: {},
+                          participation: (+o.votants / +o.inscrits) * 100 };
+        }
+        par[o.code].v[o.nuance] = (par[o.code].v[o.nuance] || 0) + +o.voix;
+      }
+      DEPS = Object.values(par).map((d) => {
+        const tot = Object.values(d.v).reduce((a, x) => a + x, 0);
+        const part = {};
+        for (const n in d.v) part[n] = (d.v[n] / tot) * 100;
+        return { nom: d.nom, part: part, participation: d.participation };
+      });
+      maj();
+    })
+    .catch(() => {
+      document.getElementById("a-rerun").textContent =
+        "les données n'ont pas pu être chargées";
+    });
+
+  const cv = document.getElementById("a-cv");
+  const ct = cv.getContext("2d");
+
+  function maj() {
+    if (!DEPS.length) return;
+    tours++;
+    const nuance = document.getElementById("a-nuance").value;
+    const mini = +document.getElementById("a-min").value;
+    const combien = +document.getElementById("a-n").value;
+    document.getElementById("a-min-v").textContent = mini + " %";
+    document.getElementById("a-n-v").textContent = combien;
+
+    const sel = DEPS.filter((d) => d.participation >= mini && d.part[nuance] !== undefined);
+    const top = sel.slice().sort((a, b) => b.part[nuance] - a.part[nuance]).slice(0, combien);
+
+    document.getElementById("m-n").textContent = sel.length;
+    document.getElementById("m-moy").textContent = sel.length
+      ? (sel.reduce((a, d) => a + d.part[nuance], 0) / sel.length).toFixed(1).replace(".", ",") + " %"
+      : "-";
+    document.getElementById("m-max").textContent = sel.length
+      ? Math.max.apply(null, sel.map((d) => d.part[nuance])).toFixed(1).replace(".", ",") + " %"
+      : "-";
+
+    const w = cv.width, h = cv.height, gx = 168, pad = 12;
+    ct.clearRect(0, 0, w, h);
+    if (!top.length) return;
+    const maxi = Math.max.apply(null, top.map((d) => d.part[nuance]));
+    const bh = Math.min(20, (h - pad * 2) / top.length - 3);
+    const pas = (h - pad * 2) / top.length;
+    ct.font = "12px system-ui, sans-serif";
+    top.forEach((d, i) => {
+      const y = pad + i * pas;
+      const lw = (d.part[nuance] / maxi) * (w - gx - 60);
+      ct.fillStyle = "#f07818";
+      ct.fillRect(gx, y, lw, bh);
+      ct.fillStyle = "#2b2722";
+      ct.textAlign = "right";
+      ct.fillText(d.nom.slice(0, 22), gx - 8, y + bh - 4);
+      ct.textAlign = "left";
+      ct.fillText(d.part[nuance].toFixed(1).replace(".", ",") + " %", gx + lw + 6, y + bh - 4);
+    });
+
+    document.getElementById("a-rerun").textContent =
+      "le script s'est exécuté " + tours + (tours > 1 ? " fois" : " fois");
+  }
+
+  ["a-nuance", "a-min", "a-n"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", maj));
+})();
+</script>
+
+</body>
+</html>

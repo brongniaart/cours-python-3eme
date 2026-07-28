@@ -436,3 +436,17 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
   padding: 6px;
   display: block;
 }
+
+/* ---------- Code assemblé mais non exécutable dans le navigateur ---------- */
+.code-fige {
+  background: var(--code-bg);
+  color: #cdd6e6;
+  border-radius: 10px;
+  padding: 15px 18px;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+}

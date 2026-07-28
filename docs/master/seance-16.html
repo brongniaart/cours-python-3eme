@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 16 - Ta note d'analyse</title>
+<link rel="stylesheet" href="../assets/style.css?v=5">
+<style>
+  .projets { display: grid; gap: 16px; margin: 18px 0; }
+  .projet { border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: #fff; }
+  .projet > summary { cursor: pointer; padding: 16px 20px; list-style: none;
+    display: flex; align-items: baseline; gap: 13px; }
+  .projet > summary::-webkit-details-marker { display: none; }
+  .projet > summary::after { content: "+"; margin-left: auto; font-size: 22px;
+    color: var(--ink-soft); font-weight: 400; line-height: 1; }
+  .projet[open] > summary::after { content: "−"; }
+  .projet .num { font-family: var(--mono); font-size: 12px; font-weight: 750;
+    color: #fff; background: var(--orange); border-radius: 6px; padding: 3px 8px; }
+  .projet h3 { margin: 0; font-size: 18.5px; letter-spacing: -.018em; }
+  .projet .tag2 { font-size: 12.5px; color: var(--ink-soft); }
+  .projet .dedans { padding: 0 20px 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .projet dl { margin: 0; display: grid; grid-template-columns: 130px 1fr; gap: 9px 16px; }
+  @media (max-width: 640px) { .projet dl { grid-template-columns: 1fr; gap: 3px 0; }
+                              .projet dd { margin-bottom: 11px; } }
+  .projet dt { font-size: 11.5px; font-weight: 750; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--ink-soft); padding-top: 2px; }
+  .projet dd { margin: 0; font-size: 14.5px; }
+
+  .plan { counter-reset: p; display: grid; gap: 11px; margin: 16px 0; }
+  .plan > div { background: var(--bg-soft); border-radius: 11px; padding: 14px 17px 14px 52px;
+                position: relative; }
+  .plan > div::before { counter-increment: p; content: counter(p);
+    position: absolute; left: 16px; top: 13px; font-family: var(--mono);
+    font-weight: 750; color: var(--orange); font-size: 15px; }
+  .plan h4 { margin: 0 0 3px; font-size: 15.5px; }
+  .plan p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+  table.grille { width: 100%; border-collapse: collapse; font-size: 14.5px; margin: 14px 0; }
+  table.grille th, table.grille td { text-align: left; padding: 9px 12px;
+    border-bottom: 1px solid var(--line); }
+  table.grille th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ink-soft); }
+  table.grille td.pt { font-family: var(--mono); font-weight: 700; white-space: nowrap; }
+
+  .check { display: grid; gap: 7px; margin: 14px 0; }
+  .check label { display: flex; gap: 11px; align-items: flex-start; cursor: pointer;
+    background: var(--bg-soft); border-radius: 10px; padding: 11px 14px; font-size: 14.5px; }
+  .check input { margin-top: 3px; width: 17px; height: 17px; accent-color: var(--orange); flex: none; }
+  .check label.ok { background: var(--green-soft); }
+  .avance { font-family: var(--mono); font-weight: 750; }
+
+  .pieges { display: grid; gap: 8px; margin: 16px 0; }
+  .pieges > div { display: grid; grid-template-columns: 78px 1fr; gap: 14px;
+    background: var(--bg-soft); border-radius: 10px; padding: 11px 15px; font-size: 14px; }
+  @media (max-width: 640px) { .pieges > div { grid-template-columns: 1fr; gap: 2px; } }
+  .pieges .s { font-family: var(--mono); font-size: 12.5px; font-weight: 700;
+    color: var(--orange); padding-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 16</a>
+  <nav class="steps"><a href="#note">1</a><a href="#projets">2</a><a href="#grille">3</a>
+    <a href="#pieges">4</a><a href="#check">✓</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 16 · 1 h 30 · projet final</div>
+    <h1>Ta note d'analyse</h1>
+    <p class="lede">Quinze séances pour arriver ici. Le livrable n'est pas
+    un programme, et personne ne lira ton code.
+    <strong>C'est une page : une question, un graphique, un chiffre,
+    une recommandation, et les limites que tu assumes.</strong></p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce qui est attendu</div>
+    <p><strong>Une note d'une page</strong> (format PDF ou Markdown),
+    <strong>une application Streamlit en ligne</strong>, et
+    <strong>un dépôt GitHub</strong> qu'un inconnu peut relancer
+    à partir du seul <code>README</code>.</p>
+    <p style="margin-bottom:0">Plus une restitution orale de dix minutes,
+    dont trois de questions. C'est le format réel d'un comité,
+    et c'est le seul exercice de tout le parcours où le code ne compte
+    que pour un quart de la note.</p>
+  </div>
+
+  <!-- LA NOTE -->
+  <section class="etape" id="note">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>La structure de la note</h2>
+      <div class="etape-meta">cinq blocs, une page, pas plus</div></div></div>
+
+    <div class="plan">
+      <div><h4>La question, en une phrase</h4>
+        <p>Fermée, datée, chiffrable. « La participation baisse-t-elle plus vite
+        dans les départements les plus pauvres ? » et non « analyse de
+        la participation ».</p></div>
+      <div><h4>Les données, et leur provenance</h4>
+        <p>Qui les produit, quand, sous quelle licence, et ce qu'elles ne couvrent
+        pas. Trois lignes. C'est la partie que tout le monde saute
+        et que les gens sérieux lisent en premier.</p></div>
+      <div><h4>Un graphique, un seul</h4>
+        <p>Celui qui porte la réponse. Titre qui énonce la conclusion,
+        axes nommés avec leur unité, échelle assumée. S'il en faut deux,
+        c'est qu'il y a deux questions, donc deux notes.</p></div>
+      <div><h4>Le chiffre, avec sa fourchette</h4>
+        <p>Jamais nu. « 386 k€ » devient « médiane 387 k€, huit scénarios
+        sur dix entre 32 et 761 k€, 8 % de probabilité de perte ».
+        Séance 14, appliquée.</p></div>
+      <div><h4>Ce que tu ne sais pas</h4>
+        <p>Les deux ou trois limites qui pourraient renverser la conclusion.
+        Les écrire toi-même te protège ; les laisser trouver par le jury
+        te coûte la note entière.</p></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Les trois fautes qui tuent une note</div>
+      <p><strong>Le graphique décoratif.</strong> Une figure qui ne sert pas
+      la réponse mais qui « fait joli ». Elle dilue l'attention et suggère
+      que tu n'as pas su choisir.</p>
+      <p><strong>La conclusion plus forte que les données.</strong>
+      « Le RN domine le territoire » à partir d'une carte : séance 13.
+      Une phrase que ton fichier ne porte pas est une faute professionnelle,
+      pas une maladresse.</p>
+      <p style="margin-bottom:0"><strong>Le chiffre à six décimales.</strong>
+      Il signale que tu n'as pas réfléchi à la précision de tes entrées.
+      Arrondis à l'ordre de grandeur que tes hypothèses justifient.</p>
+    </div>
+  </section>
+
+  <!-- LES PROJETS -->
+  <section class="etape" id="projets">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Les cinq sujets</h2>
+      <div class="etape-meta">tu en choisis un, ou tu proposes le tien</div></div></div>
+
+    <p>Chacun réutilise l'essentiel du parcours et te fait aller chercher
+    <strong>tes propres données</strong>. C'est volontaire : savoir trouver
+    et évaluer une source est la moitié du métier.</p>
+
+    <div class="projets">
+
+      <details class="projet" open>
+        <summary><span class="num">01</span>
+          <span><h3>La carte électorale d'un autre pays</h3>
+          <span class="tag2">cartographie · sources publiques · jointure</span></span></summary>
+        <div class="dedans"><dl>
+          <dt>La question</dt>
+          <dd>Prends un pays qui t'intéresse et qui a voté récemment.
+          Où se concentre le vote pour tel parti, et cette géographie
+          ressemble-t-elle à celle de la France ?</dd>
+          <dt>Les données</dt>
+          <dd>Résultats officiels du pays choisi, plus les contours administratifs
+          (<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener"
+          style="color:var(--orange)">Natural Earth</a>, portails open data nationaux,
+          <a href="https://gadm.org/" target="_blank" rel="noopener"
+          style="color:var(--orange)">GADM</a>). Côte d'Ivoire, Sénégal, Allemagne,
+          Brésil, Portugal : tous accessibles.</dd>
+          <dt>Le piège</dt>
+          <dd>La jointure. Les codes ne correspondront pas, les noms seront
+          accentués différemment, il manquera des régions.
+          <strong>Documenter ce que tu as perdu fait partie du travail</strong>,
+          exactement comme les 1,6 M de voix de la séance 7.</dd>
+          <dt>Le livrable</dt>
+          <dd>Une carte choroplèthe honnête, une appli Streamlit avec choix
+          du parti, et une note qui compare la géographie du vote à celle
+          de la France de la séance 13.</dd>
+        </dl></div>
+      </details>
+
+      <details class="projet">
+        <summary><span class="num">02</span>
+          <span><h3>Le mode de scrutin qui change tout</h3>
+          <span class="tag2">algorithmes · simulation · politique comparée</span></span></summary>
+        <div class="dedans"><dl>
+          <dt>La question</dt>
+          <dd>Sur un même scrutin réel, combien de sièges chaque parti obtient-il
+          selon la règle de répartition retenue ? À partir de quel seuil
+          la majorité bascule-t-elle ?</dd>
+          <dt>Les données</dt>
+          <dd>Les législatives françaises 2024 fournies, ou un scrutin étranger
+          que tu vas chercher. Un pays à proportionnelle réelle
+          (Allemagne, Pays-Bas, Israël) rend la comparaison plus riche.</dd>
+          <dt>Le piège</dt>
+          <dd>Croire qu'on compare des choses comparables. Les électeurs ne votent
+          pas de la même façon selon le mode de scrutin : <strong>ta note doit
+          énoncer cette limite avant que le jury ne la pose</strong>.</dd>
+          <dt>Le livrable</dt>
+          <dd>Un simulateur Streamlit : curseurs pour le nombre de sièges
+          et le seuil, choix entre D'Hondt et Sainte-Laguë, hémicycle
+          qui se recompose en direct.</dd>
+        </dl></div>
+      </details>
+
+      <details class="projet">
+        <summary><span class="num">03</span>
+          <span><h3>Acheter ou louer, vraiment</h3>
+          <span class="tag2">finance personnelle · Monte Carlo · sensibilité</span></span></summary>
+        <div class="dedans"><dl>
+          <dt>La question</dt>
+          <dd>Pour un profil donné, au bout de combien d'années l'achat
+          devient-il plus avantageux que la location ?
+          Et avec quelle probabilité ?</dd>
+          <dt>Les données</dt>
+          <dd>Prix au mètre carré et loyers (<a href="https://www.data.gouv.fr/"
+          target="_blank" rel="noopener" style="color:var(--orange)">data.gouv.fr</a>,
+          base DVF des transactions réelles), taux de crédit, frais de notaire,
+          charges de copropriété.</dd>
+          <dt>Le piège</dt>
+          <dd>Le coût d'opportunité. La plupart des comparateurs oublient que
+          l'apport non dépensé pouvait être placé. Sans cette ligne,
+          l'achat gagne toujours, et le modèle ne sert à rien.</dd>
+          <dt>Le livrable</dt>
+          <dd>Une appli où l'on saisit son profil, avec la distribution
+          du point de bascule et le tornado des hypothèses.
+          <strong>Tu réutilises presque toute la séance 14 telle quelle.</strong></dd>
+        </dl></div>
+      </details>
+
+      <details class="projet">
+        <summary><span class="num">04</span>
+          <span><h3>Où part l'argent public</h3>
+          <span class="tag2">budget · agrégation · comparaison internationale</span></span></summary>
+        <div class="dedans"><dl>
+          <dt>La question</dt>
+          <dd>Comment se répartit le budget d'un État par mission, et comment
+          cette répartition a-t-elle bougé sur dix ans ?
+          Ou : comment se compare-t-elle à celle d'un pays voisin ?</dd>
+          <dt>Les données</dt>
+          <dd>Budget de l'État sur data.gouv.fr, ou les bases
+          <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener"
+          style="color:var(--orange)">Eurostat</a> pour la comparaison
+          entre pays européens.</dd>
+          <dt>Le piège</dt>
+          <dd>Les euros courants. Comparer 2015 et 2025 sans corriger de l'inflation
+          produit une hausse partout, y compris là où le budget réel a baissé.
+          <strong>Il faut aussi rapporter au PIB ou par habitant</strong>,
+          et dire lequel tu montres.</dd>
+          <dt>Le livrable</dt>
+          <dd>Une appli avec le choix de l'année et du pays, en euros constants,
+          et une note sur les deux ou trois missions dont la trajectoire
+          est vraiment remarquable.</dd>
+        </dl></div>
+      </details>
+
+      <details class="projet">
+        <summary><span class="num">05</span>
+          <span><h3>Le portefeuille d'un fonds souverain</h3>
+          <span class="tag2">allocation · risque · frontière efficiente</span></span></summary>
+        <div class="dedans"><dl>
+          <dt>La question</dt>
+          <dd>Un fonds doit placer un milliard sur dix ans avec un mandat
+          « pas plus de 20 % de perte maximale ». Quelle allocation
+          respecte la contrainte tout en maximisant le rendement ?</dd>
+          <dt>Les données</dt>
+          <dd>Séries d'indices publiques, ou les cotations simulées de la séance 11
+          si tu préfères te concentrer sur la méthode.
+          <strong>Dans les deux cas, dis clairement laquelle tu utilises.</strong></dd>
+          <dt>Le piège</dt>
+          <dd>Optimiser sur le passé. Une allocation calée sur six ans d'historique
+          est parfaite sur ces six ans et sur aucun autre.
+          Le test honnête : optimiser sur les quatre premières années,
+          vérifier sur les deux dernières.</dd>
+          <dt>Le livrable</dt>
+          <dd>Une appli avec curseurs d'allocation, courbe du portefeuille,
+          pire perte en direct, et le nuage rendement contre risque
+          de quelques centaines d'allocations tirées au hasard.</dd>
+        </dl></div>
+      </details>
+
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Tu peux proposer ton propre sujet</div>
+      <p style="margin-bottom:0">Trois conditions : une <strong>question fermée</strong>,
+      des <strong>données publiques que tu as déjà ouvertes</strong>
+      (pas « je trouverai »), et au moins <strong>une incertitude à quantifier</strong>.
+      Valide-le avec moi avant de commencer : la moitié des projets qui échouent
+      échouent sur une source qui n'existait pas.</p>
+    </div>
+  </section>
+
+  <!-- GRILLE -->
+  <section class="etape" id="grille">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Comment c'est évalué</h2>
+      <div class="etape-meta">et pourquoi le code ne pèse qu'un quart</div></div></div>
+
+    <table class="grille">
+      <tr><th>Critère</th><th>Ce que je regarde</th><th class="pt">Points</th></tr>
+      <tr><td><strong>La question</strong></td>
+        <td>Fermée, chiffrable, et vraiment traitée à la fin.</td><td class="pt">4</td></tr>
+      <tr><td><strong>Les données</strong></td>
+        <td>Source citée, licence vérifiée, nettoyage documenté, pertes quantifiées.</td>
+        <td class="pt">4</td></tr>
+      <tr><td><strong>Le code</strong></td>
+        <td>Il tourne chez moi à partir du README. Fonctions nommées, contrôles après jointure.</td>
+        <td class="pt">5</td></tr>
+      <tr><td><strong>Le graphique</strong></td>
+        <td>Bonne forme, échelle assumée, titre qui conclut. Aucune décoration.</td>
+        <td class="pt">3</td></tr>
+      <tr><td><strong>L'incertitude</strong></td>
+        <td>Une fourchette, pas un chiffre. Les hypothèses qui pèsent sont identifiées.</td>
+        <td class="pt">3</td></tr>
+      <tr><td><strong>L'oral</strong></td>
+        <td>Dix minutes tenues. Tu sais dire ce qui invaliderait ta conclusion.</td>
+        <td class="pt">3</td></tr>
+      <tr><td colspan="2" style="text-align:right"><strong>Total</strong></td>
+        <td class="pt"><strong>20</strong></td></tr>
+    </table>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La question que je poserai à l'oral</div>
+      <p style="font-style:italic;border-left:3px solid var(--orange);padding-left:14px;margin:10px 0">
+      « Qu'est-ce qui te ferait changer d'avis ? »</p>
+      <p style="margin-bottom:0">Une réponse précise (« si la marge réelle était
+      sous 17 %, la VAN passerait négative ») vaut tous les tableaux de bord.
+      Une réponse vague (« il faudrait plus de données ») dit que le modèle
+      n'a pas été compris par celui qui l'a écrit.</p>
+    </div>
+  </section>
+
+  <!-- PIÈGES -->
+  <section class="etape" id="pieges">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Les quinze pièges du parcours</h2>
+      <div class="etape-meta">à relire avant de rendre</div></div></div>
+
+    <p>Chaque séance a montré une erreur qu'une IA commet et qu'un fichier
+    d'exemple ne révèle jamais. <strong>Les voici toutes, dans l'ordre.</strong></p>
+
+    <div class="pieges">
+      <div><span class="s">S1</span><span>Le taux annuel appliqué mensuellement sans le convertir.</span></div>
+      <div><span class="s">S2</span><span>Le <code>elif</code> qui devient inatteignable parce qu'une condition plus large est passée avant.</span></div>
+      <div><span class="s">S3</span><span>L'accumulation qui repart de zéro à chaque tour de boucle.</span></div>
+      <div><span class="s">S4</span><span>La moyenne arithmétique des rendements, qui surestime la performance réelle.</span></div>
+      <div><span class="s">S5</span><span>Le TRI affiché à 0,0 % alors qu'il n'existe pas pour cette série de flux.</span></div>
+      <div><span class="s">S6</span><span>Le séparateur deviné, et 1 057 lignes lues comme une seule colonne.</span></div>
+      <div><span class="s">S7</span><span>Les valeurs sales silencieusement ignorées : 1,6 million de voix disparues.</span></div>
+      <div><span class="s">S8</span><span>Le <code>pip install</code> hors environnement virtuel, qui marche chez toi et nulle part ailleurs.</span></div>
+      <div><span class="s">S9</span><span><code>inscrits.sum()</code> sur un format long : 574 millions d'inscrits pour 49 millions d'électeurs.</span></div>
+      <div><span class="s">S10</span><span>La répartition proportionnelle par arrondi : 578 sièges pour une assemblée qui en compte 577.</span></div>
+      <div><span class="s">S11</span><span>La volatilité multipliée par 252 au lieu de sa racine : 278 % au lieu de 17,5 %.</span></div>
+      <div><span class="s">S12</span><span>L'axe des barres tronqué : un rapport de 1,46 qui paraît dix fois plus grand.</span></div>
+      <div><span class="s">S13</span><span>La jointure sans <code>zfill</code> : neuf départements perdus, sans erreur.</span></div>
+      <div><span class="s">S14</span><span>Monte Carlo sans graine, et la moyenne présentée comme un verdict.</span></div>
+      <div><span class="s">S15</span><span>L'application Streamlit sans cache, qui relit le fichier à chaque clic.</span></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce qu'ils ont tous en commun</div>
+      <p><strong>Aucun ne provoque d'erreur.</strong> Le programme tourne,
+      il affiche un nombre, le nombre a la bonne tête.
+      C'est précisément ce qui les rend dangereux, et c'est pour ça
+      qu'aucun ne se corrige en lisant un message d'erreur.</p>
+      <p style="margin-bottom:0">Ils se corrigent tous de la même façon :
+      <strong>en sachant à quoi devrait ressembler le bon résultat
+      avant de le calculer.</strong> Un ordre de grandeur, un total connu,
+      une somme qui doit tomber juste. C'est la seule chose de tout
+      ce parcours qu'aucun outil ne fera à ta place.</p>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="etape" id="check">
+    <div class="etape-head"><div class="etape-num">✓</div><div>
+      <h2>La liste avant de rendre</h2>
+      <div class="etape-meta">tes cases sont gardées dans ce navigateur</div></div></div>
+
+    <p><span class="avance" id="avance">0 / 12</span> points validés.</p>
+
+    <div class="check" id="liste"></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le dernier mot</div>
+      <p>Tu ne deviendras pas développeur avec seize séances, et ce n'était
+      pas le but. <strong>Tu sais désormais ouvrir un fichier que personne
+      n'a nettoyé, en tirer un chiffre défendable, et dire à quel point
+      tu y crois.</strong></p>
+      <p>C'est exactement ce qu'on attend d'un analyste en finance,
+      en conseil ou en politique publique, et c'est ce qui te distinguera
+      de quelqu'un qui sait faire écrire du code par une IA
+      sans pouvoir en vérifier une ligne.</p>
+      <p style="margin-bottom:0">L'outil deviendra meilleur que toi
+      pour écrire le code. Il ne saura jamais qu'une assemblée compte
+      577 sièges, ni qu'une participation de 574 millions est absurde
+      dans un pays de 68 millions d'habitants. <strong>C'est ce jugement-là
+      qui a de la valeur.</strong></p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-15.html" style="color:var(--orange);font-weight:650">← Séance 15</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+const POINTS = [
+  "La question tient en une phrase, et la conclusion y répond vraiment.",
+  "La source est citée avec sa licence et sa date de publication.",
+  "Le nettoyage est documenté : combien de lignes écartées, et pourquoi.",
+  "Chaque jointure est suivie de ses deux contrôles : lignes avant/après, et NaN créés.",
+  "Aucun total agrégé n'a été calculé sur un format long sans dédoublonner.",
+  "Les bornes de couleur et les axes sont fixés à la main, et assumés dans la légende.",
+  "Le titre du graphique énonce la conclusion, pas le contenu.",
+  "Le chiffre principal est donné avec une fourchette et une probabilité.",
+  "Toute simulation aléatoire a une graine fixée.",
+  "L'application ne recharge pas les données à chaque interaction.",
+  "Le README permet à un inconnu de tout relancer sans me poser de question.",
+  "Les deux limites qui pourraient renverser la conclusion sont écrites noir sur blanc.",
+];
+
+(function () {
+  const cle = "master:projet-final";
+  let etat = {};
+  try { etat = JSON.parse(localStorage.getItem(cle) || "{}"); } catch (e) { etat = {}; }
+
+  const liste = document.getElementById("liste");
+  liste.innerHTML = POINTS.map((t, i) =>
+    '<label' + (etat[i] ? ' class="ok"' : "") + '>' +
+    '<input type="checkbox" data-i="' + i + '"' + (etat[i] ? " checked" : "") + ">" +
+    "<span>" + t + "</span></label>").join("");
+
+  function compter() {
+    const n = Object.values(etat).filter(Boolean).length;
+    document.getElementById("avance").textContent = n + " / " + POINTS.length;
+  }
+
+  liste.querySelectorAll("input").forEach((c) =>
+    c.addEventListener("change", () => {
+      etat[c.dataset.i] = c.checked;
+      c.closest("label").classList.toggle("ok", c.checked);
+      try { localStorage.setItem(cle, JSON.stringify(etat)); } catch (e) {}
+      compter();
+    }));
+  compter();
+})();
+</script>
+
+</body>
+</html>

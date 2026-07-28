@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 14 - L'incertitude</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=5">
+<style>
+  .mc { display: grid; grid-template-columns: 1fr 250px; gap: 24px; align-items: start; }
+  @media (max-width: 900px) { .mc { grid-template-columns: 1fr; } }
+  .kpis { display: grid; gap: 9px; }
+  .kpis > div { background: var(--bg-soft); border-radius: 10px; padding: 11px 13px; }
+  .kpis .k { font-size: 10.5px; font-weight: 750; letter-spacing: .05em;
+             text-transform: uppercase; color: var(--ink-soft); }
+  .kpis .v { font-size: 22px; font-weight: 780; letter-spacing: -.02em; font-family: var(--mono); }
+  .kpis .s { font-size: 12px; color: var(--ink-soft); }
+  .risque { border-radius: 10px; padding: 11px 13px; border: 1px solid; }
+  .risque.ok { background: var(--green-soft); border-color: #bfe3d3; }
+  .risque.ko { background: var(--red-soft); border-color: #f5c9c4; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">matplotlib est lourd, comptez une quinzaine de secondes</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 14</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 14 · 1 h 30</div>
+    <h1>L'incertitude</h1>
+    <p class="lede">Ton modèle dit que le projet vaut <strong>389 000 €</strong>.
+    Il ne les vaut pas. Il vaut « quelque part entre 32 000 et 761 000 »,
+    avec <strong>une chance sur douze de perdre de l'argent</strong>,
+    et c'est cette phrase-là qu'on te demande en comité.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Transformer un chiffre unique en fourchette, calculer une probabilité
+    de perte, et identifier <strong>laquelle de tes hypothèses décide vraiment
+    du résultat</strong>. Trois outils, et la fin des tableurs à trois scénarios.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Le dossier, et son chiffre unique</h2>
+      <div class="etape-meta">15 minutes · le point de départ de toute note</div></div></div>
+
+    <p>Un investissement de <strong>800 000 €</strong>. Un chiffre d'affaires
+    de 1,2 M€ la première année, qui croît de 8 % par an pendant cinq ans.
+    Une marge de 22 %. Un taux d'actualisation de 9 %.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+INVESTISSEMENT = 800_000
+CA_INITIAL = 1_200_000
+ANNEES = 5
+
+
+def van(croissance, marge, taux=0.09):
+    total = -INVESTISSEMENT
+    for annee in range(1, ANNEES + 1):
+        ca = CA_INITIAL * (1 + croissance) ** (annee - 1)
+        flux = ca * marge
+        total = total + flux / (1 + taux) ** annee
+    return total
+
+
+print(f"{van(0.08, 0.22):,.0f} euros".replace(",", " "))
+
+# et si la marge tombe de deux points ?
+print(f"{van(0.08, 0.20):,.0f} euros".replace(",", " "))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 <code>388 992 €</code> : le mensonge de la précision</div>
+      <p>Ce chiffre a six chiffres significatifs. Il repose sur une croissance
+      devinée, une marge devinée et un taux discuté en réunion.
+      <strong>Aucune de ces trois entrées n'est connue à mieux que 20 % près.</strong></p>
+      <p style="margin-bottom:0">Écrire 389 k€ suggère une maîtrise qui n'existe pas.
+      Toute la séance consiste à remplacer ce chiffre par quelque chose d'honnête,
+      sans pour autant répondre « on ne sait pas » : ça, ce n'est pas une analyse.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Dix mille projets au lieu d'un</h2>
+      <div class="etape-meta">bouge l'incertitude, regarde la fourchette</div></div></div>
+
+    <p>Au lieu d'une croissance de 8 %, on en tire dix mille au hasard autour de 8 %.
+    Pareil pour la marge. On calcule la VAN à chaque fois.
+    <strong>La distribution qui en sort est la vraie réponse.</strong></p>
+
+    <div class="widget">
+      <div class="mc">
+        <div>
+          <canvas id="cv" width="720" height="300" style="width:100%;height:auto"></canvas>
+          <div class="slider-row" style="margin-top:14px">
+            <label>Incertitude sur la croissance <span class="val" id="v-sg">± 4,0 pts</span></label>
+            <input type="range" id="s-sg" min="0" max="10" step="0.5" value="4"></div>
+          <div class="slider-row">
+            <label>Incertitude sur la marge <span class="val" id="v-sm">± 5,0 pts</span></label>
+            <input type="range" id="s-sm" min="0" max="12" step="0.5" value="5"></div>
+          <div class="slider-row">
+            <label>Taux d'actualisation <span class="val" id="v-t">9,0 %</span></label>
+            <input type="range" id="s-t" min="3" max="18" step="0.5" value="9"></div>
+        </div>
+        <div class="kpis">
+          <div class="risque ko" id="r-perte">
+            <div class="k">Probabilité de perdre</div>
+            <div class="v" id="k-perte" style="color:var(--red)"></div>
+            <div class="s">VAN négative</div>
+          </div>
+          <div><div class="k">Médiane</div><div class="v" id="k-med"></div>
+            <div class="s">un scénario sur deux au-dessus</div></div>
+          <div><div class="k">Fourchette 10 - 90 %</div>
+            <div class="v" id="k-four" style="font-size:15px"></div>
+            <div class="s">huit scénarios sur dix</div></div>
+        </div>
+      </div>
+      <p class="hint" id="cmt" style="margin-top:12px"></p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Mets les deux incertitudes à zéro</div>
+      <p>La distribution s'effondre sur une barre unique à 389 k€, et la probabilité
+      de perte tombe à 0 %. <strong>C'est exactement ce que dit un tableur.</strong></p>
+      <p style="margin-bottom:0">Un modèle sans incertitude ne dit pas « le projet
+      rapportera 389 k€ ». Il dit « si toutes mes hypothèses sont exactes,
+      alors 389 k€ ». La deuxième phrase n'engage personne, et c'est bien
+      le problème.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Monte Carlo en douze lignes</h2>
+      <div class="etape-meta">20 minutes · numpy, tirages, quantiles</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import numpy as np
+
+INVESTISSEMENT = 800_000
+CA_INITIAL = 1_200_000
+ANNEES = 5
+TAUX = 0.09
+N = 200_000
+
+# la graine : sans elle, deux executions ne donnent pas le meme resultat
+alea = np.random.default_rng(42)
+
+croissance = alea.normal(0.08, 0.04, N)
+marge = alea.normal(0.22, 0.05, N)
+
+van = np.full(N, -float(INVESTISSEMENT))
+for annee in range(1, ANNEES + 1):
+    ca = CA_INITIAL * (1 + croissance) ** (annee - 1)
+    van = van + ca * marge / (1 + TAUX) ** annee
+
+print("moyenne  ", round(van.mean()))
+print("mediane  ", round(np.median(van)))
+print("P10 - P90", round(np.percentile(van, 10)), round(np.percentile(van, 90)))
+print("perte    ", round((van < 0).mean() * 100, 1), "%")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Trois remarques sur ce code</div>
+      <p><strong>La graine.</strong> <code>default_rng(42)</code> rend le résultat
+      reproductible. Sans elle, tu montres 8,2 % en réunion, ton collègue relance
+      et obtient 8,4 %, et toute la crédibilité du modèle part avec.
+      <strong>Une analyse qu'on ne peut pas rejouer à l'identique n'est pas une analyse.</strong></p>
+      <p><strong>Le vectoriel.</strong> Aucune boucle sur les 200 000 tirages :
+      numpy les traite tous d'un coup. La boucle ne porte que sur les 5 années.
+      C'est cent fois plus rapide qu'un <code>for</code> sur les scénarios.</p>
+      <p style="margin-bottom:0"><strong>La loi normale.</strong> C'est un choix,
+      pas une vérité. Elle autorise des marges négatives et des croissances
+      de 30 %. Pour une durée ou un prix, une loi <em>lognormale</em>
+      (jamais négative) est souvent plus juste. <strong>Le choix de la loi
+      fait partie des hypothèses à écrire dans la note.</strong></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Quelle hypothèse décide vraiment ?</h2>
+      <div class="etape-meta">20 minutes · analyse de sensibilité, tornade</div></div></div>
+
+    <p>Monte Carlo donne la fourchette. Il ne dit pas <em>d'où elle vient</em>.
+    Pour ça, on fait bouger une hypothèse à la fois.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import matplotlib.pyplot as plt
+
+INVESTISSEMENT = 800_000
+CA_INITIAL = 1_200_000
+
+
+def van(croissance=0.08, marge=0.22, taux=0.09):
+    total = -INVESTISSEMENT
+    for annee in range(1, 6):
+        ca = CA_INITIAL * (1 + croissance) ** (annee - 1)
+        total = total + ca * marge / (1 + taux) ** annee
+    return total
+
+
+centre = van()
+tests = {
+    "croissance +/- 4 pts": (van(croissance=0.04), van(croissance=0.12)),
+    "marge +/- 5 pts":      (van(marge=0.17),      van(marge=0.27)),
+    "taux +/- 3 pts":       (van(taux=0.12),       van(taux=0.06)),
+}
+
+for nom, (bas, haut) in tests.items():
+    print(f"{nom:22s} {bas:>10,.0f} {haut:>10,.0f}   amplitude {haut-bas:>10,.0f}")
+
+ordre = sorted(tests.items(), key=lambda kv: kv[1][1] - kv[1][0])
+fig, ax = plt.subplots(figsize=(7.5, 3))
+for i, (nom, (bas, haut)) in enumerate(ordre):
+    ax.barh(i, haut - bas, left=bas, color="#f07818", height=0.55)
+ax.axvline(centre, color="#2b2722", linewidth=1.4)
+ax.set_yticks(range(len(ordre)))
+ax.set_yticklabels([n for n, _ in ordre])
+ax.set_xlabel("VAN, en euros")
+ax.set_title("Ce qui fait bouger la VAN", loc="left", weight="bold")
+fig.tight_layout()
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le résultat, et ce qu'on en fait</div>
+      <p style="font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:8px 0">marge      +/- 5 pts    amplitude  540 451
+taux       +/- 3 pts    amplitude  195 829
+croissance +/- 4 pts    amplitude  174 642</p>
+      <p><strong>La marge pèse trois fois plus que la croissance.</strong>
+      Et pourtant, dans neuf dossiers sur dix, c'est la croissance
+      qui occupe toute la discussion, parce qu'elle est plus facile à raconter.</p>
+      <p style="margin-bottom:0">La conséquence est opérationnelle :
+      si tu as une semaine pour fiabiliser une seule hypothèse,
+      <strong>tu vas chercher la marge</strong>. Une analyse de sensibilité
+      ne sert pas à décorer une annexe, elle sert à décider où passer son temps.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la fiche de risque</h2>
+      <div class="etape-meta">25 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Une fonction <code>fiche_risque()</code> qui rend tout ce qu'un comité
+    d'investissement demande, et une figure qui tient dans une note.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le cahier des charges</div>
+      <p style="margin-bottom:0">Médiane, P10, P90, probabilité de VAN négative,
+      et <strong>la perte moyenne quand ça se passe mal</strong>
+      (la moyenne des VAN négatives seulement). Puis un histogramme
+      où la zone négative est colorée différemment, avec la médiane
+      matérialisée par une verticale.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import numpy as np
+import matplotlib.pyplot as plt
+
+alea = np.random.default_rng(42)
+
+# 1. Les tirages, et le vecteur des VAN
+
+
+# 2. La fiche de risque
+
+
+# 3. L'histogramme, zone negative en rouge
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>15 minutes</strong>. Valeurs de contrôle
+      avec la graine 42 et 200 000 tirages : médiane <strong>386 869</strong>,
+      P10 <strong>32 269</strong>, P90 <strong>760 557</strong>,
+      probabilité de perte <strong>8,1 %</strong>,
+      perte moyenne quand elle survient <strong>-121 467</strong>.</p>
+      <p><strong>Le piège attendu :</strong> pour la perte moyenne, il va écrire
+      <code>van.mean()</code> au lieu de <code>van[van &lt; 0].mean()</code>.
+      Le masque booléen de la séance 9, à l'endroit exact où il compte.</p>
+      <p style="margin-bottom:0">Et s'il obtient d'autres nombres que les miens :
+      il a oublié la graine, ou il n'a pas mis 42.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : combien de tirages suffisent ?</h2>
+      <div class="etape-meta">20 minutes · la question que personne ne pose</div></div></div>
+
+    <p>Tout le monde écrit 10 000 tirages parce que c'est ce qu'il y avait
+    dans le tutoriel. <strong>Personne ne vérifie que c'est assez.</strong></p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Ecris une fonction qui rend la probabilite de perte
+#    pour un nombre de tirages N et une graine donnee
+
+
+# 2. Pour N allant de 100 a 200 000, relance avec cinq graines
+#    differentes et regarde l'ecart entre les cinq resultats
+
+
+# 3. Trace : N en abscisse (echelle log), la probabilite en ordonnee,
+#    les cinq courbes superposees. A partir de quel N se rejoignent-elles ?
+
+      </script></div></div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Ce que tu vas voir</div>
+      <p>À 100 tirages, les cinq graines donnent des probabilités qui vont
+      du simple au double. À 10 000, elles tiennent dans quelques dixièmes
+      de point. À 200 000, elles sont confondues.</p>
+      <p style="margin-bottom:0"><strong>L'erreur d'une simulation décroît
+      en racine de N :</strong> multiplier les tirages par 100 ne divise
+      l'erreur que par 10. C'est pour ça qu'on ne gagne plus rien
+      à monter au-delà de quelques centaines de milliers, et pour ça
+      qu'en dessous de mille on raconte n'importe quoi avec assurance.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Fais une simulation Monte Carlo de la VAN de ce projet avec numpy, croissance et marge incertaines, et dis-moi si le projet est rentable.</p>
+      <p style="margin-top:12px">Le code est propre et vectorisé.
+      <strong>Deux détails le rendent inutilisable en comité.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 La phrase à écrire en haut de la note</div>
+      <p style="font-style:italic;border-left:3px solid var(--orange);padding-left:14px;margin:10px 0">
+      « La VAN médiane ressort à 387 k€. Huit scénarios sur dix se situent
+      entre 32 k€ et 761 k€, et 8 % d'entre eux sont négatifs.
+      La marge explique l'essentiel de cette dispersion :
+      cinq points de marge valent 540 k€ de VAN. »</p>
+      <p style="margin-bottom:0">Quatre lignes. Un ordre de grandeur, une fourchette,
+      un risque, un levier. <strong>C'est le livrable de la séance 16</strong>,
+      et tu sais maintenant produire chacun de ces quatre nombres.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Reprends ta simulation et remplace la loi normale de la marge
+      par une <strong>loi triangulaire</strong> : pessimiste 15 %,
+      probable 22 %, optimiste 26 %. <code>alea.triangular(0.15, 0.22, 0.26, N)</code>.</p>
+      <p class="hint" style="margin-top:8px">Compare la probabilité de perte
+      avant et après. Puis écris une phrase : <strong>de combien la conclusion
+      dépend-elle du choix de la loi ?</strong> C'est la question qu'un jury
+      pose toujours, et à laquelle presque personne n'a de réponse chiffrée.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-13.html" style="color:var(--orange);font-weight:650">← Séance 13</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = ["numpy", "pandas", "matplotlib"];
+window.FICHIERS = [];
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=5"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Le chiffre unique",
+    contexte: "Le point de départ : une VAN, une seule.",
+    lignes: [
+      { t: "INVESTISSEMENT = 800_000" },
+      { t: "CA_INITIAL = 1_200_000" },
+      { t: "" },
+      { b:1, long:46, consigne:"Définis <code>van</code>, qui prend <code>croissance</code>, <code>marge</code>, et <code>taux</code> à 0.09 par défaut.",
+        ok:["def van(croissance, marge, taux=0.09):"],
+        indices:["Le paramètre par défaut se met en dernier.",
+                 "<code>def van(croissance, marge, taux=0.09):</code>"],
+        pourquoi:"Une valeur par défaut permet d'appeler <code>van(0.08, 0.22)</code> sans répéter le taux à chaque fois." },
+      { b:1, indent:4, long:38, consigne:"Démarre le total à moins l'investissement.",
+        ok:["total = -INVESTISSEMENT"],
+        indices:["Le signe compte.", "<code>total = -INVESTISSEMENT</code>"],
+        pourquoi:"L'investissement est un flux sortant à la date zéro : il n'est pas actualisé." },
+      { b:1, indent:4, long:34, consigne:"Boucle sur les années 1 à 5.",
+        ok:["for annee in range(1, 6):"],
+        indices:["<code>range(1, 6)</code> donne 1, 2, 3, 4, 5.",
+                 "<code>for annee in range(1, 6):</code>"],
+        pourquoi:"" },
+      { b:1, indent:8, long:64, consigne:"Ajoute le flux de l'année, actualisé.",
+        ok:["total = total + CA_INITIAL * (1 + croissance) ** (annee - 1) * marge / (1 + taux) ** annee"],
+        indices:["CA de l'année, fois la marge, divisé par (1 + taux) puissance l'année.",
+                 "<code>total = total + CA_INITIAL * (1 + croissance) ** (annee - 1) * marge / (1 + taux) ** annee</code>"],
+        pourquoi:"<code>annee - 1</code> pour la croissance : la première année, le CA n'a pas encore crû." },
+      { b:1, indent:4, long:20, consigne:"Renvoie le total.",
+        ok:["return total"],
+        indices:["<code>return total</code>", "<code>return total</code>"],
+        pourquoi:"388 992 € pour croissance 8 % et marge 22 %." },
+    ],
+  },
+  {
+    titre: "Dix mille projets d'un coup",
+    contexte: "Monte Carlo, sans une seule boucle sur les scénarios.",
+    lignes: [
+      { t: "import numpy as np" },
+      { t: "" },
+      { b:1, long:44, consigne:"Crée le générateur aléatoire avec la graine 42, dans <code>alea</code>.",
+        ok:["alea = np.random.default_rng(42)"],
+        indices:["<code>np.random.default_rng(graine)</code>",
+                 "<code>alea = np.random.default_rng(42)</code>"],
+        pourquoi:"Sans graine, deux exécutions donnent deux résultats. Une analyse qu'on ne peut pas rejouer à l'identique ne vaut rien en comité." },
+      { b:1, long:52, consigne:"Tire 200 000 croissances, de moyenne 0.08 et d'écart-type 0.04.",
+        ok:["croissance = alea.normal(0.08, 0.04, 200_000)",
+            "croissance = alea.normal(0.08, 0.04, 200000)"],
+        indices:["<code>alea.normal(moyenne, ecart_type, taille)</code>",
+                 "<code>croissance = alea.normal(0.08, 0.04, 200_000)</code>"],
+        pourquoi:"Le choix de la loi normale est une hypothèse : elle autorise des croissances négatives, ce qui est réaliste ici, mais ne le serait pas pour un prix." },
+      { b:1, long:52, consigne:"Tire autant de marges, de moyenne 0.22 et d'écart-type 0.05.",
+        ok:["marge = alea.normal(0.22, 0.05, 200_000)",
+            "marge = alea.normal(0.22, 0.05, 200000)"],
+        indices:["Même fonction, autres paramètres.",
+                 "<code>marge = alea.normal(0.22, 0.05, 200_000)</code>"],
+        pourquoi:"" },
+      { b:1, long:52, consigne:"Initialise <code>van</code> : un tableau de 200 000 fois <code>-800_000.0</code>.",
+        ok:["van = np.full(200_000, -800_000.0)", "van = np.full(200000, -800000.0)"],
+        indices:["<code>np.full(taille, valeur)</code>",
+                 "<code>van = np.full(200_000, -800_000.0)</code>"],
+        pourquoi:"Un tableau plutôt qu'un nombre : toutes les opérations suivantes s'appliqueront aux 200 000 scénarios en une fois." },
+    ],
+  },
+  {
+    titre: "Lire la distribution",
+    contexte: "Quatre nombres, et la note est écrite.",
+    lignes: [
+      { t: "import numpy as np" },
+      { t: "# van contient deja les 200 000 scenarios" },
+      { t: "" },
+      { b:1, long:40, consigne:"Affiche la médiane, arrondie à l'unité.",
+        ok:["print(round(np.median(van)))"],
+        indices:["<code>np.median</code>", "<code>print(round(np.median(van)))</code>"],
+        pourquoi:"386 869 €. On donne la médiane et non la moyenne : elle n'est pas tirée par les scénarios extrêmes." },
+      { b:1, long:58, consigne:"Affiche les percentiles 10 et 90, arrondis.",
+        ok:["print(round(np.percentile(van, 10)), round(np.percentile(van, 90)))"],
+        indices:["<code>np.percentile(tableau, 10)</code>",
+                 "<code>print(round(np.percentile(van, 10)), round(np.percentile(van, 90)))</code>"],
+        pourquoi:"32 269 et 760 557. Huit scénarios sur dix tombent dans cette fourchette : c'est elle qu'on annonce, jamais le chiffre unique." },
+      { b:1, long:48, consigne:"Affiche la probabilité de VAN négative, en pourcentage, à une décimale.",
+        ok:["print(round((van < 0).mean() * 100, 1))"],
+        indices:["<code>(van &lt; 0)</code> donne des booléens ; leur moyenne est la proportion de vrais.",
+                 "<code>print(round((van < 0).mean() * 100, 1))</code>"],
+        pourquoi:"8,1 %. Une chance sur douze de perdre de l'argent, qu'aucun chiffre unique n'aurait laissé deviner." },
+      { b:1, long:52, consigne:"Affiche la perte moyenne, en ne moyennant que les scénarios négatifs.",
+        ok:["print(round(van[van < 0].mean()))"],
+        indices:["Le masque sert à sélectionner avant de moyenner.",
+                 "<code>print(round(van[van < 0].mean()))</code>"],
+        pourquoi:"Le piège est d'écrire <code>van.mean()</code>, qui moyenne tout le monde et donne un nombre positif. On veut la perte quand elle survient." },
+    ],
+  },
+  {
+    titre: "Quelle hypothèse décide ?",
+    contexte: "Une à la fois, toutes choses égales par ailleurs.",
+    lignes: [
+      { t: "# van() accepte croissance, marge et taux, avec des valeurs par defaut" },
+      { t: "" },
+      { b:1, long:32, consigne:"Le cas central, dans <code>centre</code>.",
+        ok:["centre = van()"],
+        indices:["Tous les paramètres ont une valeur par défaut.", "<code>centre = van()</code>"],
+        pourquoi:"" },
+      { b:1, long:64, consigne:"L'effet de la marge : de 0.17 à 0.27, dans <code>bas_m</code> et <code>haut_m</code>.",
+        ok:["bas_m, haut_m = van(marge=0.17), van(marge=0.27)"],
+        indices:["On nomme l'argument pour ne changer que celui-là.",
+                 "<code>bas_m, haut_m = van(marge=0.17), van(marge=0.27)</code>"],
+        pourquoi:"En nommant l'argument, les deux autres gardent leur valeur par défaut : c'est ce qui rend la comparaison honnête." },
+      { b:1, long:64, consigne:"L'effet de la croissance : de 0.04 à 0.12, dans <code>bas_c</code> et <code>haut_c</code>.",
+        ok:["bas_c, haut_c = van(croissance=0.04), van(croissance=0.12)"],
+        indices:["Même forme.",
+                 "<code>bas_c, haut_c = van(croissance=0.04), van(croissance=0.12)</code>"],
+        pourquoi:"" },
+      { b:1, long:62, consigne:"Affiche les deux amplitudes, arrondies.",
+        ok:["print(round(haut_m - bas_m), round(haut_c - bas_c))"],
+        indices:["Haut moins bas, pour chacune.",
+                 "<code>print(round(haut_m - bas_m), round(haut_c - bas_c))</code>"],
+        pourquoi:"540 451 contre 174 642. La marge pèse trois fois plus que la croissance, alors que c'est la croissance qui occupe toute la discussion en réunion." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=5"></script>
+
+<script>
+/* ---------- Le code de l'IA : pas de graine, et la moyenne comme verdict ---------- */
+(function () {
+  const LIGNES = [
+    "import numpy as np",
+    "",
+    "N = 10000",
+    "croissance = np.random.normal(0.08, 0.04, N)",
+    "marge = np.random.normal(0.22, 0.05, N)",
+    "",
+    "van = np.full(N, -800000.0)",
+    "for annee in range(1, 6):",
+    "    ca = 1200000 * (1 + croissance) ** (annee - 1)",
+    "    van = van + ca * marge / 1.09 ** annee",
+    "",
+    'print("VAN moyenne :", round(van.mean()))',
+    '# Le projet est rentable : la VAN moyenne est positive.',
+  ];
+  const BUGS = [3, 12];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - lignes 4 et 13</div>' +
+        "<p><strong>Ligne 4 : pas de graine.</strong> <code>np.random.normal</code> " +
+        "sans <code>default_rng(42)</code> donne un résultat différent à chaque " +
+        "exécution. Tu annonces un chiffre en comité, on te demande de relancer, " +
+        "et le chiffre a bougé. Le modèle est mort.</p>" +
+        "<p><strong>Ligne 13 : la moyenne comme verdict.</strong> " +
+        "« La VAN moyenne est positive donc le projet est rentable » est " +
+        "un raccourci dangereux. Ici, la moyenne est de 392 k€ " +
+        "et pourtant <strong>8 % des scénarios perdent de l'argent</strong>. " +
+        "La moyenne ne dit rien du risque, qui est précisément la question posée.</p>" +
+        "<p style='margin-bottom:0'>Le paradoxe de la séance : <strong>l'IA a fait " +
+        "une simulation Monte Carlo pour en tirer un chiffre unique</strong>. " +
+        "Elle a payé le coût de la méthode sans en récolter le bénéfice.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Les trois lignes manquantes</div>' +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre;margin:8px 0'>" +
+        "alea = np.random.default_rng(42)\n" +
+        "print(np.percentile(van, [10, 50, 90]))\n" +
+        'print("perte :", (van < 0).mean())</p>' +
+        "<p style='margin-bottom:0'>Une pour la reproductibilité, deux pour " +
+        "la fourchette et le risque. <strong>Demande la distribution, " +
+        "pas la conclusion.</strong></p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est juste. Deux questions à te poser : " +
+        "<strong>est-ce que je peux rejouer ce calcul à l'identique demain ?</strong> " +
+        "et <strong>est-ce que le résultat répond vraiment à la question du risque ?</strong></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Monte Carlo en direct, avec un generateur reproductible ---------- */
+(function () {
+  const INV = 800000, CA0 = 1200000, N = 20000;
+
+  /* mulberry32 : petit generateur a graine, pour que la page affiche
+     toujours la meme chose d'une visite a l'autre */
+  function rng(graine) {
+    let a = graine >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  /* Box-Muller : d'un tirage uniforme a un tirage normal */
+  function normales(n, mu, sd, graine) {
+    const u = rng(graine), out = new Float64Array(n);
+    for (let i = 0; i < n; i += 2) {
+      const a = Math.max(u(), 1e-12), b = u();
+      const r = Math.sqrt(-2 * Math.log(a));
+      out[i] = mu + sd * r * Math.cos(2 * Math.PI * b);
+      if (i + 1 < n) out[i + 1] = mu + sd * r * Math.sin(2 * Math.PI * b);
+    }
+    return out;
+  }
+
+  const cv = document.getElementById("cv");
+  const ct = cv.getContext("2d");
+  const eur = (x) => Math.round(x / 1000).toLocaleString("fr-FR") + " k€";
+
+  function maj() {
+    const sg = parseFloat(document.getElementById("s-sg").value) / 100;
+    const sm = parseFloat(document.getElementById("s-sm").value) / 100;
+    const taux = parseFloat(document.getElementById("s-t").value) / 100;
+    document.getElementById("v-sg").textContent =
+      "± " + (sg * 100).toFixed(1).replace(".", ",") + " pts";
+    document.getElementById("v-sm").textContent =
+      "± " + (sm * 100).toFixed(1).replace(".", ",") + " pts";
+    document.getElementById("v-t").textContent =
+      (taux * 100).toFixed(1).replace(".", ",") + " %";
+
+    const g = normales(N, 0.08, sg, 42);
+    const m = normales(N, 0.22, sm, 7);
+    const van = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      let s = -INV;
+      for (let a = 1; a <= 5; a++) {
+        s += CA0 * Math.pow(1 + g[i], a - 1) * m[i] / Math.pow(1 + taux, a);
+      }
+      van[i] = s;
+    }
+
+    const tri = Array.from(van).sort((a, b) => a - b);
+    const q = (p) => tri[Math.min(N - 1, Math.floor(p * N))];
+    const med = q(0.5), p10 = q(0.1), p90 = q(0.9);
+    let neg = 0;
+    for (let i = 0; i < N; i++) if (van[i] < 0) neg++;
+    const pPerte = (neg / N) * 100;
+
+    document.getElementById("k-perte").textContent =
+      pPerte.toFixed(1).replace(".", ",") + " %";
+    document.getElementById("r-perte").className =
+      "risque " + (pPerte < 5 ? "ok" : "ko");
+    document.getElementById("k-med").textContent = eur(med);
+    document.getElementById("k-four").textContent = eur(p10) + " → " + eur(p90);
+
+    /* --- histogramme --- */
+    const lo = Math.min(tri[0], -200000), hi = Math.max(tri[N - 1], 900000);
+    const nb = 56, seaux = new Array(nb).fill(0);
+    for (let i = 0; i < N; i++) {
+      let k = Math.floor(((van[i] - lo) / (hi - lo)) * nb);
+      k = Math.max(0, Math.min(nb - 1, k));
+      seaux[k]++;
+    }
+    const pic = Math.max.apply(null, seaux) || 1;
+    const w = cv.width, h = cv.height, pad = 34;
+    ct.clearRect(0, 0, w, h);
+    const bw = (w - pad * 2) / nb;
+    seaux.forEach((v, k) => {
+      const centreK = lo + ((k + 0.5) / nb) * (hi - lo);
+      const bh = (v / pic) * (h - pad - 26);
+      ct.fillStyle = centreK < 0 ? "#c0392b" : "#f07818";
+      ct.fillRect(pad + k * bw, h - 26 - bh, bw - 1, bh);
+    });
+    const px = (val) => pad + ((val - lo) / (hi - lo)) * (w - pad * 2);
+    // le zero
+    ct.strokeStyle = "#2b2722"; ct.lineWidth = 1.4;
+    ct.beginPath(); ct.moveTo(px(0), 6); ct.lineTo(px(0), h - 26); ct.stroke();
+    ct.fillStyle = "#2b2722"; ct.font = "12px system-ui, sans-serif";
+    ct.textAlign = "center"; ct.fillText("0", px(0), h - 10);
+    // la mediane
+    ct.strokeStyle = "#0e8a55"; ct.setLineDash([5, 4]);
+    ct.beginPath(); ct.moveTo(px(med), 6); ct.lineTo(px(med), h - 26); ct.stroke();
+    ct.setLineDash([]);
+    ct.fillStyle = "#0e8a55";
+    ct.fillText("médiane " + eur(med), px(med), h - 10);
+
+    document.getElementById("cmt").innerHTML = sg === 0 && sm === 0
+      ? "Sans incertitude, il ne reste qu'une barre : c'est le tableur à trois scénarios."
+      : "20 000 tirages, graine fixe : cette page affiche le même résultat à chaque visite. " +
+        "<strong>La zone rouge est la part des scénarios qui perdent de l'argent.</strong> " +
+        "Les valeurs diffèrent de quelques dixièmes de celles du code Python, " +
+        "qui en fait 200 000 : c'est exactement l'erreur de simulation du défi.";
+  }
+
+  ["s-sg", "s-sm", "s-t"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", maj));
+  maj();
+})();
+</script>
+
+</body>
+</html>
