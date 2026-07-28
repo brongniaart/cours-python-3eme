@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 2 - Décider</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>
+  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
+  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
+  .etape-num { background: #1f6feb; }
+  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
+  .box.prof .box-title { color: #2b4b7e; }
+
+  .dossier { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 860px) { .dossier { grid-template-columns: 1fr; } }
+
+  .arbre-l { padding: 11px 15px; border-radius: 10px; margin-bottom: 7px;
+    font-family: var(--mono); font-size: 14px; white-space: pre-wrap;
+    background: rgba(0,0,0,.03); color: #8a8f99; border-left: 3px solid transparent; }
+  .arbre-l.teste { background: #f4f0e8; color: var(--ink-soft); }
+  .arbre-l.gagne { background: #e8effb; color: #14315f; border-left-color: #1f6feb; font-weight: 650; }
+
+  .verdict { border-radius: 12px; padding: 20px 22px; margin-top: 16px; border: 2px solid; }
+  .verdict .t { font-size: 26px; font-weight: 780; letter-spacing: -.02em; }
+  .verdict .p { font-size: 15px; margin-top: 5px; }
+  .verdict.ok { background: var(--green-soft); border-color: #bfe3d3; }
+  .verdict.ok .t { color: var(--green); }
+  .verdict.mid { background: #fdf0e2; border-color: #f7d8b8; }
+  .verdict.mid .t { color: #b8560c; }
+  .verdict.no { background: var(--red-soft); border-color: #f5c9c4; }
+  .verdict.no .t { color: var(--red); }
+
+  .indics { display: flex; gap: 26px; flex-wrap: wrap; margin-bottom: 14px; }
+  .indics div span { font-size: 12px; font-weight: 750; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--ink-soft); display: block; }
+  .indics div b { font-size: 24px; font-weight: 780; letter-spacing: -.02em; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 2</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#viz">👁</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 2 · 1 h 30</div>
+    <h1>Décider</h1>
+    <p class="lede">Quand une banque refuse un crédit, personne n'a pris la décision :
+    <strong>une grille de conditions l'a prise</strong>. Aujourd'hui tu écris cette grille.
+    Et tu découvres qu'en déplaçant un seuil de deux points, tu changes le sort
+    de milliers de dossiers.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Écrire une grille de scoring qui accorde, refuse ou met en étude,
+    et qui <strong>justifie sa décision</strong>. C'est la brique de base de tout
+    modèle de risque, de toute règle d'éligibilité, de tout arbitrage automatisé.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Si… alors</h2>
+      <div class="etape-meta">15 minutes · if, else, et le décalage qui compte</div></div></div>
+
+    <p>Le critère roi du crédit immobilier, c'est le <strong>taux d'endettement</strong> :
+    la part de tes revenus qui part en mensualité. En France, le seuil réglementaire
+    est de 35 %.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+revenus = 3200
+mensualite = 1050
+
+endettement = mensualite / revenus * 100
+
+print(f"Endettement : {round(endettement, 1)} %")
+
+if endettement <= 35:
+    print("Dossier recevable")
+else:
+    print("Dossier refuse : endettement trop eleve")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Deux choses obligatoires en Python : les <strong>deux points</strong> en fin de ligne,
+    et le <strong>décalage</strong> de ce qui suit. Ce n'est pas de la mise en forme :
+    c'est le décalage qui dit ce qui appartient au <code>if</code>.</p>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ L'essai à faire tout de suite</div>
+      <p>Passe la mensualité à <code>1150</code> et relance. Le dossier bascule.
+      Puis reviens à <code>1050</code> et passe les revenus à <code>2900</code> :
+      il bascule aussi. <strong>Deux chemins pour le même refus</strong> — c'est
+      déjà une information utile pour l'emprunteur.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Comparer, et l'escalier de décisions</h2>
+      <div class="etape-meta">20 minutes · opérateurs, elif</div></div></div>
+
+    <p>Une banque ne dit pas seulement oui ou non. Elle dit oui, non,
+    ou « on regarde de plus près ». D'où <code>elif</code>, qui veut dire
+    « sinon si ».</p>
+
+    <table style="border-collapse:collapse;width:100%;font-size:15.5px;margin:16px 0">
+      <thead><tr style="text-align:left;border-bottom:2px solid var(--line)">
+        <th style="padding:8px">Signe</th><th>Se lit</th><th style="padding:8px">Signe</th><th>Se lit</th></tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>==</code></td><td>est égal à</td><td style="padding:8px"><code>!=</code></td><td>est différent de</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><code>&lt;</code></td><td>strictement inférieur</td><td style="padding:8px"><code>&lt;=</code></td><td>inférieur ou égal</td></tr>
+        <tr><td style="padding:8px"><code>&gt;</code></td><td>strictement supérieur</td><td style="padding:8px"><code>&gt;=</code></td><td>supérieur ou égal</td></tr>
+      </tbody>
+    </table>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+endettement = 38
+
+if endettement <= 33:
+    decision = "Accorde"
+elif endettement <= 35:
+    decision = "Accorde sous conditions"
+elif endettement <= 40:
+    decision = "Etude complementaire"
+else:
+    decision = "Refuse"
+
+print(decision)
+
+# le piege le plus classique de tout le langage
+print(endettement == 38)
+print(endettement != 38)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Un signe égal, ou deux ?</div>
+      <p><code>=</code> range une valeur. <code>==</code> pose une question.
+      Écris <code>if endettement = 38:</code> et lance : Python refuse de démarrer.</p>
+      <p>Ici il te protège. Dans d'autres langages, la même faute compile
+      silencieusement et écrase ta variable — c'est une des erreurs les plus coûteuses
+      de l'histoire du logiciel.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 L'ordre de l'escalier n'est pas décoratif</div>
+      <p>Python teste <strong>de haut en bas</strong> et <strong>s'arrête au premier
+      qui est vrai</strong>. Un dossier à 30 % remplit les quatre conditions ci-dessus —
+      il n'obtient pourtant qu'une seule réponse, celle du premier <code>elif</code> atteint.</p>
+      <p>Conséquence directe : <strong>on écrit toujours du plus strict au plus large</strong>.
+      Inverse l'ordre, et tout le monde tombe dans la case la plus permissive.
+      Retiens ça, on y revient à la fin de la séance.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Le dossier qui bascule</h2>
+      <div class="etape-meta">bouge les curseurs, regarde la règle s'appliquer</div></div></div>
+
+    <p>Voici une grille réelle à quatre critères. Fais varier le dossier et regarde
+    quelle condition tranche. <strong>Cherche le dossier qui passe de justesse,
+    puis regarde ce qu'un seuil à 33 % au lieu de 35 % lui ferait.</strong></p>
+
+    <div class="widget">
+      <div class="dossier">
+        <div>
+          <div class="slider-row">
+            <label>Revenus nets mensuels <span class="val" id="v-rev">3 200 €</span></label>
+            <input type="range" id="s-rev" min="1500" max="8000" step="100" value="3200">
+          </div>
+          <div class="slider-row">
+            <label>Mensualité du prêt <span class="val" id="v-men">1 050 €</span></label>
+            <input type="range" id="s-men" min="300" max="3000" step="50" value="1050">
+          </div>
+          <div class="slider-row">
+            <label>Apport personnel <span class="val" id="v-app">12 %</span></label>
+            <input type="range" id="s-app" min="0" max="35" value="12">
+          </div>
+          <div class="slider-row">
+            <label>Ancienneté professionnelle <span class="val" id="v-anc">4 ans</span></label>
+            <input type="range" id="s-anc" min="0" max="20" value="4">
+          </div>
+        </div>
+        <div>
+          <div class="indics">
+            <div><span>Endettement</span><b id="i-end"></b></div>
+            <div><span>Reste à vivre</span><b id="i-rav"></b></div>
+          </div>
+          <div id="arbre"></div>
+          <div class="verdict" id="verdict">
+            <div class="t" id="v-t"></div>
+            <div class="p" id="v-p"></div>
+          </div>
+          <p class="hint" id="v-sensi" style="margin-top:14px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Ce petit escalier gouverne bien plus que le crédit. Une <strong>compagnie
+      d'assurance</strong> segmente ses tarifs comme ça. Un <strong>fonds</strong>
+      filtre ses candidats à l'investissement comme ça. Un <strong>État</strong>
+      définit l'éligibilité à une aide comme ça.</p>
+      <p>Et le débat public porte presque toujours sur <strong>où placer le seuil</strong>,
+      jamais sur la structure. Tu viens de voir pourquoi : deux points de seuil
+      déplacent des populations entières d'une case à l'autre.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Combiner plusieurs critères</h2>
+      <div class="etape-meta">15 minutes · and, or, not</div></div></div>
+
+    <p><code>and</code> : les deux conditions doivent être vraies.
+    <code>or</code> : une seule suffit. <code>not</code> : inverse.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+endettement = 32
+reste_a_vivre = 2150
+anciennete = 4
+
+if endettement <= 35 and reste_a_vivre >= 1200:
+    print("Criteres financiers : OK")
+
+if anciennete < 2 or endettement > 40:
+    print("Dossier a risque")
+else:
+    print("Profil standard")
+
+# une condition peut se ranger dans une variable
+solide = endettement <= 30 and anciennete >= 5
+print(solide)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La ligne à ne pas survoler</div>
+      <p><code>solide = endettement &lt;= 30 and anciennete &gt;= 5</code> range
+      un <strong>vrai ou faux</strong> dans une variable. Ça paraît anodin, c'est
+      pourtant ce qui permet d'écrire des grilles lisibles :
+      <code>if solide and apport_suffisant:</code> se relit en français.</p>
+      <p>Un modèle de risque qui se relit à voix haute est un modèle qu'on peut
+      défendre devant un comité. C'est un vrai critère professionnel.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : ta grille de scoring</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Le programme demande les quatre éléments d'un dossier, calcule les deux
+    indicateurs, et rend un verdict <strong>motivé</strong> : pas seulement
+    « refusé », mais « refusé parce que ».</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 La grille à implémenter</div>
+      <ol style="margin-bottom:0">
+        <li>Endettement au-dessus de <strong>35 %</strong> → refus</li>
+        <li>Reste à vivre sous <strong>1 200 €</strong> → refus</li>
+        <li>Ancienneté sous <strong>2 ans</strong> → étude complémentaire</li>
+        <li>Apport sous <strong>10 %</strong> → étude complémentaire</li>
+        <li>Sinon → accord</li>
+      </ol>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+# 1. Les quatre saisies (attention aux conversions)
+
+
+# 2. Les deux indicateurs
+
+
+# 3. L'escalier de decision, du plus strict au plus large
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. La question à poser s'il bloque :
+      <em>« dans quel ordre une banque teste-t-elle ses critères, et pourquoi
+      cet ordre-là ? »</em></p>
+      <p>S'il finit vite : « fais en sorte que le programme affiche <strong>tous</strong>
+      les motifs de refus, pas seulement le premier ». Il découvrira que
+      <code>elif</code> ne convient plus, et qu'il lui faut des <code>if</code>
+      indépendants et une liste. C'est exactement la séance 4.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : le revenu qui fait basculer</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Mensualité fixée à <strong>1 200 €</strong>. À partir de quel revenu mensuel
+    le dossier passe-t-il sous les 35 % d'endettement ? Trouve-le
+    <strong>par le calcul</strong>, pas en tâtonnant.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Pour aller plus loin</div>
+      <p>Calcule le <strong>coût du seuil</strong> : combien de revenu mensuel
+      supplémentaire faut-il si la banque passe son seuil de 35 % à 33 % ?</p>
+      <p>Ce chiffre est le cœur du débat sur la réglementation du crédit :
+      deux points de seuil se traduisent en euros de salaire exigés,
+      et donc en ménages exclus. Tu viens de le chiffrer en trois lignes.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <p>Tu viens d'écrire cette grille à la main. Voici le prompt que tu aurais
+    pu donner, et ce que l'IA a répondu.</p>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Écris-moi une grille de scoring de crédit en Python. Trois issues : accordé si le taux d'endettement est sous 33 %, étude complémentaire entre 33 et 40 %, refusé au-delà. Affiche la décision.</p>
+      <p style="margin-top:12px">Le code tourne. Il ne plante jamais.
+      <strong>Et pourtant, personne ne sera jamais accepté.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi cette erreur est dangereuse en vrai</div>
+      <p>Un test qui ne s'exécute jamais ne produit aucune alerte. Le programme
+      tourne, sort des décisions plausibles, et <strong>tout le monde tombe dans
+      la même case</strong>. Sur mille dossiers traités, personne ne s'en aperçoit
+      avant que quelqu'un ne demande pourquoi le taux d'acceptation est à zéro.</p>
+      <p>Le réflexe à prendre : <strong>tester une grille avec un cas de chaque
+      catégorie</strong>. Un dossier à 25 %, un à 36 %, un à 50 %. Si l'un des
+      trois ne sort jamais, il y a un problème d'ordre.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+    <p class="hint">Le décalage à l'intérieur des conditions est déjà mis pour toi.</p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Une <strong>grille d'éligibilité à une bourse</strong> : revenu du foyer,
+      nombre d'enfants à charge, distance du lieu d'études. Trois montants possibles
+      et un refus. À toi de fixer les seuils et de les justifier en deux lignes.</p>
+      <p class="hint" style="margin-top:8px">La partie difficile n'est pas le code :
+      c'est de décider où placer les seuils, et d'assumer qui tombe de chaque côté.
+      C'est exactement le métier.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-01.html" style="color:var(--orange);font-weight:650">← Séance 1</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-03.html" style="color:var(--orange);font-weight:650">Séance 3 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=2"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Le premier verdict",
+    contexte: "Un seul critère, deux issues. La brique de base de toute règle.",
+    lignes: [
+      { t: "revenus = 3200" },
+      { t: "mensualite = 1150" },
+      { t: "" },
+      { b:1, long:34, consigne:"Calcule le taux d'endettement <strong>en pourcentage</strong> et range-le dans <code>endettement</code>.",
+        ok:["endettement = mensualite / revenus * 100"],
+        indices:["La part des revenus qui part en mensualité, multipliée par 100.",
+                 "<code>endettement = mensualite / revenus * 100</code>"],
+        pourquoi:"On stocke en pourcentage parce que c'est ainsi que le seuil réglementaire est exprimé. Rester dans l'unité du métier évite les erreurs." },
+      { b:1, long:22, consigne:"Si l'endettement est <strong>inférieur ou égal</strong> à 35…",
+        ok:["if endettement <= 35:"],
+        indices:["« Inférieur ou égal » s'écrit <code>&lt;=</code>, et n'oublie pas les deux points.",
+                 "<code>if endettement &lt;= 35:</code>"],
+        pourquoi:"<code>&lt;=</code> et non <code>&lt;</code> : à 35,00 % exactement, le dossier passe. Sur un seuil réglementaire, cette nuance a des conséquences réelles." },
+      { b:1, indent:4, long:26, consigne:"Affiche <code>Dossier recevable</code>.",
+        ok:['print("Dossier recevable")'],
+        indices:["Un print décalé dans le if.",'<code>print("Dossier recevable")</code>'],
+        pourquoi:"" },
+      { b:1, long:6, consigne:"Sinon.",
+        ok:["else:"],
+        indices:["Un mot, deux points, aligné avec le <code>if</code>.","<code>else:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:34, consigne:"Affiche <code>Refus : endettement de 35.9 %</code>, arrondi à une décimale.",
+        ok:['print(f"Refus : endettement de {round(endettement, 1)} %")'],
+        indices:["Une f-string avec <code>round(endettement, 1)</code>.",
+                 '<code>print(f"Refus : endettement de {round(endettement, 1)} %")</code>'],
+        pourquoi:"Un refus sans son motif chiffré est incontestable et donc inacceptable. Toujours rendre la décision vérifiable." },
+    ],
+  },
+  {
+    titre: "L'escalier, dans le bon sens",
+    contexte: "Quatre issues. L'ordre des conditions décide de tout.",
+    lignes: [
+      { t: "endettement = 37" },
+      { t: "" },
+      { b:1, long:22, consigne:"Premier étage, le plus strict : endettement <strong>au maximum 33</strong>.",
+        ok:["if endettement <= 33:"],
+        indices:["On commence toujours par la condition la plus exigeante.",
+                 "<code>if endettement &lt;= 33:</code>"],
+        pourquoi:"Si on commençait par 40, tout le monde tomberait dans cette case et les suivantes ne serviraient à rien." },
+      { b:1, indent:4, long:24, consigne:"Range le texte <code>Accorde</code> dans <code>decision</code>.",
+        ok:['decision = "Accorde"'],
+        indices:["Une affectation, décalée dans le if.",'<code>decision = "Accorde"</code>'],
+        pourquoi:"On range la décision plutôt que de l'afficher : on pourra la réutiliser, la compter, l'exporter." },
+      { b:1, long:26, consigne:"Deuxième étage : <strong>sinon si</strong> l'endettement est au maximum 35.",
+        ok:["elif endettement <= 35:"],
+        indices:["« Sinon si » s'écrit en un mot : <code>elif</code>",
+                 "<code>elif endettement &lt;= 35:</code>"],
+        pourquoi:"Ce test n'est atteint que si le précédent était faux. Donc il signifie implicitement « entre 33 et 35 »." },
+      { t: '    decision = "Accorde sous conditions"' },
+      { b:1, long:26, consigne:"Troisième étage : sinon si au maximum 40.",
+        ok:["elif endettement <= 40:"],
+        indices:["Même forme, seuil plus large.","<code>elif endettement &lt;= 40:</code>"],
+        pourquoi:"" },
+      { t: '    decision = "Etude complementaire"' },
+      { b:1, long:6, consigne:"Tous les autres cas.",
+        ok:["else:"],
+        indices:["Sans condition.","<code>else:</code>"],
+        pourquoi:"Sans <code>else</code>, un dossier à 60 % ne recevrait aucune décision et la variable n'existerait pas. Toujours fermer l'escalier." },
+      { t: '    decision = "Refuse"' },
+      { t: "" },
+      { b:1, long:30, consigne:"Affiche <code>Endettement 37 % : Etude complementaire</code>.",
+        ok:['print(f"Endettement {endettement} % : {decision}")'],
+        indices:["Deux accolades dans la même phrase.",
+                 '<code>print(f"Endettement {endettement} % : {decision}")</code>'],
+        pourquoi:"La décision et son motif chiffré sur la même ligne : c'est le format minimal d'une décision défendable." },
+    ],
+  },
+  {
+    titre: "Croiser deux critères",
+    contexte: "Une banque ne regarde jamais un seul indicateur.",
+    lignes: [
+      { t: "revenus = 4100" },
+      { t: "mensualite = 1300" },
+      { t: "anciennete = 1" },
+      { t: "" },
+      { t: "endettement = mensualite / revenus * 100" },
+      { b:1, long:32, consigne:"Calcule le <code>reste_a_vivre</code> : ce qui reste chaque mois une fois la mensualité payée.",
+        ok:["reste_a_vivre = revenus - mensualite"],
+        indices:["Les revenus moins la mensualité.","<code>reste_a_vivre = revenus - mensualite</code>"],
+        pourquoi:"Le reste à vivre corrige le taux d'endettement : 35 % de 8 000 € n'a rien à voir avec 35 % de 1 800 €." },
+      { t: "" },
+      { b:1, long:44, consigne:"Si l'endettement est au maximum 35 <strong>et</strong> le reste à vivre au moins 1200…",
+        ok:["if endettement <= 35 and reste_a_vivre >= 1200:"],
+        indices:["Deux conditions reliées par <code>and</code>.",
+                 "<code>if endettement &lt;= 35 and reste_a_vivre &gt;= 1200:</code>"],
+        pourquoi:"Avec <code>and</code>, les deux doivent être vraies. Un seul critère satisfait ne suffit pas." },
+      { b:1, indent:4, long:30, consigne:"Affiche <code>Criteres financiers OK</code>.",
+        ok:['print("Criteres financiers OK")'],
+        indices:["Un print décalé.",'<code>print("Criteres financiers OK")</code>'],
+        pourquoi:"" },
+      { t: "else:" },
+      { t: '    print("Criteres financiers insuffisants")' },
+      { t: "" },
+      { b:1, long:26, consigne:"Range dans <code>junior</code> le fait que l'ancienneté soit <strong>strictement inférieure</strong> à 2.",
+        ok:["junior = anciennete < 2"],
+        indices:["Une comparaison peut se ranger dans une variable, sans <code>if</code>.",
+                 "<code>junior = anciennete &lt; 2</code>"],
+        pourquoi:"<code>junior</code> vaut maintenant vrai ou faux. On peut l'utiliser tel quel dans un <code>if</code>, ce qui rend la grille lisible à voix haute." },
+      { b:1, long:18, consigne:"Affiche le contenu de <code>junior</code>.",
+        ok:["print(junior)"],
+        indices:["Un print tout simple.","<code>print(junior)</code>"],
+        pourquoi:"<code>True</code> avec une majuscule : c'est un troisième type de valeur, après les nombres et le texte." },
+    ],
+  },
+  {
+    titre: "La grille complète",
+    contexte: "Tout ce que tu as vu, dans une décision motivée.",
+    lignes: [
+      { b:1, long:38, consigne:"Demande <code>Revenus nets mensuels ?</code> et convertis en nombre à virgule.",
+        ok:['revenus = float(input("Revenus nets mensuels ? "))','revenus = float(input("Revenus nets mensuels ?"))'],
+        indices:["<code>float(input(...))</code>, comme en séance 1.",
+                 '<code>revenus = float(input("Revenus nets mensuels ? "))</code>'],
+        pourquoi:"" },
+      { b:1, long:34, consigne:"Demande <code>Mensualite du pret ?</code> et convertis de même.",
+        ok:['mensualite = float(input("Mensualite du pret ? "))','mensualite = float(input("Mensualite du pret ?"))'],
+        indices:["Même forme.",'<code>mensualite = float(input("Mensualite du pret ? "))</code>'],
+        pourquoi:"" },
+      { t: "" },
+      { t: "endettement = mensualite / revenus * 100" },
+      { t: "reste_a_vivre = revenus - mensualite" },
+      { t: "" },
+      { b:1, long:24, consigne:"Premier motif de refus : endettement <strong>strictement supérieur</strong> à 35.",
+        ok:["if endettement > 35:"],
+        indices:["« Strictement supérieur » s'écrit <code>&gt;</code>","<code>if endettement &gt; 35:</code>"],
+        pourquoi:"On teste ici le refus plutôt que l'accord : c'est le motif qu'il faudra afficher." },
+      { b:1, indent:4, long:44, consigne:"Range le motif dans <code>verdict</code> : <code>Refus : endettement de 37.5 %</code>, arrondi à une décimale.",
+        ok:['verdict = f"Refus : endettement de {round(endettement, 1)} %"'],
+        indices:["Une f-string rangée dans une variable, pas affichée.",
+                 '<code>verdict = f"Refus : endettement de {round(endettement, 1)} %"</code>'],
+        pourquoi:"Une f-string est une valeur comme une autre : on peut la stocker et ne l'afficher qu'à la fin." },
+      { b:1, long:34, consigne:"Sinon si le reste à vivre est <strong>strictement inférieur</strong> à 1200…",
+        ok:["elif reste_a_vivre < 1200:"],
+        indices:["<code>elif</code> et <code>&lt;</code>","<code>elif reste_a_vivre &lt; 1200:</code>"],
+        pourquoi:"" },
+      { t: '    verdict = f"Refus : reste a vivre de {round(reste_a_vivre)} EUR"' },
+      { t: "else:" },
+      { b:1, indent:4, long:26, consigne:"Range <code>Accord</code> dans <code>verdict</code>.",
+        ok:['verdict = "Accord"'],
+        indices:["Une affectation simple.",'<code>verdict = "Accord"</code>'],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:16, consigne:"Affiche le verdict.",
+        ok:["print(verdict)"],
+        indices:["Un print de la variable.","<code>print(verdict)</code>"],
+        pourquoi:"Toute la grille converge vers une seule ligne d'affichage. C'est la structure d'un vrai moteur de décision : on calcule, puis on rend." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=2"></script>
+
+<script>
+/* ---------- Le code de l'IA : un elif inatteignable ---------- */
+(function () {
+  const LIGNES = [
+    "endettement = mensualite / revenus * 100",
+    "",
+    "if endettement < 40:",
+    '    decision = "Etude complementaire"',
+    "elif endettement < 33:",
+    '    decision = "Accorde"',
+    "else:",
+    '    decision = "Refuse"',
+    "",
+    "print(decision)",
+  ];
+  const BUGS = [4];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 5</div>' +
+        "<p>Ce <code>elif</code> n'est <strong>jamais atteint</strong>. " +
+        "Un dossier à 25 % est déjà inférieur à 40, donc il tombe dans le premier test " +
+        "et reçoit « Étude complémentaire ».</p>" +
+        "<p><strong>Personne n'obtient jamais « Accordé ».</strong> Le programme tourne, " +
+        "affiche des décisions crédibles, et le taux d'acceptation est de zéro.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong> écrire l'escalier " +
+        "du plus strict au plus large.</p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        "if endettement < 33:\n" +
+        '    decision = "Accorde"\n' +
+        "elif endettement < 40:\n" +
+        '    decision = "Etude complementaire"\n' +
+        "else:\n" +
+        '    decision = "Refuse"</p>' +
+        "<p style='margin-bottom:0'>C'est exactement la règle vue à l'étape 2 : " +
+        "Python s'arrête au premier test vrai, donc l'ordre <em>est</em> la logique.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Prends un dossier à " +
+        "<strong>25 % d'endettement</strong> et suis le programme ligne par ligne : " +
+        "<em>quelle décision ressort, et laquelle aurait dû ressortir ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Le dossier qui bascule ---------- */
+(function () {
+  const eur = (n) => Math.round(n).toLocaleString("fr-FR") + " €";
+
+  const REGLES = [
+    { txt: "if endettement > 35:", res: "Refus", motif: "taux d'endettement au-dessus du seuil", cls: "no",
+      test: (d) => d.end > 35 },
+    { txt: "elif reste_a_vivre < 1200:", res: "Refus", motif: "reste à vivre insuffisant", cls: "no",
+      test: (d) => d.rav < 1200 },
+    { txt: "elif anciennete < 2:", res: "Étude complémentaire", motif: "ancienneté professionnelle trop courte", cls: "mid",
+      test: (d) => d.anc < 2 },
+    { txt: "elif apport < 10:", res: "Étude complémentaire", motif: "apport personnel sous les 10 %", cls: "mid",
+      test: (d) => d.app < 10 },
+    { txt: "else:", res: "Accord", motif: "tous les critères sont satisfaits", cls: "ok",
+      test: () => true },
+  ];
+
+  function verdictPour(d) {
+    for (let i = 0; i < REGLES.length; i++) if (REGLES[i].test(d)) return i;
+    return REGLES.length - 1;
+  }
+
+  function maj() {
+    const rev = +document.getElementById("s-rev").value;
+    const men = +document.getElementById("s-men").value;
+    const app = +document.getElementById("s-app").value;
+    const anc = +document.getElementById("s-anc").value;
+
+    document.getElementById("v-rev").textContent = eur(rev);
+    document.getElementById("v-men").textContent = eur(men);
+    document.getElementById("v-app").textContent = app + " %";
+    document.getElementById("v-anc").textContent = anc + (anc > 1 ? " ans" : " an");
+
+    const d = { end: (men / rev) * 100, rav: rev - men, app: app, anc: anc };
+
+    document.getElementById("i-end").textContent = d.end.toFixed(1).replace(".", ",") + " %";
+    document.getElementById("i-end").style.color = d.end > 35 ? "var(--red)" : "#1f6feb";
+    document.getElementById("i-rav").textContent = eur(d.rav);
+    document.getElementById("i-rav").style.color = d.rav < 1200 ? "var(--red)" : "#1f6feb";
+
+    const gagnant = verdictPour(d);
+    document.getElementById("arbre").innerHTML = REGLES.map((r, i) => {
+      let cls = "arbre-l";
+      if (i < gagnant) cls += " teste";
+      if (i === gagnant) cls += " gagne";
+      return '<div class="' + cls + '">' + r.txt.replace(/</g, "&lt;") + "</div>";
+    }).join("");
+
+    const g = REGLES[gagnant];
+    document.getElementById("verdict").className = "verdict " + g.cls;
+    document.getElementById("v-t").textContent = g.res;
+    document.getElementById("v-p").textContent = g.motif;
+
+    // sensibilité : et si le seuil passait de 35 à 33 ?
+    const alt = { end: d.end, rav: d.rav, app: d.app, anc: d.anc };
+    const gagnantAlt = (function () {
+      if (alt.end > 33) return 0;
+      if (alt.rav < 1200) return 1;
+      if (alt.anc < 2) return 2;
+      if (alt.app < 10) return 3;
+      return 4;
+    })();
+    const s = document.getElementById("v-sensi");
+    if (gagnantAlt !== gagnant) {
+      const besoin = (men / 0.33) - rev;
+      s.innerHTML = "🎯 <strong style='color:var(--red)'>Avec un seuil à 33 % au lieu de 35 %, " +
+        "ce dossier passerait à « " + REGLES[gagnantAlt].res + " ».</strong> " +
+        "Il faudrait " + eur(besoin) + " de revenu mensuel en plus pour repasser.";
+    } else {
+      s.textContent = "Un seuil à 33 % ne changerait rien pour ce dossier. " +
+        "Fais glisser la mensualité vers le haut pour trouver la zone qui bascule.";
+    }
+  }
+
+  ["s-rev", "s-men", "s-app", "s-anc"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", maj));
+  maj();
+})();
+</script>
+
+</body>
+</html>

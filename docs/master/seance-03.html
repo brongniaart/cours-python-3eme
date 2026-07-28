@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 3 - Répéter</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>
+  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
+  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
+  .etape-num { background: #1f6feb; }
+  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
+  .box.prof .box-title { color: #2b4b7e; }
+
+  .pret { display: grid; grid-template-columns: 1fr 300px; gap: 28px; align-items: start; }
+  @media (max-width: 900px) { .pret { grid-template-columns: 1fr; } }
+  .kpi { border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px;
+    background: #fff; margin-bottom: 12px; }
+  .kpi span { font-size: 11.5px; font-weight: 750; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-soft); display: block; }
+  .kpi b { font-size: 27px; font-weight: 780; letter-spacing: -.02em; }
+  .kpi.cout { background: #fdf0e2; border-color: #f7d8b8; }
+  .kpi.cout b { color: #b8560c; }
+  .legende { display: flex; gap: 20px; font-size: 13.5px; color: var(--ink-soft); margin-top: 10px; }
+  .legende i { width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+    margin-right: 6px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 3</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#viz">👁</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 3 · 1 h 30</div>
+    <h1>Répéter</h1>
+    <p class="lede">Tu empruntes 200 000 €. Selon le taux et la durée, tu en rembourses
+    entre 240 000 et 380 000. <strong>L'écart, c'est le prix d'un appartement</strong> —
+    et il tient entièrement dans deux chiffres que personne ne regarde.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Écrire un tableau d'amortissement complet : mois par mois, ce qui part
+    en intérêts et ce qui réduit vraiment ta dette. C'est le calcul que ta banque
+    ne t'envoie qu'en annexe, et celui qui répond à « faut-il rembourser par anticipation ».</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Répéter un nombre connu de fois</h2>
+      <div class="etape-meta">15 minutes · for et range</div></div></div>
+
+    <p>En séance 1, tu avais écrit trois lignes presque identiques pour trois années.
+    Pour 240 mensualités, ce n'est plus tenable. <code>for</code> répète un bloc,
+    et <code>range</code> fournit les numéros.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+for annee in range(5):
+    print(annee)
+
+print("---")
+
+for annee in range(1, 6):
+    capital = 10000 * (1 + 0.07) ** annee
+    print(f"Annee {annee} : {round(capital)} EUR")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Le décalage qui surprend tout le monde</div>
+      <p><code>range(5)</code> donne <strong>0, 1, 2, 3, 4</strong>. Cinq valeurs,
+      mais qui s'arrêtent <em>avant</em> 5. <code>range(1, 6)</code> donne 1 à 5 :
+      la borne de départ est incluse, celle d'arrivée jamais.</p>
+      <p>C'est déroutant deux jours, puis ça devient un réflexe. Et ça a une raison :
+      <code>range(len(donnees))</code> donne exactement les bons indices,
+      sans jamais avoir à retirer 1 à la main.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Accumuler</h2>
+      <div class="etape-meta">15 minutes · le compteur qui grossit</div></div></div>
+
+    <p>La boucle sert rarement à afficher. Elle sert à <strong>accumuler</strong> :
+    un total, un capital restant, un compteur. C'est le mécanisme central de tout
+    modèle financier.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+total_verse = 0
+capital = 0
+versement = 200
+taux_mensuel = 0.004
+
+for mois in range(1, 13):
+    capital = capital * (1 + taux_mensuel) + versement
+    total_verse = total_verse + versement
+
+print(f"Verse : {total_verse} EUR")
+print(f"Valeur : {round(capital)} EUR")
+print(f"Gagne : {round(capital - total_verse)} EUR")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La ligne à ne pas survoler</div>
+      <p><code>capital = capital * (1 + taux_mensuel) + versement</code> est absurde
+      en mathématiques et parfaitement normale en programmation. Elle se lit
+      <strong>de droite à gauche</strong> : prends l'ancienne valeur, fais-la fructifier,
+      ajoute le versement, et remets le tout dans la boîte.</p>
+      <p>Si le contresens « <code>=</code> veut dire égal » traîne encore,
+      c'est ici qu'il faut le tuer. Toute la modélisation repose sur cette ligne.</p>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 À provoquer</div>
+      <p>Déplace <code>total_verse = 0</code> <strong>à l'intérieur</strong> de la boucle,
+      décalé de quatre espaces. Relance : le total tombe à 200.</p>
+      <p>La variable est remise à zéro à chaque tour. C'est l'erreur d'accumulation
+      la plus fréquente, et elle ne produit aucun message : juste un chiffre faux
+      et crédible.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Où part vraiment ton argent</h2>
+      <div class="etape-meta">chaque barre est une année de remboursement</div></div></div>
+
+    <p>La partie bleue réduit ta dette. La partie orange part en intérêts,
+    et ne t'appartiendra jamais. <strong>Regarde ce que la durée fait au coût total :
+    passe de 15 à 25 ans et observe le chiffre orange.</strong></p>
+
+    <div class="widget">
+      <div class="pret">
+        <div>
+          <canvas id="amort" width="760" height="330" style="width:100%;background:#fff;border:1px solid var(--line);border-radius:10px"></canvas>
+          <div class="legende">
+            <span><i style="background:#1f6feb"></i>capital remboursé</span>
+            <span><i style="background:#f0a828"></i>intérêts versés</span>
+          </div>
+          <div class="slider-row" style="margin-top:18px">
+            <label>Montant emprunté <span class="val" id="v-cap">200 000 €</span></label>
+            <input type="range" id="s-cap" min="50000" max="500000" step="10000" value="200000">
+          </div>
+          <div class="slider-row">
+            <label>Taux annuel <span class="val" id="v-tx">3,5 %</span></label>
+            <input type="range" id="s-tx" min="0.5" max="8" step="0.1" value="3.5">
+          </div>
+          <div class="slider-row">
+            <label>Durée <span class="val" id="v-du">20 ans</span></label>
+            <input type="range" id="s-du" min="5" max="30" value="20">
+          </div>
+        </div>
+        <div>
+          <div class="kpi"><span>Mensualité</span><b id="k-men"></b></div>
+          <div class="kpi"><span>Total remboursé</span><b id="k-tot"></b></div>
+          <div class="kpi cout"><span>Coût du crédit</span><b id="k-cout"></b></div>
+          <p class="hint" id="k-note"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Les deux enseignements que personne n'a en tête</div>
+      <p><strong>La durée coûte plus cher que le taux.</strong> Allonger de 20 à 25 ans
+      fait baisser la mensualité de 14 % - de 1 160 à 1 001 € - mais gonfle
+      le coût du crédit de 28 %, soit 22 000 € de plus. C'est l'arbitrage central de tout crédit immobilier.</p>
+      <p><strong>Les premières années remboursent surtout des intérêts.</strong>
+      C'est pour ça qu'un remboursement anticipé rapporte beaucoup au début
+      et presque rien à la fin — et que revendre au bout de trois ans coûte
+      bien plus cher qu'on ne l'imagine.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Répéter tant que</h2>
+      <div class="etape-meta">10 minutes · while</div></div></div>
+
+    <p><code>for</code> quand tu sais combien de fois. <code>while</code> quand
+    ça dépend d'une condition — par exemple « tant qu'il reste du capital à rembourser ».</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+capital = 10000
+objectif = 20000
+taux = 0.07
+annees = 0
+
+while capital < objectif:
+    capital = capital * (1 + taux)
+    annees = annees + 1
+
+print(f"Objectif atteint en {annees} ans")
+print(f"Capital : {round(capital)} EUR")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Tu retrouves les 10,2 ans annoncés en séance 1 — arrondis à 11, puisqu'on
+    compte des années entières. La règle des 72 disait 10,3 : elle était bonne.</p>
+
+    <div class="box bug">
+      <div class="box-title">🐛 La boucle infinie, à provoquer une fois</div>
+      <p>Supprime <code>annees = annees + 1</code> : le programme tourne encore,
+      parce que le capital continue de monter. Mets maintenant <code>taux = 0</code>
+      et relance : le capital ne bouge plus, la condition reste vraie,
+      <strong>la page se fige</strong>. Recharge pour t'en sortir.</p>
+      <p>La question réflexe, à se poser devant tout <code>while</code> :
+      <em>qu'est-ce qui va rendre ma condition fausse un jour ?</em></p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : le tableau d'amortissement</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Mois par mois : les intérêts du mois, la part qui rembourse le capital,
+    et ce qu'il reste à devoir. Puis le bilan sur toute la durée.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 La formule de la mensualité</div>
+      <p style="font-family:var(--mono);font-size:14px">mensualite = capital * t / (1 - (1 + t) ** -n)</p>
+      <p><strong>Attention aux unités</strong>, c'est tout le sujet :
+      <code>t</code> est le taux <strong>mensuel</strong> (le taux annuel divisé par 12)
+      et <code>n</code> le nombre de <strong>mois</strong>. Mélanger les deux
+      est l'erreur la plus classique de la finance appliquée.</p>
+      <p>Ensuite, chaque mois : les intérêts valent <code>restant * t</code>,
+      et le reste de la mensualité réduit le capital.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+capital = 200000
+taux_annuel = 0.035
+duree_annees = 20
+
+# 1. Convertis en taux mensuel et en nombre de mois
+
+
+# 2. Calcule la mensualite
+
+
+# 3. La boucle : affiche les 12 premiers mois, puis le bilan total
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. Le contrôle à lui faire faire
+      avant tout : <em>« ta mensualité, elle est plausible ? »</em> Pour 200 000 €
+      sur 20 ans, l'ordre de grandeur est un peu plus de 1 000 € par mois.
+      S'il obtient 7 000 ou 90, il a mélangé les unités.</p>
+      <p>S'il finit vite : « affiche seulement les mois où la part de capital
+      dépasse la part d'intérêts ». Il devra combiner boucle et condition.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : ce que coûte un point de taux</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Même emprunt, deux taux : 3,5 % et 4,5 %. Calcule les deux mensualités,
+    les deux coûts totaux, et l'écart. Un seul point de taux — combien d'euros ?</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Pour aller plus loin</div>
+      <p>Compare maintenant <strong>un point de taux</strong> et
+      <strong>cinq ans de durée</strong>. Lequel coûte le plus cher ?</p>
+      <p>La réponse surprend presque tout le monde, y compris des gens qui
+      travaillent dans la banque. C'est le genre de chiffre qui fait basculer
+      une recommandation.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <p>Tu viens de te battre avec les unités. Voici ce que l'IA a répondu au même besoin.</p>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Calcule la mensualité d'un prêt de 200 000 € sur 20 ans à 3,5 % par an, avec la formule d'annuité constante. Affiche la mensualité et le coût total du crédit.</p>
+      <p style="margin-top:12px">La formule utilisée est <strong>la bonne</strong>.
+      Le code tourne. Le résultat est faux d'un facteur six.</p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 L'erreur d'unités, fléau de la finance appliquée</div>
+      <p>Taux annuel appliqué à des périodes mensuelles, rendement mensuel multiplié
+      par 12 au lieu d'être composé, volatilité quotidienne annualisée sans
+      la racine de 252 : ce sont les mêmes erreurs, et elles traversent
+      toute la modélisation financière.</p>
+      <p>Aucune IA ne peut les détecter à ta place, parce qu'elles ne sont pas
+      dans le code : <strong>elles sont dans le sens des variables</strong>.
+      Seul quelqu'un qui connaît le métier peut voir qu'un chiffre est absurde.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Le <strong>calculateur de capacité d'emprunt</strong> : à partir d'un revenu
+      mensuel, d'un taux et d'une durée, quel montant maximum peut-on emprunter
+      en restant sous 35 % d'endettement ?</p>
+      <p class="hint" style="margin-top:8px">Tu peux inverser la formule,
+      ou faire monter le montant dans une boucle jusqu'à dépasser le seuil.
+      Les deux approches sont bonnes — et la seconde est souvent la plus rapide
+      à écrire quand la formule ne s'inverse pas.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-02.html" style="color:var(--orange);font-weight:650">← Séance 2</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=2"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "La boucle qui compte",
+    contexte: "Répéter un nombre connu de fois, et faire varier le calcul à chaque tour.",
+    lignes: [
+      { t: "capital = 10000" },
+      { t: "taux = 0.07" },
+      { t: "" },
+      { b:1, long:22, consigne:"Une boucle qui fait défiler <code>annee</code> de <strong>1 à 5 inclus</strong>.",
+        ok:["for annee in range(1, 6):"],
+        indices:["<code>range(1, 6)</code> donne 1, 2, 3, 4, 5 : la borne d'arrivée n'est jamais atteinte.",
+                 "<code>for annee in range(1, 6):</code>"],
+        pourquoi:"Pour aller jusqu'à 5, on écrit 6. Déroutant au début, puis c'est ce qui rend <code>range(len(...))</code> naturel." },
+      { b:1, indent:4, long:34, consigne:"Calcule la <code>valeur</code> du capital après <code>annee</code> années.",
+        ok:["valeur = capital * (1 + taux) ** annee"],
+        indices:["La formule de la séance 1, avec <code>annee</code> qui change à chaque tour.",
+                 "<code>valeur = capital * (1 + taux) ** annee</code>"],
+        pourquoi:"Une seule ligne écrite, cinq calculs différents : c'est exactement ce que la boucle apporte." },
+      { b:1, indent:4, long:36, consigne:"Affiche <code>Annee 1 : 10700 EUR</code>, arrondi à l'entier.",
+        ok:['print(f"Annee {annee} : {round(valeur)} EUR")'],
+        indices:["Deux accolades : le numéro d'année et la valeur arrondie.",
+                 '<code>print(f"Annee {annee} : {round(valeur)} EUR")</code>'],
+        pourquoi:"" },
+    ],
+  },
+  {
+    titre: "Accumuler",
+    contexte: "Le mécanisme central de tout modèle : une variable qui grossit à chaque tour.",
+    lignes: [
+      { b:1, long:16, consigne:"Crée <code>total</code>, à zéro. <strong>Avant</strong> la boucle.",
+        ok:["total = 0"],
+        indices:["Une variable et un zéro.","<code>total = 0</code>"],
+        pourquoi:"Hors de la boucle : si elle était dedans, elle repartirait de zéro à chaque tour." },
+      { t: "versement = 200" },
+      { t: "" },
+      { b:1, long:20, consigne:"Une boucle sur <strong>12</strong> mois.",
+        ok:["for mois in range(12):","for mois in range(1, 13):"],
+        indices:["<code>range(12)</code> suffit ici : on ne se sert pas du numéro.",
+                 "<code>for mois in range(12):</code>"],
+        pourquoi:"Quand le compteur ne sert à rien, <code>range(12)</code> est plus direct." },
+      { b:1, indent:4, long:26, consigne:"Ajoute le versement au total.",
+        ok:["total = total + versement","total += versement"],
+        indices:["Prends le total, ajoute le versement, remets le tout dedans.",
+                 "<code>total = total + versement</code>"],
+        pourquoi:"Absurde en maths, fondamental en programmation. Toute accumulation prend cette forme." },
+      { t: "" },
+      { b:1, long:32, consigne:"Affiche <code>Verse sur 12 mois : 2400 EUR</code>.",
+        ok:['print(f"Verse sur 12 mois : {total} EUR")'],
+        indices:["Une f-string avec <code>total</code>.",
+                 '<code>print(f"Verse sur 12 mois : {total} EUR")</code>'],
+        pourquoi:"" },
+    ],
+  },
+  {
+    titre: "Tant que l'objectif n'est pas atteint",
+    contexte: "Quand on ne sait pas d'avance combien de tours il faudra.",
+    lignes: [
+      { t: "capital = 10000" },
+      { t: "taux = 0.07" },
+      { b:1, long:12, consigne:"Un compteur d'années, à zéro.",
+        ok:["annees = 0"],
+        indices:["Comme le total de l'exercice précédent.","<code>annees = 0</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:26, consigne:"<strong>Tant que</strong> le capital est strictement inférieur à 20000…",
+        ok:["while capital < 20000:"],
+        indices:["« Tant que » s'écrit <code>while</code>, avec deux points.",
+                 "<code>while capital &lt; 20000:</code>"],
+        pourquoi:"Ici on ne sait pas combien de tours : c'est précisément le cas d'usage du <code>while</code>." },
+      { b:1, indent:4, long:32, consigne:"Fais fructifier le capital d'une année.",
+        ok:["capital = capital * (1 + taux)"],
+        indices:["L'ancienne valeur multipliée par le facteur annuel.",
+                 "<code>capital = capital * (1 + taux)</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:24, consigne:"Ajoute une année au compteur. <strong>Sans cette ligne, tu ne saurais jamais combien de temps il a fallu.</strong>",
+        ok:["annees = annees + 1","annees += 1"],
+        indices:["Le même mécanisme d'accumulation.","<code>annees = annees + 1</code>"],
+        pourquoi:"Ici le compteur ne sert pas à sortir de la boucle - c'est le capital qui la termine - mais à mesurer." },
+      { t: "" },
+      { b:1, long:38, consigne:"Affiche <code>Double en 11 ans, capital 21049 EUR</code>.",
+        ok:['print(f"Double en {annees} ans, capital {round(capital)} EUR")'],
+        indices:["Deux accolades.",
+                 '<code>print(f"Double en {annees} ans, capital {round(capital)} EUR")</code>'],
+        pourquoi:"11 ans, alors que la règle des 72 annonçait 10,3 : la différence vient du fait qu'on compte en années entières." },
+    ],
+  },
+  {
+    titre: "Le tableau d'amortissement",
+    contexte: "Attention aux unités : c'est tout l'enjeu de la séance.",
+    lignes: [
+      { t: "capital = 200000" },
+      { t: "taux_annuel = 0.035" },
+      { t: "duree_annees = 20" },
+      { t: "" },
+      { b:1, long:30, consigne:"Calcule le <strong>taux mensuel</strong> à partir du taux annuel.",
+        ok:["taux_mensuel = taux_annuel / 12"],
+        indices:["Le taux annuel divisé par le nombre de mois dans l'année.",
+                 "<code>taux_mensuel = taux_annuel / 12</code>"],
+        pourquoi:"C'est la convention des prêts amortissables. Sans cette ligne, tout le calcul est faux d'un facteur six." },
+      { b:1, long:32, consigne:"Calcule le nombre de <strong>mois</strong> total.",
+        ok:["nb_mois = duree_annees * 12"],
+        indices:["Les années multipliées par 12.","<code>nb_mois = duree_annees * 12</code>"],
+        pourquoi:"Taux mensuel et périodes mensuelles : les deux unités doivent être cohérentes." },
+      { t: "" },
+      { b:1, long:48, consigne:"Applique la formule : <code>capital * t / (1 - (1 + t) ** -n)</code>, avec les bonnes variables.",
+        ok:["mensualite = capital * taux_mensuel / (1 - (1 + taux_mensuel) ** -nb_mois)"],
+        indices:["Remplace <code>t</code> par <code>taux_mensuel</code> et <code>n</code> par <code>nb_mois</code>.",
+                 "<code>mensualite = capital * taux_mensuel / (1 - (1 + taux_mensuel) ** -nb_mois)</code>"],
+        pourquoi:"Environ 1 160 € : c'est l'ordre de grandeur attendu pour 200 000 € sur 20 ans. Toujours vérifier avant d'aller plus loin." },
+      { t: "" },
+      { b:1, long:34, consigne:"Calcule le <code>total</code> remboursé sur toute la durée.",
+        ok:["total = mensualite * nb_mois"],
+        indices:["La mensualité multipliée par le nombre de mois.",
+                 "<code>total = mensualite * nb_mois</code>"],
+        pourquoi:"" },
+      { b:1, long:44, consigne:"Affiche <code>Mensualite 1160 EUR, cout du credit 78381 EUR</code>, les deux arrondis.",
+        ok:['print(f"Mensualite {round(mensualite)} EUR, cout du credit {round(total - capital)} EUR")'],
+        indices:["Le coût du crédit, c'est le total remboursé moins le capital emprunté.",
+                 '<code>print(f"Mensualite {round(mensualite)} EUR, cout du credit {round(total - capital)} EUR")</code>'],
+        pourquoi:"78 400 € d'intérêts sur 200 000 € empruntés : près de 40 % du prix du bien, et cette ligne ne figure sur aucune annonce immobilière." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=2"></script>
+
+<script>
+/* ---------- Le code de l'IA : taux annuel, périodes mensuelles ---------- */
+(function () {
+  const LIGNES = [
+    "capital = 200000",
+    "taux_annuel = 0.035",
+    "duree_mois = 20 * 12",
+    "",
+    "mensualite = capital * taux_annuel / (1 - (1 + taux_annuel) ** -duree_mois)",
+    "",
+    "total = mensualite * duree_mois",
+    "",
+    'print(f"Mensualite : {round(mensualite, 2)} EUR")',
+    'print(f"Cout du credit : {round(total - capital, 2)} EUR")',
+  ];
+  const BUGS = [4];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 5</div>' +
+        "<p>La formule est juste. Les <strong>unités ne le sont pas</strong> : " +
+        "le taux est <em>annuel</em> (0,035) mais la durée est en <em>mois</em> (240). " +
+        "Le programme calcule un prêt à 3,5 % <strong>par mois</strong>.</p>" +
+        "<p>Résultat annoncé : <strong>7 000 € de mensualité</strong> " +
+        "et 1,48 million de coût du crédit, au lieu de 1 160 € et 78 381 €. " +
+        "Six fois trop, sans le moindre message d'erreur.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        "taux_mensuel = taux_annuel / 12\n\n" +
+        "mensualite = capital * taux_mensuel / (1 - (1 + taux_mensuel) ** -duree_mois)</p>" +
+        "<p style='margin-bottom:0'>Nommer la variable <code>taux_mensuel</code> " +
+        "plutôt que <code>taux</code> n'est pas cosmétique : c'est ce qui rend " +
+        "l'incohérence visible à la relecture.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Le second défaut</div>' +
+        "<p style='margin-bottom:0'>Lignes 9 et 10 : <code>round(..., 2)</code> affiche " +
+        "des centimes sur un coût de crédit calculé à partir d'un taux qui n'est pas " +
+        "encore négocié. <strong>La précision affichée doit refléter la précision réelle</strong>, " +
+        "sinon elle ment sur la fiabilité du chiffre.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Pose-toi la question " +
+        "des <strong>unités</strong> : <em>chaque variable de la formule parle-t-elle " +
+        "bien de la même période ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Où part ton argent ---------- */
+(function () {
+  const cv = document.getElementById("amort");
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+  const M = { g: 64, d: 16, h: 18, b: 32 };
+  const eur = (n) => Math.round(n).toLocaleString("fr-FR") + " €";
+
+  function calculer(capital, tauxAnnuel, annees) {
+    const t = tauxAnnuel / 12, n = annees * 12;
+    const m = t === 0 ? capital / n : (capital * t) / (1 - Math.pow(1 + t, -n));
+    const parAn = [];
+    let restant = capital;
+    for (let a = 0; a < annees; a++) {
+      let interets = 0, principal = 0;
+      for (let k = 0; k < 12; k++) {
+        const i = restant * t;
+        interets += i;
+        principal += m - i;
+        restant -= m - i;
+      }
+      parAn.push({ interets: interets, principal: principal });
+    }
+    return { mensualite: m, parAn: parAn, total: m * n };
+  }
+
+  function dessiner() {
+    const cap = +document.getElementById("s-cap").value;
+    const tx = parseFloat(document.getElementById("s-tx").value);
+    const du = +document.getElementById("s-du").value;
+
+    document.getElementById("v-cap").textContent = eur(cap);
+    document.getElementById("v-tx").textContent = tx.toFixed(1).replace(".", ",") + " %";
+    document.getElementById("v-du").textContent = du + " ans";
+
+    const r = calculer(cap, tx / 100, du);
+    const cout = r.total - cap;
+
+    document.getElementById("k-men").textContent = eur(r.mensualite);
+    document.getElementById("k-tot").textContent = eur(r.total);
+    document.getElementById("k-cout").textContent = eur(cout);
+    document.getElementById("k-note").innerHTML =
+      "Soit <strong>" + Math.round((cout / cap) * 100) + " %</strong> du montant emprunté, " +
+      "payé en plus du bien lui-même.";
+
+    const maxBarre = Math.max(...r.parAn.map((a) => a.interets + a.principal));
+    const pas = (W - M.g - M.d) / du;
+    const y = (v) => H - M.b - (v / maxBarre) * (H - M.h - M.b);
+
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "#eee9e0"; ctx.lineWidth = 1;
+    ctx.font = "11px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#9a9287"; ctx.textAlign = "right";
+    for (let i = 0; i <= 4; i++) {
+      const v = (maxBarre / 4) * i, yy = y(v);
+      ctx.beginPath(); ctx.moveTo(M.g, yy); ctx.lineTo(W - M.d, yy); ctx.stroke();
+      ctx.fillText(Math.round(v / 1000) + "k", M.g - 8, yy + 4);
+    }
+
+    r.parAn.forEach((a, i) => {
+      const x = M.g + i * pas + pas * 0.14, larg = pas * 0.72;
+      const hP = (a.principal / maxBarre) * (H - M.h - M.b);
+      const hI = (a.interets / maxBarre) * (H - M.h - M.b);
+      ctx.fillStyle = "#1f6feb";
+      ctx.fillRect(x, H - M.b - hP, larg, hP);
+      ctx.fillStyle = "#f0a828";
+      ctx.fillRect(x, H - M.b - hP - hI, larg, hI);
+    });
+
+    ctx.fillStyle = "#9a9287"; ctx.textAlign = "center";
+    const saut = du <= 10 ? 1 : du <= 20 ? 2 : 5;
+    for (let i = 0; i < du; i += saut) {
+      ctx.fillText(i + 1, M.g + i * pas + pas / 2, H - 12);
+    }
+  }
+
+  ["s-cap", "s-tx", "s-du"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", dessiner));
+  dessiner();
+})();
+</script>
+
+</body>
+</html>
