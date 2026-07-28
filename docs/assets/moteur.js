@@ -722,11 +722,38 @@ window.addEventListener("DOMContentLoaded", () => {
   monterReferences();
   document.querySelectorAll("[data-cellule]").forEach((el) => new Cellule(el));
 
-  demarrerPython().then(() => {
-    const b = document.getElementById("boot");
-    if (b) {
-      b.classList.add("gone");
-      setTimeout(() => b.remove(), 500);
-    }
-  });
+  /* L'écran de démarrage ne doit jamais tourner indéfiniment :
+     on informe si c'est long, et on explique si ça échoue. */
+  const boot = document.getElementById("boot");
+  const dire = (html) => {
+    const p = boot && boot.querySelector(".boot-inner p");
+    if (p) p.innerHTML = html;
+  };
+
+  const lent = setTimeout(() => dire(
+    "Python se télécharge…<br><span style='font-size:13.5px;opacity:.7'>" +
+    "environ 10 Mo la première fois, ensuite c'est instantané</span>"), 8000);
+
+  const tresLent = setTimeout(() => dire(
+    "C'est plus long que prévu.<br><span style='font-size:13.5px;opacity:.7'>" +
+    "Connexion lente, ou un bloqueur de publicités qui empêche le téléchargement.</span>"), 25000);
+
+  demarrerPython()
+    .then(() => {
+      clearTimeout(lent); clearTimeout(tresLent);
+      if (boot) { boot.classList.add("gone"); setTimeout(() => boot.remove(), 500); }
+    })
+    .catch((e) => {
+      clearTimeout(lent); clearTimeout(tresLent);
+      const msg = String((e && e.message) || e).slice(0, 200);
+      dire(
+        "<strong style='color:var(--red)'>Python n'a pas pu démarrer.</strong><br>" +
+        "<span style='font-size:13.5px;opacity:.75;display:block;margin:10px auto;max-width:34ch'>" +
+        "La cause la plus fréquente est un bloqueur de publicités ou un réseau " +
+        "d'entreprise qui bloque <code>cdn.jsdelivr.net</code>. Désactive-le sur ce site, " +
+        "ou essaie un autre navigateur.</span>" +
+        "<span style='font-size:12px;opacity:.5;font-family:var(--mono)'>" +
+        msg.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</span><br>" +
+        "<button class='btn-run' style='margin-top:16px' onclick='location.reload()'>Réessayer</button>");
+    });
 });
