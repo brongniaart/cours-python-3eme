@@ -51,7 +51,7 @@
     <h1>Ta boîte à outils</h1>
     <p class="lede">Tu as déjà écrit la formule de la mensualité trois fois.
     Trois occasions de te tromper, et trois endroits à corriger le jour où
-    la convention de taux change. <strong>Aujourd'hui, tu l'écris une dernière fois</strong> —
+    la convention de taux change. <strong>Aujourd'hui, tu l'écris une dernière fois</strong> -
     et tu la réutilises jusqu'à la fin du parcours.</p>
   </div>
 
@@ -101,7 +101,7 @@ print(round(mensualite(300000, 0.035, 25)))
       <p>Remplace <code>return</code> par <code>print</code> et essaie
       <code>total = mensualite(200000, 0.035, 20) * 240</code>.</p>
       <p><code>TypeError: unsupported operand type(s) for *: 'NoneType' and 'int'</code>.
-      Une fonction sans <code>return</code> ne rend rien — littéralement
+      Une fonction sans <code>return</code> ne rend rien - littéralement
       <code>None</code>. <strong>Un outil qui calcule doit rendre, pas afficher.</strong></p>
     </div>
   </section>
@@ -139,7 +139,7 @@ print(round(cout_credit(200000, annees=25)))
       <div class="box-title">🎙️ Les deux idées de cette étape</div>
       <p><strong>Les valeurs par défaut.</strong> <code>taux_annuel=0.035</code>
       fixe une hypothèse standard qu'on peut écraser au besoin. C'est très exactement
-      un jeu d'hypothèses de référence — et le fait de pouvoir en dévier
+      un jeu d'hypothèses de référence - et le fait de pouvoir en dévier
       sans réécrire la fonction, c'est ce qui permet l'analyse de scénarios.</p>
       <p><strong>Nommer l'argument à l'appel.</strong> <code>cout_credit(200000, annees=25)</code>
       saute le deuxième paramètre. Ça évite les appels illisibles du type
@@ -228,7 +228,7 @@ print(round(van(projet, 0.25)))
       <div class="box-title">🌍 Ce que ça veut dire en réunion</div>
       <p>Un projet dont le TRI est de 17 % survit tant que le coût du capital
       reste en dessous. Si les taux montent et que le financement passe à 18 %,
-      <strong>le projet détruit de la valeur</strong> — sans que rien n'ait changé
+      <strong>le projet détruit de la valeur</strong> - sans que rien n'ait changé
       dans le projet lui-même.</p>
       <p>Fais bouger l'investissement initial : tu verras le TRI s'effondrer bien
       plus vite que l'intuition ne le suggère. C'est pour ça qu'en conseil,
@@ -249,9 +249,9 @@ print(round(van(projet, 0.25)))
       <div class="box-title">🎯 Les quatre outils</div>
       <ul style="margin-bottom:0">
         <li><code>mensualite(capital, taux_annuel, annees)</code></li>
-        <li><code>cout_credit(capital, taux_annuel, annees)</code> — utilise la précédente</li>
+        <li><code>cout_credit(capital, taux_annuel, annees)</code> - utilise la précédente</li>
         <li><code>van(flux, taux)</code></li>
-        <li><code>cagr(valeur_debut, valeur_fin, annees)</code> — le taux de croissance
+        <li><code>cagr(valeur_debut, valeur_fin, annees)</code> - le taux de croissance
         annuel moyen, c'est-à-dire <code>(fin / debut) ** (1 / annees) - 1</code></li>
       </ul>
     </div>
@@ -268,7 +268,7 @@ print(round(van(projet, 0.25)))
       <p>Pas d'aide avant <strong>20 minutes</strong>. Impose une chose :
       <strong>chaque fonction doit être testée juste après son écriture</strong>,
       avec un cas dont il connaît la réponse. <code>cagr(100, 200, 10)</code>
-      doit donner environ 7,2 % — la règle des 72, retrouvée par le calcul.</p>
+      doit donner environ 7,2 % - la règle des 72, retrouvée par le calcul.</p>
       <p>S'il finit vite : « ajoute une fonction <code>tri(flux)</code> qui trouve
       le taux annulant la VAN ». Il devra faire varier le taux dans une boucle
       jusqu'à changer de signe. C'est le défi ci-dessous.</p>

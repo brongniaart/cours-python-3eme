@@ -57,7 +57,7 @@
     <h1>Ranger un portefeuille</h1>
     <p class="lede">Cinq lignes en portefeuille, rendements connus. Quel est le rendement
     de l'ensemble ? Presque tout le monde fait la moyenne des cinq.
-    <strong>Sur le portefeuille d'aujourd'hui, ça donne 16,4 % au lieu de 4,4 %</strong> —
+    <strong>Sur le portefeuille d'aujourd'hui, ça donne 16,4 % au lieu de 4,4 %</strong> -
     une erreur d'un facteur quatre, dans le bon sens pour celui qui la commet.</p>
   </div>
 
@@ -65,7 +65,7 @@
     <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
     <p>Manipuler un portefeuille entier : le valoriser, calculer les poids,
     trouver la meilleure et la pire ligne, mesurer la concentration.
-    Et surtout, produire un rendement <strong>pondéré</strong> — celui qu'on peut
+    Et surtout, produire un rendement <strong>pondéré</strong> - celui qu'on peut
     présenter sans se faire corriger.</p>
   </div>
 
@@ -193,7 +193,7 @@ print(round(pondere, 2))
     <div class="box prof">
       <div class="box-title">🎙️ La ligne qui porte tout</div>
       <p><code>pondere = pondere + poids * rendements[i]</code> est une accumulation,
-      comme en séance 3 — mais chaque terme est <strong>pesé</strong> avant d'être ajouté.</p>
+      comme en séance 3 - mais chaque terme est <strong>pesé</strong> avant d'être ajouté.</p>
       <p>C'est la structure de presque tout calcul financier agrégé : indice boursier,
       inflation, taux moyen d'un portefeuille de crédits. À chaque fois,
       une somme pondérée. Si tu ne devais retenir qu'une boucle de la séance,
@@ -302,7 +302,7 @@ rendements = [3.1, 42.0, -6.5, 38.0, 5.2]
       ça donne le <em>numéro</em> de la case, qu'on utilise ensuite dans
       <code>lignes[...]</code>. Ne la donne que s'il bute vraiment.</p>
       <p>S'il finit vite : « trie le rapport de la plus grosse ligne à la plus petite ».
-      Il découvrira qu'il ne peut pas trier deux listes en parallèle sans les lier —
+      Il découvrira qu'il ne peut pas trier deux listes en parallèle sans les lier -
       et c'est exactement pour ça que pandas existe, en séance 9.</p>
     </div>
   </section>
@@ -327,7 +327,7 @@ rendements = [3.1, 42.0, -6.5, 38.0, 5.2]
     <div class="box defi">
       <div class="box-title">🔥 Le piège de ce défi</div>
       <p>Quand tu vends une partie d'une ligne, <strong>le total du portefeuille
-      baisse aussi</strong> — donc le poids des autres lignes monte mécaniquement.
+      baisse aussi</strong> - donc le poids des autres lignes monte mécaniquement.
       Un contrôle naïf, ligne par ligne, ne converge pas.</p>
       <p>C'est un vrai problème de gestion, et il n'a pas de solution en une formule.
       Signale-le dans ton code, même si tu ne le résous pas : repérer qu'un modèle
