@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lire un rapport - parcours master</title>
+<link rel="stylesheet" href="../assets/style.css?v=5">
+<style>
+  .coller textarea {
+    width: 100%; height: 130px; font-family: var(--mono); font-size: 12px;
+    line-height: 1.5; padding: 14px 16px; border: 1px solid var(--line);
+    border-radius: 11px; resize: vertical; background: #fff;
+  }
+  .coller textarea:focus { outline: none; border-color: var(--orange); }
+
+  .chiffres { display: flex; gap: 36px; flex-wrap: wrap; margin: 6px 0 24px; }
+  .chiffres .gros { font-size: 34px; font-weight: 750; letter-spacing: -.02em;
+                    color: var(--orange); line-height: 1.1; }
+  .chiffres span { font-size: 13.5px; color: var(--ink-soft); }
+
+  table.rap { width: 100%; border-collapse: collapse; font-size: 15px; margin: 10px 0 26px; }
+  table.rap th { text-align: left; background: var(--bg-soft); padding: 9px 12px;
+    font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+  table.rap td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  table.rap td.n { font-weight: 750; color: var(--orange); width: 40px; }
+  table.rap tr.bloc-sep td { background: var(--bg-soft); font-size: 11.5px;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft);
+    font-weight: 750; padding: 6px 12px; }
+  .jauge { display: inline-block; width: 82px; height: 8px; background: var(--bg-soft);
+    border-radius: 20px; overflow: hidden; vertical-align: middle; margin-right: 9px; }
+  .jauge i { display: block; height: 100%; background: var(--green); }
+
+  .bloc {
+    display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
+    border-radius: 11px; margin-bottom: 9px; border: 1px solid;
+  }
+  .bloc.rouge { background: var(--red-soft); border-color: #f5c9c4; }
+  .bloc.orange { background: var(--orange-soft); border-color: #f7d8b8; }
+  .bloc .pastille { font-size: 19px; flex: none; }
+  .bloc code { background: rgba(255,255,255,.75); font-size: 13.5px; }
+  .bloc .ou { font-size: 13px; color: var(--ink-soft); margin-top: 5px; }
+  .bloc .cnt { margin-left: auto; font-size: 13px; font-weight: 700;
+               color: var(--ink-soft); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python master - Rapport</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Outil enseignant · parcours finance, politique, conseil</div>
+    <h1>Lire un rapport d'étudiant</h1>
+    <p class="lede">Colle ici le code envoyé par l'étudiant. Tu verras où il en est
+    sur les seize séances et, surtout,
+    <strong>les lignes exactes sur lesquelles il a buté</strong>.</p>
+  </div>
+
+  <section class="etape coller">
+    <div class="etape-head"><div class="etape-num">📥</div><div>
+      <h2>Colle le code</h2>
+      <div class="etape-meta">il commence par CPM-</div></div></div>
+
+    <textarea id="entree" placeholder="CPM-eyJ2IjoxLCJwIjoibWFzdGVyIi..." spellcheck="false"></textarea>
+    <div class="runbar" style="margin-top:12px">
+      <button class="btn-run" id="lire">Lire le rapport</button>
+      <button class="btn-ghost" id="vider">Effacer</button>
+      <span class="hint" id="etat"></span>
+    </div>
+  </section>
+
+  <div id="sortie"></div>
+
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🔒</div><div>
+      <h2>Ce que contient ce code</h2>
+      <div class="etape-meta">et ce qu'il ne contient pas</div></div></div>
+
+    <p><strong>Il contient :</strong> le nombre de programmes écrits par séance,
+    les exercices terminés, la liste des lignes qui ont demandé plusieurs essais
+    ou dont la réponse a dû être affichée, et l'avancement de la liste
+    de contrôle du projet final.</p>
+
+    <p><strong>Il ne contient pas :</strong> le code écrit par l'étudiant,
+    son nom, ni aucune donnée personnelle.</p>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Rien ne transite par un serveur</div>
+      <p>Le site est un ensemble de fichiers statiques : il n'envoie aucune donnée
+      nulle part. Le code est fabriqué dans le navigateur de l'étudiant, et il ne
+      voyage que parce qu'il te l'envoie lui-même. Cette page le décode dans
+      <em>ton</em> navigateur, hors ligne si tu veux.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Deux parcours, deux codes</div>
+      <p style="margin-bottom:0">Les rapports du parcours 3ème commencent par
+      <code>CP3-</code> et se lisent sur
+      <a href="../rapport.html" style="color:var(--orange);font-weight:650">l'autre page</a>.
+      Ceux du master commencent par <code>CPM-</code>. Les deux stockages
+      sont indépendants : un étudiant peut suivre les deux sans que rien ne se mélange.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const SEANCES = [
+  ["Le premier modèle", "Calculer"],
+  ["Décider", "Calculer"],
+  ["Répéter", "Calculer"],
+  ["Ranger un portefeuille", "Structurer"],
+  ["Ta boîte à outils", "Structurer"],
+  ["De vraies données", "Structurer"],
+  ["Les données sont sales", "Structurer"],
+  ["Ton environnement de travail", "Analyser"],
+  ["pandas, premiers pas", "Analyser"],
+  ["Croiser et agréger", "Analyser"],
+  ["Séries temporelles", "Analyser"],
+  ["Le graphique qui ment", "Convaincre"],
+  ["La carte électorale", "Convaincre"],
+  ["L'incertitude", "Convaincre"],
+  ["Ton analyse devient une appli", "Convaincre"],
+  ["Ta note d'analyse", "Convaincre"],
+];
+
+/* la notion la plus fragile de chaque séance : ce qu'il faut rouvrir en priorité */
+const REPRISE = {
+  1: "la conversion d'un taux annuel en taux mensuel",
+  2: "l'ordre des elif, et la condition trop large placée en premier",
+  3: "l'accumulateur initialisé hors de la boucle",
+  4: "moyenne arithmétique contre moyenne géométrique des rendements",
+  5: "ce qu'une fonction renvoie, et le cas où le TRI n'existe pas",
+  6: "le séparateur du CSV, et la lecture ligne à ligne",
+  7: "try/except autour d'une conversion, et le décompte de ce qu'on écarte",
+  8: "l'environnement virtuel et le requirements.txt",
+  9: "le masque booléen, et le piège du format long sur les inscrits",
+  10: "transform contre sum, et les deux contrôles après un merge",
+  11: "l'annualisation en racine de 252, et l'index temporel",
+  12: "set_ylim, et la règle des barres qui partent de zéro",
+  13: "le zfill de la jointure, et la lecture d'un NaN légitime",
+  14: "la graine du générateur, et le masque van[van < 0]",
+  15: "le décorateur de cache et le modèle de réexécution",
+  16: "la structure de la note en cinq blocs",
+};
+
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function decoder(txt) {
+  let code = txt.trim().replace(/\s+/g, "");
+  if (code.indexOf("CPM-") === 0) code = code.slice(4);
+  else if (code.indexOf("CP3-") === 0) {
+    throw new Error("C'est un rapport du parcours 3ème, pas du master.");
+  }
+  const brut = atob(code);
+  const octets = Uint8Array.from(brut, (c) => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(octets));
+}
+
+function afficher(d) {
+  const seances = d.s || [], blocages = d.b || [], coches = d.c || 0;
+
+  const programmes = seances.reduce((s, l) => s + l[1], 0);
+  const finis = seances.reduce((s, l) => s + l[2], 0);
+  // dénominateur fixe : 15 séances à 4 exercices, la 16e étant le projet final.
+  // Sommer les totaux des seules séances commencées ferait bouger le repère
+  // d'un rapport à l'autre, sans que l'étudiant ait rien fait de moins.
+  const total = 15 * 4;
+  const montres = blocages.filter((b) => b[5] === 1).length;
+
+  // on regroupe les lignes identiques : une même erreur répétée compte double
+  const paquets = {};
+  blocages.forEach((b) => {
+    const cle = b[0] + "|" + b[3];
+    if (!paquets[cle]) {
+      paquets[cle] = { seance: b[0], exo: b[2], ligne: b[3],
+                       essais: b[4], montre: b[5], n: 0 };
+    }
+    paquets[cle].n++;
+    paquets[cle].essais = Math.max(paquets[cle].essais, b[4]);
+    paquets[cle].montre = Math.max(paquets[cle].montre, b[5]);
+  });
+
+  const liste = Object.values(paquets).sort((a, b) =>
+    (b.montre - a.montre) || (b.n - a.n) || (b.essais - a.essais));
+
+  let html = '<section class="etape"><div class="etape-head"><div class="etape-num">📊</div><div>' +
+    "<h2>Son avancement</h2><div class='etape-meta'>rapport du " +
+    esc(d.d || "?") + "</div></div></div>";
+
+  html += '<div class="chiffres">' +
+    "<div><div class='gros'>" + programmes + "</div><span>programmes écrits</span></div>" +
+    "<div><div class='gros'>" + finis + " / " + total + "</div><span>exercices terminés</span></div>" +
+    "<div><div class='gros'>" + seances.length + " / 16</div><span>séances commencées</span></div>" +
+    "<div><div class='gros' style='color:" + (montres ? "var(--red)" : "var(--green)") + "'>" +
+      montres + "</div><span>réponses qu'il a dû regarder</span></div>" +
+    "<div><div class='gros'>" + coches + " / 12</div><span>points du projet final</span></div>" +
+    "</div>";
+
+  html += '<table class="rap"><thead><tr><th></th><th>Séance</th><th>Programmes</th>' +
+    "<th>Exercices</th><th>Blocages</th></tr></thead><tbody>";
+  let blocCourant = "";
+  seances.forEach((l) => {
+    const n = l[0], tot = l[3] || 4;
+    const fiche = SEANCES[n - 1] || ["?", ""];
+    if (fiche[1] !== blocCourant) {
+      blocCourant = fiche[1];
+      html += "<tr class='bloc-sep'><td colspan='5'>Bloc · " + esc(blocCourant) + "</td></tr>";
+    }
+    const nb = blocages.filter((b) => b[0] === n).length;
+    html += "<tr><td class='n'>" + n + "</td><td><strong>" + esc(fiche[0]) + "</strong></td>" +
+      "<td>" + l[1] + "</td>" +
+      "<td><span class='jauge'><i style='width:" + Math.round(l[2] / tot * 100) + "%'></i></span>" +
+        l[2] + " / " + tot + "</td>" +
+      "<td>" + (nb ? nb : "-") + "</td></tr>";
+  });
+  html += "</tbody></table>";
+
+  if (!liste.length) {
+    html += '<div class="box defi"><div class="box-title">✅ Aucun blocage enregistré</div>' +
+      "<p>Il a trouvé toutes les lignes du premier coup. Passe directement " +
+      "aux défis marqués d'une étoile, qui sont conçus pour être plus durs " +
+      "que les exercices guidés.</p></div>";
+  } else {
+    html += "<h3 style='margin-top:30px'>À reprendre en priorité</h3>" +
+      "<p class='hint' style='margin-bottom:16px'>Rouge : il a dû regarder la réponse. " +
+      "Orange : il a fini par trouver, mais après plusieurs essais.</p>";
+    liste.forEach((p) => {
+      html += '<div class="bloc ' + (p.montre ? "rouge" : "orange") + '">' +
+        '<span class="pastille">' + (p.montre ? "⛔" : "⚠️") + "</span><div>" +
+        "<code>" + esc(p.ligne) + "</code>" +
+        "<div class='ou'>Séance " + p.seance + " · " + esc(p.exo) + " · " +
+          (p.montre ? "réponse affichée après 3 échecs"
+                    : p.essais + " essai" + (p.essais > 1 ? "s" : "") + " avant de trouver") +
+        "</div></div>" +
+        (p.n > 1 ? "<span class='cnt'>×" + p.n + "</span>" : "") +
+        "</div>";
+    });
+
+    // la séance la plus douloureuse, et la notion à rouvrir
+    const parSeance = {};
+    liste.forEach((p) => {
+      parSeance[p.seance] = (parSeance[p.seance] || 0) + p.n + (p.montre ? 2 : 0);
+    });
+    const pire = Object.keys(parSeance)
+      .sort((a, b) => parSeance[b] - parSeance[a])[0];
+
+    html += '<div class="box prof" style="margin-top:24px">' +
+      '<div class="box-title">🎙️ Comment ouvrir la prochaine séance</div>' +
+      "<p>Prends la première ligne rouge de la liste et démarre par elle : " +
+      "<em>« montre-moi comment tu écrirais cette ligne aujourd'hui »</em>. " +
+      "S'il la retrouve, c'est acquis, tu passes. Sinon tu sais exactement " +
+      "quoi réexpliquer avant d'attaquer la notion du jour.</p>" +
+      (pire && REPRISE[pire]
+        ? "<p style='margin-bottom:0'>La séance qui lui a le plus coûté est la " +
+          "<strong>séance " + esc(pire) + "</strong>. La notion à rouvrir en premier : " +
+          "<strong>" + esc(REPRISE[pire]) + "</strong>.</p>"
+        : "") +
+      "</div>";
+  }
+
+  html += "</section>";
+  document.getElementById("sortie").innerHTML = html;
+}
+
+document.getElementById("lire").onclick = () => {
+  const etat = document.getElementById("etat");
+  const txt = document.getElementById("entree").value;
+  if (!txt.trim()) { etat.textContent = "Colle d'abord un code."; return; }
+  try {
+    afficher(decoder(txt));
+    etat.textContent = "";
+    document.getElementById("sortie").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) {
+    etat.textContent = /3ème/.test(e.message)
+      ? e.message + " Ouvre l'autre page de lecture."
+      : "Ce code est illisible. Vérifie qu'il est complet et commence par CPM-.";
+    document.getElementById("sortie").innerHTML = "";
+  }
+};
+
+document.getElementById("vider").onclick = () => {
+  document.getElementById("entree").value = "";
+  document.getElementById("sortie").innerHTML = "";
+  document.getElementById("etat").textContent = "";
+};
+</script>
+
+</body>
+</html>
