@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 7 - Les données sont sales</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=3">
+<style>
+  .defauts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 18px 0; }
+  .defaut { border: 1px solid var(--line); border-radius: 11px; padding: 14px 16px; background: #fff; }
+  .defaut b { font-size: 26px; font-weight: 780; letter-spacing: -.02em; color: var(--red); display: block; }
+  .defaut span { font-size: 13.5px; color: var(--ink-soft); }
+  .defaut code { font-size: 12px; }
+
+  .nett { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 880px) { .nett { grid-template-columns: 1fr; } }
+  .regle { display: flex; gap: 12px; align-items: flex-start; padding: 13px 15px;
+    border: 1px solid var(--line); border-radius: 11px; margin-bottom: 10px;
+    cursor: pointer; background: #fff; transition: all .13s; }
+  .regle.on { border-color: var(--green); background: var(--green-soft); }
+  .regle .coche { flex: none; width: 22px; height: 22px; border: 2px solid var(--line);
+    border-radius: 6px; display: grid; place-items: center; font-size: 13px; color: #fff; }
+  .regle.on .coche { background: var(--green); border-color: var(--green); }
+  .regle strong { display: block; font-size: 14.5px; }
+  .regle span { font-size: 13px; color: var(--ink-soft); }
+
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .kpi2 { border: 1px solid var(--line); border-radius: 11px; padding: 14px 16px; background: #fff; }
+  .kpi2 span { font-size: 11.5px; font-weight: 750; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--ink-soft); display: block; }
+  .kpi2 b { font-size: 25px; font-weight: 780; letter-spacing: -.02em; }
+  .kpi2.mauvais b { color: var(--red); }
+  .kpi2.bon b { color: var(--green); }
+  .ecart { border-radius: 11px; padding: 15px 17px; border: 1px solid; }
+  .ecart.loin { background: var(--red-soft); border-color: #f5c9c4; }
+  .ecart.proche { background: #fdf0e2; border-color: #f7d8b8; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 7</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 7 · 1 h 30</div>
+    <h1>Les données sont sales</h1>
+    <p class="lede">Le fichier de la séance 6 était un cadeau : je l'avais préparé.
+    Voici les mêmes données telles qu'elles arrivent vraiment.
+    <strong>Un million et demi de voix ont disparu</strong> — l'équivalent d'un parti
+    moyen — et le RN affiche 12 % de moins qu'en réalité.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Diagnostiquer un fichier, écrire un nettoyage qui ne plante jamais,
+    et produire un <strong>rapport de qualité</strong> qui dit ce que tu as jeté
+    et pourquoi. C'est la partie du métier qui occupe le plus de temps,
+    et celle dont on parle le moins.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Diagnostiquer avant de corriger</h2>
+      <div class="etape-meta">15 minutes · compter les problèmes</div></div></div>
+
+    <p>La faute de débutant est de se jeter sur la correction. On commence par
+    <strong>compter</strong> : combien de lignes sont touchées, et par quoi.
+    Sans ce chiffre, on ne saura jamais si le nettoyage a marché.</p>
+
+    <p>Voici ce que contient <code>legislatives-2024-sale.csv</code>, sur 1 059 lignes :</p>
+
+    <div class="defauts">
+      <div class="defaut"><b>28</b><span>voix vides</span></div>
+      <div class="defaut"><b>20</b><span>voix à <code>N/A</code></span></div>
+      <div class="defaut"><b>18</b><span>nuances avec espaces</span></div>
+      <div class="defaut"><b>15</b><span>nuances en minuscules</span></div>
+      <div class="defaut"><b>8</b><span>inscrits manquants</span></div>
+      <div class="defaut"><b>2</b><span>doublons exacts</span></div>
+      <div class="defaut"><b>1</b><span>valeur négative</span></div>
+      <div class="defaut"><b>4</b><span>formats de date différents</span></div>
+    </div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import csv
+
+fichier = open("legislatives-2024-sale.csv", encoding="utf-8", newline="")
+donnees = list(csv.reader(fichier, delimiter=";"))[1:]
+fichier.close()
+
+vides = 0
+na = 0
+espaces = 0
+
+for ligne in donnees:
+    if ligne[6].strip() == "":
+        vides = vides + 1
+    if ligne[6].strip().upper() == "N/A":
+        na = na + 1
+    if ligne[5] != ligne[5].strip():
+        espaces = espaces + 1
+
+print(len(donnees), "lignes")
+print(vides, "voix vides")
+print(na, "voix N/A")
+print(espaces, "nuances avec espaces")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La question qui vient toujours trop tard</div>
+      <p><strong>D'où viennent ces défauts ?</strong> Les dates en quatre formats,
+      c'est de la saisie manuelle par des gens différents. Les <code>N/A</code>,
+      c'est un export depuis un tableur. Les doublons, c'est une fusion de fichiers
+      mal faite.</p>
+      <p>Comprendre l'origine d'un défaut dit s'il est <em>réparable</em> ou
+      <em>définitif</em>. Une casse incohérente se corrige. Une voix perdue, non.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Chaque décision de nettoyage change le résultat</h2>
+      <div class="etape-meta">active les règles, regarde le chiffre bouger</div></div></div>
+
+    <p>Le nettoyage n'est pas cosmétique. <strong>Chaque règle que tu appliques
+    ou non déplace le résultat final.</strong> Commence par tout désactiver,
+    puis active une règle à la fois.</p>
+
+    <div class="widget">
+      <div class="nett">
+        <div id="regles"></div>
+        <div>
+          <div class="kpis">
+            <div class="kpi2" id="k-nuances"><span>Nuances distinctes</span><b></b>
+              <div class="hint" style="margin-top:3px">il n'en existe que 22</div></div>
+            <div class="kpi2"><span>Lignes retenues</span><b id="k-ret"></b>
+              <div class="hint" style="margin-top:3px" id="k-rej"></div></div>
+          </div>
+          <div class="kpi2" style="margin-bottom:12px">
+            <span>Total des voix RN</span><b id="k-rn"></b>
+          </div>
+          <div class="ecart" id="k-ecart">
+            <div style="font-size:11.5px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)">Écart avec le résultat officiel</div>
+            <div style="font-size:24px;font-weight:780;letter-spacing:-.02em" id="k-diff"></div>
+            <div class="hint" id="k-note" style="margin-top:5px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le piège le plus coûteux : la casse</div>
+      <p>Sans normalisation du texte, le fichier contient <strong>44 nuances</strong>
+      au lieu de 22. Le RN y apparaît trois fois :</p>
+      <p style="font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;white-space:pre">'RN'      8 236 817
+' RN '      196 163
+'rn'         76 767</p>
+      <p>Un classement bâti là-dessus <strong>sous-estime le RN de 12 %</strong>
+      et le fait passer derrière un autre parti selon les seuils.
+      Le programme ne plante pas, le tableau est bien présenté,
+      et la conclusion politique est fausse.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Convertir sans jamais planter</h2>
+      <div class="etape-meta">20 minutes · try et except</div></div></div>
+
+    <p><code>int("N/A")</code> arrête tout le programme. Sur un fichier de mille lignes,
+    une seule cellule illisible et tu n'as aucun résultat. <code>try</code> veut dire
+    « essaie », <code>except</code> « et si ça rate, fais plutôt ça ».</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+brut = ["103524", "", "N/A", "-1200", "54073"]
+
+total = 0
+rejetees = 0
+
+for valeur in brut:
+    try:
+        voix = int(valeur)
+        if voix < 0:
+            rejetees = rejetees + 1
+        else:
+            total = total + voix
+    except ValueError:
+        rejetees = rejetees + 1
+
+print("total :", total)
+print("rejetees :", rejetees)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Deux sortes de rejets, à ne pas confondre</div>
+      <p><strong>L'illisible</strong> : <code>""</code> et <code>"N/A"</code> ne sont
+      pas des nombres, la conversion échoue. On les attrape avec <code>except</code>.</p>
+      <p><strong>L'aberrant</strong> : <code>-1200</code> se convertit très bien.
+      Aucune erreur ne sera levée. C'est <strong>toi</strong> qui dois décider
+      qu'un nombre de voix négatif n'a pas de sens.</p>
+      <p>Python ne connaît pas ton métier. Il ne peut détecter que ce qui est
+      impossible, jamais ce qui est absurde.</p>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 L'except qui avale tout</div>
+      <p>Remplace <code>except ValueError:</code> par <code>except:</code> tout seul.
+      Ça marche encore — et c'est pire.</p>
+      <p>Un <code>except</code> nu attrape <strong>toutes</strong> les erreurs,
+      y compris tes propres fautes de frappe. Ton programme les compte alors
+      comme des « lignes sales » et continue tranquillement. Toujours nommer
+      l'erreur qu'on attend.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Normaliser et dédoublonner</h2>
+      <div class="etape-meta">15 minutes · strip, upper, et la mémoire des lignes vues</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+nuances = ["RN", " RN ", "rn", "UG", "ug ", "ENS"]
+
+propres = []
+for n in nuances:
+    propres.append(n.strip().upper())
+
+print(nuances)
+print(propres)
+print(len(set(nuances)), "->", len(set(propres)))
+
+# se souvenir de ce qu'on a deja vu
+lignes = ["a;1", "b;2", "a;1", "c;3", "b;2"]
+vues = set()
+uniques = []
+
+for l in lignes:
+    if l not in vues:
+        vues.add(l)
+        uniques.append(l)
+
+print(len(lignes), "->", len(uniques))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le <code>set</code>, et pourquoi il va vite</div>
+      <p>Un <code>set</code> est une collection <strong>sans doublons</strong>,
+      qui répond à « est-ce que je l'ai déjà vu ? » instantanément, même sur
+      des millions d'éléments. Une liste, elle, devrait tout reparcourir à chaque fois.</p>
+      <p>Sur mille lignes la différence est invisible. Sur un million, c'est
+      quelques secondes contre plusieurs heures. C'est le premier moment
+      du parcours où le choix de la structure change l'ordre de grandeur.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : le pipeline et son rapport</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Charge le fichier sale, nettoie-le, et produis <strong>deux</strong> sorties :
+    le classement des nuances, et un rapport de qualité.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Ce que doit contenir le rapport de qualité</div>
+      <ol style="margin-bottom:0">
+        <li>Lignes lues, lignes retenues, lignes rejetées</li>
+        <li>Le détail des rejets <strong>par motif</strong> : illisible, doublon, aberrant</li>
+        <li>Le nombre de nuances avant et après normalisation</li>
+        <li>Le total des voix retenues, et l'écart avec les 32 057 946 officiels</li>
+      </ol>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import csv
+
+fichier = open("legislatives-2024-sale.csv", encoding="utf-8", newline="")
+donnees = list(csv.reader(fichier, delimiter=";"))[1:]
+fichier.close()
+
+# 1. Les compteurs de rejet, par motif
+
+
+# 2. La boucle de nettoyage
+
+
+# 3. Le classement des nuances
+
+
+# 4. Le rapport de qualite
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. Le résultat attendu :
+      <strong>1 008 lignes retenues, 51 rejetées, 22 nuances</strong>, et un RN
+      à <strong>8 509 747</strong> voix.</p>
+      <p><strong>La question à poser quand il a fini</strong>, et c'est le cœur de la séance :
+      <em>« il manque encore 870 000 voix au RN par rapport au chiffre officiel.
+      Est-ce que ton nettoyage a échoué ? »</em></p>
+      <p>Non. Ces voix étaient dans les 48 lignes illisibles. <strong>Le nettoyage
+      ne récupère pas ce qui a été détruit</strong> — il permet seulement de savoir
+      combien il manque. C'est exactement ce qu'un rapport de qualité doit dire.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : la jointure qui échoue en silence</h2>
+      <div class="etape-meta">15 minutes · un vrai piège, rencontré pour de bon</div></div></div>
+
+    <p>Pour cartographier ces résultats en séance 13, il faut relier chaque département
+    du fichier à sa forme géographique. Les deux sources sont officielles.
+    <strong>La jointure échoue quand même sur neuf départements.</strong></p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+import csv, json
+
+fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")
+donnees = list(csv.reader(fichier, delimiter=";"))[1:]
+fichier.close()
+
+carte = json.load(open("departements.geojson", encoding="utf-8"))
+
+codes_resultats = set()
+for l in donnees:
+    codes_resultats.add(l[0])
+
+codes_carte = set()
+for f in carte["features"]:
+    codes_carte.add(f["properties"]["code"])
+
+# 1. Combien de codes se correspondent ?
+
+
+# 2. Lesquels manquent de chaque cote ? Regarde-les bien.
+
+
+# 3. Corrige, et recompte.
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Ce que tu vas trouver</div>
+      <p>Le ministère écrit <code>'1'</code>, <code>'2'</code>, <code>'9'</code>.
+      La carte écrit <code>'01'</code>, <code>'02'</code>, <code>'09'</code>.
+      Neuf départements ne se rejoignent jamais. <strong>Aucune erreur n'est levée :
+      ils disparaissent simplement de la carte.</strong></p>
+      <p>Un <code>zfill(2)</code> et la jointure passe de 87 à 96 sur 96.</p>
+      <p>Restent les outre-mer et les Français de l'étranger, absents de la carte
+      métropolitaine. Autre vraie question : que fait-on des données qu'on ne peut
+      pas représenter ? On les retire en silence, ou on le dit dans la légende ?</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Mon fichier CSV de résultats électoraux contient des valeurs manquantes et des erreurs. Écris-moi un programme Python qui le nettoie et calcule le total des voix par nuance.</p>
+      <p style="margin-top:12px">Le code est excellent. Il gère les erreurs, il normalise,
+      il ne plante jamais. <strong>Et c'est précisément le problème.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 La règle qui te distinguera</div>
+      <p><strong>Un nettoyage qui ne dit pas ce qu'il a jeté n'est pas un nettoyage,
+      c'est une perte de données silencieuse.</strong></p>
+      <p>Sur ce fichier, 48 lignes disparaissent et personne ne le sait.
+      Sur un fichier client de 200 000 lignes, ce sera 9 000 clients évaporés,
+      et la conclusion portera sur une population qui n'est plus celle de départ.</p>
+      <p>En réunion, la première question sur une analyse sérieuse est toujours
+      la même : <em>combien de lignes as-tu écartées, et pourquoi ?</em>
+      Une IA ne se la pose jamais, parce que personne ne la lui a posée.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>La colonne <code>date_saisie</code> contient <strong>quatre formats différents</strong>.
+      Écris une fonction qui les ramène tous à <code>AAAA-MM-JJ</code>, et qui
+      <strong>signale</strong> les formats qu'elle ne sait pas traiter au lieu
+      de les ignorer.</p>
+      <p class="hint" style="margin-top:8px">Le vrai piège est ailleurs :
+      <code>07/07/2024</code> est ambigu. Est-ce le 7 juillet ou le 7 juillet ?
+      Ici oui. Mais <code>05/06/2024</code> ? Selon que le fichier vient de Paris
+      ou de New York, ce n'est pas le même jour, et rien dans le fichier ne le dit.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🎯 À préparer pour la séance 8</div>
+      <p>La prochaine séance, on quitte le navigateur : tu installes
+      <strong>VS Code et ton propre environnement Python</strong>.
+      Vérifie que tu as les droits d'installer des logiciels sur ta machine.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-06.html" style="color:var(--orange);font-weight:650">← Séance 6</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>window.FICHIERS = [
+  "donnees/legislatives-2024-sale.csv",
+  "donnees/legislatives-2024.csv",
+  "donnees/departements.geojson"
+];</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=3"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Diagnostiquer",
+    contexte: "Compter les défauts avant de corriger quoi que ce soit.",
+    lignes: [
+      { t: "import csv" },
+      { t: 'fichier = open("legislatives-2024-sale.csv", encoding="utf-8", newline="")' },
+      { t: 'donnees = list(csv.reader(fichier, delimiter=";"))[1:]' },
+      { t: "fichier.close()" },
+      { t: "" },
+      { b:1, long:12, consigne:"Un compteur <code>vides</code>, à zéro.",
+        ok:["vides = 0"],
+        indices:["Avant la boucle.","<code>vides = 0</code>"],
+        pourquoi:"" },
+      { b:1, long:24, consigne:"Une boucle sur <code>donnees</code>, chaque élément s'appelle <code>ligne</code>.",
+        ok:["for ligne in donnees:"],
+        indices:["Un parcours de liste.","<code>for ligne in donnees:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:30, consigne:"Si la colonne voix (numéro <code>6</code>), <strong>débarrassée de ses espaces</strong>, est vide…",
+        ok:['if ligne[6].strip() == "":'],
+        indices:["<code>.strip()</code> retire les espaces avant et après.",
+                 '<code>if ligne[6].strip() == "":</code>'],
+        pourquoi:"Sans <code>.strip()</code>, une cellule contenant un simple espace passerait pour remplie." },
+      { b:1, indent:8, long:20, consigne:"Ajoute 1 au compteur.",
+        ok:["vides = vides + 1","vides += 1"],
+        indices:["Le mécanisme d'accumulation habituel.","<code>vides = vides + 1</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:36, consigne:"Affiche <code>28 voix vides sur 1059 lignes</code>.",
+        ok:['print(f"{vides} voix vides sur {len(donnees)} lignes")'],
+        indices:["Deux accolades.",'<code>print(f"{vides} voix vides sur {len(donnees)} lignes")</code>'],
+        pourquoi:"28 lignes sur 1059, soit 2,6 %. Un chiffre modeste qui coûte pourtant des centaines de milliers de voix." },
+    ],
+  },
+  {
+    titre: "Convertir sans planter",
+    contexte: "Le motif à recopier dans tout traitement de fichier.",
+    lignes: [
+      { t: 'brut = ["103524", "", "N/A", "-1200", "54073"]' },
+      { t: "" },
+      { t: "total = 0" },
+      { b:1, long:16, consigne:"Un compteur <code>rejetees</code>, à zéro.",
+        ok:["rejetees = 0"],
+        indices:["Comme le total.","<code>rejetees = 0</code>"],
+        pourquoi:"Compter les rejets est aussi important que calculer le total. C'est ce qui distingue un nettoyage d'une perte de données." },
+      { t: "" },
+      { b:1, long:22, consigne:"Une boucle sur <code>brut</code>, chaque élément s'appelle <code>valeur</code>.",
+        ok:["for valeur in brut:"],
+        indices:["Un parcours de liste.","<code>for valeur in brut:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:6, consigne:"Ouvre le bloc « essaie ».",
+        ok:["try:"],
+        indices:["Un mot, deux points.","<code>try:</code>"],
+        pourquoi:"" },
+      { b:1, indent:8, long:24, consigne:"Convertis en entier, dans <code>voix</code>.",
+        ok:["voix = int(valeur)"],
+        indices:["C'est la ligne qui peut échouer.","<code>voix = int(valeur)</code>"],
+        pourquoi:"Sur <code>\"\"</code> et <code>\"N/A\"</code>, cette ligne lève une <code>ValueError</code>." },
+      { b:1, indent:8, long:22, consigne:"Ajoute les voix au total.",
+        ok:["total = total + voix","total += voix"],
+        indices:["Accumulation classique.","<code>total = total + voix</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:20, consigne:"Attrape l'erreur <code>ValueError</code>, et <strong>elle seule</strong>.",
+        ok:["except ValueError:"],
+        indices:["Aligné avec le <code>try</code>, et on nomme l'erreur attendue.",
+                 "<code>except ValueError:</code>"],
+        pourquoi:"Un <code>except</code> nu attraperait aussi tes propres fautes de frappe, et les compterait comme des lignes sales." },
+      { b:1, indent:8, long:26, consigne:"Compte la ligne comme rejetée.",
+        ok:["rejetees = rejetees + 1","rejetees += 1"],
+        indices:["Le compteur de rejets.","<code>rejetees = rejetees + 1</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:40, consigne:"Affiche <code>157597 retenu, 2 rejete</code>.",
+        ok:['print(f"{total} retenu, {rejetees} rejete")'],
+        indices:["Deux accolades.",'<code>print(f"{total} retenu, {rejetees} rejete")</code>'],
+        pourquoi:"Le -1200 s'est converti sans erreur et compte dans le total. Python ne peut pas savoir qu'un nombre de voix négatif est absurde : c'est à toi de le décider." },
+    ],
+  },
+  {
+    titre: "Normaliser le texte",
+    contexte: "Le défaut le plus coûteux de la séance : 44 nuances au lieu de 22.",
+    lignes: [
+      { t: 'nuances = ["RN", " RN ", "rn", "UG", "ug ", "ENS"]' },
+      { t: "" },
+      { b:1, long:14, consigne:"Une liste vide <code>propres</code>.",
+        ok:["propres = []"],
+        indices:["Des crochets vides.","<code>propres = []</code>"],
+        pourquoi:"" },
+      { b:1, long:22, consigne:"Une boucle sur <code>nuances</code>, chaque élément s'appelle <code>n</code>.",
+        ok:["for n in nuances:"],
+        indices:["Un parcours de liste.","<code>for n in nuances:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:34, consigne:"Ajoute à <code>propres</code> la nuance <strong>sans espaces et en majuscules</strong>.",
+        ok:["propres.append(n.strip().upper())"],
+        indices:["On enchaîne les deux : <code>n.strip().upper()</code>",
+                 "<code>propres.append(n.strip().upper())</code>"],
+        pourquoi:"L'ordre compte peu ici, mais l'enchaînement est le motif standard : chaque outil rend un texte, sur lequel on applique le suivant." },
+      { t: "" },
+      { b:1, long:38, consigne:"Affiche le nombre de valeurs distinctes avant et après : <code>6 -> 3</code>. Utilise <code>set</code>.",
+        ok:['print(len(set(nuances)), "->", len(set(propres)))'],
+        indices:["<code>set(...)</code> supprime les doublons, <code>len</code> les compte.",
+                 '<code>print(len(set(nuances)), "->", len(set(propres)))</code>'],
+        pourquoi:"Six valeurs distinctes qui n'en font que trois. Sur le vrai fichier : 44 qui n'en font que 22." },
+    ],
+  },
+  {
+    titre: "Le pipeline complet",
+    contexte: "Nettoyer, agréger, et rendre des comptes.",
+    lignes: [
+      { t: "import csv" },
+      { t: 'fichier = open("legislatives-2024-sale.csv", encoding="utf-8", newline="")' },
+      { t: 'donnees = list(csv.reader(fichier, delimiter=";"))[1:]' },
+      { t: "fichier.close()" },
+      { t: "" },
+      { t: "totaux = {}" },
+      { t: "rejetees = 0" },
+      { b:1, long:16, consigne:"Un <code>set</code> vide nommé <code>vues</code>, pour mémoriser les lignes déjà rencontrées.",
+        ok:["vues = set()"],
+        indices:["Un ensemble vide s'écrit <code>set()</code>, pas <code>{}</code>.",
+                 "<code>vues = set()</code>"],
+        pourquoi:"<code>{}</code> crée un dictionnaire vide, pas un ensemble. C'est une des rares irrégularités de Python." },
+      { t: "" },
+      { t: "for ligne in donnees:" },
+      { b:1, indent:4, long:24, consigne:"Fabrique une clé comparable à partir de la ligne entière, dans <code>cle</code>. Utilise <code>tuple</code>.",
+        ok:["cle = tuple(ligne)"],
+        indices:["<code>tuple(...)</code> transforme la liste en valeur figée, utilisable dans un set.",
+                 "<code>cle = tuple(ligne)</code>"],
+        pourquoi:"Une liste ne peut pas entrer dans un <code>set</code> parce qu'elle est modifiable. Le tuple, lui, est figé." },
+      { b:1, indent:4, long:22, consigne:"Si cette clé a <strong>déjà</strong> été vue…",
+        ok:["if cle in vues:"],
+        indices:["Le mot pour « est dans » est <code>in</code>.","<code>if cle in vues:</code>"],
+        pourquoi:"" },
+      { t: "        rejetees = rejetees + 1" },
+      { b:1, indent:8, long:10, consigne:"Passe à la ligne suivante sans traiter celle-ci.",
+        ok:["continue"],
+        indices:["Le mot qui saute au tour suivant.","<code>continue</code>"],
+        pourquoi:"<code>continue</code> et non <code>break</code> : on saute une ligne, on n'arrête pas le fichier." },
+      { b:1, indent:4, long:20, consigne:"Mémorise cette clé.",
+        ok:["vues.add(cle)"],
+        indices:["On ajoute à un set avec <code>.add()</code>","<code>vues.add(cle)</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { t: "    try:" },
+      { t: "        voix = int(ligne[6])" },
+      { t: "    except ValueError:" },
+      { t: "        rejetees = rejetees + 1" },
+      { t: "        continue" },
+      { t: "" },
+      { b:1, indent:4, long:32, consigne:"Range la nuance normalisée dans <code>nuance</code>.",
+        ok:["nuance = ligne[5].strip().upper()"],
+        indices:["Sans espaces et en majuscules.","<code>nuance = ligne[5].strip().upper()</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:44, consigne:"Ajoute les voix au total de cette nuance, avec <code>.get()</code>.",
+        ok:["totaux[nuance] = totaux.get(nuance, 0) + voix"],
+        indices:["<code>totaux.get(nuance, 0)</code> rend 0 si la nuance est inconnue.",
+                 "<code>totaux[nuance] = totaux.get(nuance, 0) + voix</code>"],
+        pourquoi:"" },
+      { t: "" },
+      { b:1, long:52, consigne:"Le rapport : affiche <code>1008 retenues, 51 rejetees, 22 nuances</code>.",
+        ok:['print(f"{len(donnees) - rejetees} retenues, {rejetees} rejetees, {len(totaux)} nuances")'],
+        indices:["Les retenues, c'est le total lu moins les rejets.",
+                 '<code>print(f"{len(donnees) - rejetees} retenues, {rejetees} rejetees, {len(totaux)} nuances")</code>'],
+        pourquoi:"Ce rapport est la partie la plus importante du programme. Sans lui, les 51 lignes perdues n'existent pour personne." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=3"></script>
+
+<script>
+/* ---------- Le code de l'IA : un nettoyage muet ---------- */
+(function () {
+  const LIGNES = [
+    "import csv",
+    "",
+    "totaux = {}",
+    "",
+    'with open("legislatives-2024-sale.csv", encoding="utf-8", newline="") as f:',
+    '    lecteur = csv.reader(f, delimiter=";")',
+    "    next(lecteur)",
+    "    for ligne in lecteur:",
+    "        try:",
+    "            voix = int(ligne[6])",
+    "        except ValueError:",
+    "            continue",
+    "        nuance = ligne[5].strip().upper()",
+    "        totaux[nuance] = totaux.get(nuance, 0) + voix",
+    "",
+    "for nuance, voix in sorted(totaux.items(), key=lambda x: -x[1]):",
+    '    print(f"{nuance} : {voix}")',
+  ];
+  const BUGS = [11];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 12</div>' +
+        "<p>Ce <code>continue</code> est <strong>muet</strong>. Il écarte 48 lignes " +
+        "sans les compter, sans les signaler, sans laisser la moindre trace.</p>" +
+        "<p>Le programme affiche un classement impeccable, bien trié, sans erreur. " +
+        "Et personne ne saura jamais qu'il porte sur <strong>95,5 % des données</strong> " +
+        "et qu'il manque <strong>1,6 million de voix</strong>.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction tient en deux lignes :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        "        except ValueError:\n" +
+        "            rejetees = rejetees + 1\n" +
+        "            continue\n\n" +
+        "# ... et a la fin\n" +
+        'print(f"{rejetees} lignes ecartees, non convertibles")</p>' +
+        "<p style='margin-bottom:0'>Le code de l'IA n'est pas incorrect : il est " +
+        "<strong>irresponsable</strong>. Nuance essentielle, et c'est exactement " +
+        "celle qu'on te demandera de tenir.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Un second défaut, plus subtil</div>' +
+        "<p style='margin-bottom:0'>La valeur <code>-1200</code> passe le " +
+        "<code>int()</code> sans problème et entre dans le total. " +
+        "<strong>Aucune IA ne peut savoir qu'un nombre de voix négatif est absurde</strong> : " +
+        "c'est une connaissance du métier, pas du langage.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte, et le code tourne parfaitement. " +
+        "Pose-toi la vraie question : <em>quand ce programme rencontre une ligne " +
+        "illisible, qu'est-ce qu'il en fait, et qui est au courant ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Le nettoyeur : chaque règle déplace le résultat ---------- */
+(function () {
+  const OFFICIEL = 9379092;
+  // mesures reelles sur le fichier, cle = texte + dedoublonnage + rejet des negatifs
+  const T = {
+    "000": {retenues:1011, rejetees:48, nuances:44, rn:8236817},
+    "001": {retenues:1010, rejetees:49, nuances:44, rn:8236817},
+    "010": {retenues:1009, rejetees:50, nuances:44, rn:8236817},
+    "011": {retenues:1008, rejetees:51, nuances:44, rn:8236817},
+    "100": {retenues:1011, rejetees:48, nuances:22, rn:8509747},
+    "101": {retenues:1010, rejetees:49, nuances:22, rn:8509747},
+    "110": {retenues:1009, rejetees:50, nuances:22, rn:8509747},
+    "111": {retenues:1008, rejetees:51, nuances:22, rn:8509747},
+  };
+
+  const REGLES = [
+    { cle: "texte", titre: "Normaliser le texte",
+      sous: "strip() et upper() sur les nuances" },
+    { cle: "dedup", titre: "Supprimer les doublons",
+      sous: "les lignes strictement identiques" },
+    { cle: "neg", titre: "Rejeter les valeurs aberrantes",
+      sous: "un nombre de voix négatif n'a pas de sens" },
+  ];
+
+  const etat = { texte: false, dedup: false, neg: false };
+  const nb = (n) => n.toLocaleString("fr-FR");
+
+  function maj() {
+    document.getElementById("regles").innerHTML = REGLES.map((r) =>
+      '<div class="regle' + (etat[r.cle] ? " on" : "") + '" data-c="' + r.cle + '">' +
+      '<div class="coche">✓</div><div><strong>' + r.titre + "</strong>" +
+      "<span>" + r.sous + "</span></div></div>"
+    ).join("");
+    document.querySelectorAll(".regle").forEach((el) =>
+      (el.onclick = () => { etat[el.dataset.c] = !etat[el.dataset.c]; maj(); }));
+
+    const k = (etat.texte ? "1" : "0") + (etat.dedup ? "1" : "0") + (etat.neg ? "1" : "0");
+    const d = T[k];
+
+    const cn = document.getElementById("k-nuances");
+    cn.className = "kpi2 " + (d.nuances === 22 ? "bon" : "mauvais");
+    cn.querySelector("b").textContent = d.nuances;
+
+    document.getElementById("k-ret").textContent = nb(d.retenues);
+    document.getElementById("k-rej").textContent = d.rejetees + " lignes écartées";
+    document.getElementById("k-rn").textContent = nb(d.rn) + " voix";
+
+    const ecart = OFFICIEL - d.rn;
+    const pct = (ecart / OFFICIEL * 100).toFixed(1).replace(".", ",");
+    const bloc = document.getElementById("k-ecart");
+    bloc.className = "ecart " + (d.nuances === 22 ? "proche" : "loin");
+    document.getElementById("k-diff").textContent = "- " + nb(ecart) + " voix  (" + pct + " %)";
+    document.getElementById("k-diff").style.color = d.nuances === 22 ? "#b8560c" : "var(--red)";
+
+    document.getElementById("k-note").innerHTML = d.nuances === 44
+      ? "Le RN est éparpillé entre <code>'RN'</code>, <code>' RN '</code> et <code>'rn'</code>. " +
+        "Il apparaît <strong>12 % plus faible</strong> qu'en réalité."
+      : "Le texte est normalisé, les 22 vraies nuances sont là. " +
+        "<strong>Il manque encore 870 000 voix</strong> : elles étaient dans les 48 lignes " +
+        "illisibles. Le nettoyage ne récupère pas ce qui a été détruit, " +
+        "il permet seulement de <strong>savoir combien il manque</strong>.";
+  }
+  maj();
+})();
+</script>
+
+</body>
+</html>
