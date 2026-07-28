@@ -9,11 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="../assets/style.css?v=2">
 <style>
-  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
-  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
-  .etape-num { background: #1f6feb; }
-  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
-  .box.prof .box-title { color: #2b4b7e; }
 
   .pret { display: grid; grid-template-columns: 1fr 300px; gap: 28px; align-items: start; }
   @media (max-width: 900px) { .pret { grid-template-columns: 1fr; } }
@@ -161,7 +156,7 @@ print(f"Gagne : {round(capital - total_verse)} EUR")
         <div>
           <canvas id="amort" width="760" height="330" style="width:100%;background:#fff;border:1px solid var(--line);border-radius:10px"></canvas>
           <div class="legende">
-            <span><i style="background:#1f6feb"></i>capital remboursé</span>
+            <span><i style="background:#f07818"></i>capital remboursé</span>
             <span><i style="background:#f0a828"></i>intérêts versés</span>
           </div>
           <div class="slider-row" style="margin-top:18px">
@@ -648,7 +643,7 @@ window.EXERCICES = [
       const x = M.g + i * pas + pas * 0.14, larg = pas * 0.72;
       const hP = (a.principal / maxBarre) * (H - M.h - M.b);
       const hI = (a.interets / maxBarre) * (H - M.h - M.b);
-      ctx.fillStyle = "#1f6feb";
+      ctx.fillStyle = "#f07818";
       ctx.fillRect(x, H - M.b - hP, larg, hP);
       ctx.fillStyle = "#f0a828";
       ctx.fillRect(x, H - M.b - hP - hI, larg, hI);

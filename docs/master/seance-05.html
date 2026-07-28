@@ -9,11 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="../assets/style.css?v=2">
 <style>
-  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
-  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
-  .etape-num { background: #1f6feb; }
-  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
-  .box.prof .box-title { color: #2b4b7e; }
 
   .van { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
   @media (max-width: 900px) { .van { grid-template-columns: 1fr; } }
@@ -26,7 +21,7 @@
   .carte-v.pos b { color: var(--green); }
   .carte-v.neg { background: var(--red-soft); border-color: #f5c9c4; }
   .carte-v.neg b { color: var(--red); }
-  .carte-v.tri b { color: #1f6feb; }
+  .carte-v.tri b { color: #f07818; }
   .flux { display: flex; gap: 6px; margin-bottom: 16px; }
   .flux div { flex: 1; text-align: center; font-family: var(--mono); font-size: 12.5px;
     padding: 7px 4px; border-radius: 7px; background: var(--bg-soft); color: var(--ink-soft); }
@@ -660,7 +655,7 @@ window.EXERCICES = [
       const xx = x((k / 100) * tMax), yy = y(v);
       k ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy);
     });
-    ctx.strokeStyle = "#1f6feb"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.stroke();
+    ctx.strokeStyle = "#f07818"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.stroke();
 
     // le TRI
     if (t !== null && t <= tMax) {
@@ -676,7 +671,7 @@ window.EXERCICES = [
     }
 
     // le point du taux retenu
-    ctx.fillStyle = vanActuelle >= 0 ? "#1f6feb" : "#d13a2c";
+    ctx.fillStyle = vanActuelle >= 0 ? "#f07818" : "#d13a2c";
     ctx.beginPath(); ctx.arc(x(Math.min(taux, tMax)), y(vanActuelle), 6, 0, 6.283); ctx.fill();
 
     ctx.fillStyle = "#9a9287"; ctx.textAlign = "center";

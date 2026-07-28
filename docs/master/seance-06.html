@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 6 - De vraies données</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>
+
+  .brut { background: var(--code-bg); color: #cdd6e6; border-radius: 10px;
+    padding: 14px 16px; font-family: var(--mono); font-size: 12.5px;
+    line-height: 1.8; overflow-x: auto; white-space: pre; }
+  .brut .sep { color: #ff8b7d; font-weight: 700; }
+  .brut .ent { color: #ffd9b3; }
+
+  .tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .tbl th { background: var(--bg-soft); padding: 7px 9px; text-align: left;
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+  .tbl td { padding: 6px 9px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; }
+  .bascule-vue { display: flex; border: 1px solid var(--line); border-radius: 9px;
+    overflow: hidden; width: fit-content; margin-bottom: 14px; }
+  .bascule-vue button { border: 0; border-radius: 0; background: #fff; color: var(--ink-soft);
+    padding: 8px 18px; font-weight: 650; font-size: 14px; }
+  .bascule-vue button.on { background: #f07818; color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 6</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#ou">🔎</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 6 · 1 h 30</div>
+    <h1>De vraies données</h1>
+    <p class="lede">Jusqu'ici, tes chiffres étaient tapés dans le code. Aujourd'hui tu ouvres
+    un <strong>vrai fichier du ministère de l'Intérieur</strong> : les résultats définitifs
+    du premier tour des législatives de 2024, département par département.
+    32 millions de voix, 1 057 lignes.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Ouvrir un fichier, comprendre sa structure, le charger en mémoire et en tirer
+    un chiffre national. Autrement dit : arrêter de dépendre de ce que quelqu'un
+    a bien voulu recopier pour toi.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Ouvrir un fichier</h2>
+      <div class="etape-meta">15 minutes · open, read, close</div></div></div>
+
+    <p>Trois temps, toujours les mêmes : <strong>ouvrir</strong>, <strong>lire</strong>,
+    <strong>fermer</strong>. Regarde d'abord à quoi ressemble le fichier avant
+    de vouloir le traiter.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+fichier = open("legislatives-2024.csv", encoding="utf-8")
+contenu = fichier.read()
+fichier.close()
+
+print(len(contenu), "caracteres")
+print(contenu[:300])
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 L'encodage, ce détail qui gâche des journées</div>
+      <p><code>encoding="utf-8"</code> n'est pas décoratif. Sans lui, selon la machine,
+      <em>Côte-d'Or</em> devient <em>CÃ´te-d'Or</em>. C'est la première question à poser
+      devant un fichier inconnu.</p>
+      <p>Les fichiers publics français sont tantôt en <code>utf-8</code>,
+      tantôt en <code>latin-1</code>. Quand les accents sont cassés, c'est presque
+      toujours ça — et non un problème dans tes données.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Ce que Python voit, et ce que tu crois voir</h2>
+      <div class="etape-meta">bascule entre les deux</div></div></div>
+
+    <p>Un tableur te montre un tableau. <strong>Python, lui, reçoit du texte brut</strong>,
+    avec des points-virgules et des retours à la ligne. Tout le travail consiste
+    à passer de gauche à droite.</p>
+
+    <div class="widget">
+      <div class="bascule-vue">
+        <button class="on" data-v="brut">Ce que Python reçoit</button>
+        <button data-v="table">Ce que tu imagines</button>
+      </div>
+      <div id="vue-fichier"></div>
+      <p class="hint" id="vue-note" style="margin-top:12px"></p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Pourquoi le point-virgule</div>
+      <p>Un fichier CSV français utilise presque toujours le <strong>point-virgule</strong>,
+      parce que la virgule est déjà prise par les décimales : <code>29,26</code>.
+      Les fichiers anglo-saxons utilisent la virgule et le point décimal.</p>
+      <p>Ouvrir un fichier français en supposant la virgule, c'est obtenir une seule
+      colonne géante. Tu le verras dans le bloc IA à la fin de la séance.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Découper proprement</h2>
+      <div class="etape-meta">20 minutes · le module csv</div></div></div>
+
+    <p>On pourrait découper à la main avec <code>split(";")</code>. Le module
+    <code>csv</code> le fait mieux : il gère les guillemets, les champs contenant
+    un point-virgule, les retours à la ligne à l'intérieur d'une cellule.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import csv
+
+fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")
+lecteur = csv.reader(fichier, delimiter=";")
+lignes = list(lecteur)
+fichier.close()
+
+entete = lignes[0]
+donnees = lignes[1:]
+
+print(entete)
+print(len(donnees), "lignes de donnees")
+print(donnees[0])
+print(donnees[1])
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 L'en-tête compté comme une donnée</div>
+      <p>Enlève <code>donnees = lignes[1:]</code> et travaille directement sur
+      <code>lignes</code>. Ton total national gagnera une ligne fantôme dont
+      la colonne « voix » vaut le texte <code>"voix"</code>.</p>
+      <p>Selon le calcul, ça plante ou ça fausse silencieusement. Sur un fichier
+      de 1 057 lignes, une ligne de trop passe inaperçue.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Tout arrive en texte</h2>
+      <div class="etape-meta">15 minutes · le retour du piège de la séance 1</div></div></div>
+
+    <p>Un fichier ne contient que des caractères. <strong>Aucune colonne n'est
+    un nombre</strong> tant que tu ne l'as pas convertie — même celles qui
+    ressemblent à des nombres.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import csv
+
+fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")
+donnees = list(csv.reader(fichier, delimiter=";"))[1:]
+fichier.close()
+
+premiere = donnees[0]
+print(premiere[6])
+print(type(premiere[6]))
+
+# la preuve par l'absurde
+print(premiere[6] + premiere[6])
+
+# et maintenant, en nombre
+print(int(premiere[6]) + int(premiere[6]))
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le réflexe à installer maintenant</div>
+      <p>Devant tout fichier : <strong>afficher une ligne, et vérifier le type
+      de chaque colonne qu'on va calculer</strong>. Trente secondes qui évitent
+      des heures.</p>
+      <p>C'est le même piège qu'à la séance 1 avec <code>input</code>. Il ne disparaît
+      jamais : il change simplement de porte d'entrée.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : le résultat national</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>À partir du fichier, reconstitue le résultat national du premier tour :
+    le total des voix par nuance politique, et le pourcentage des exprimés.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Les colonnes du fichier</div>
+      <p style="font-family:var(--mono);font-size:13.5px">0 code · 1 departement · 2 inscrits · 3 votants · 4 exprimes · 5 nuance · 6 voix</p>
+      <p><strong>Attention :</strong> le fichier est en format long. Chaque département
+      apparaît sur plusieurs lignes, une par nuance. Donc <code>exprimes</code>
+      est <strong>répété</strong> sur toutes les lignes d'un même département :
+      tu ne peux pas simplement additionner cette colonne.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import csv
+
+# 1. Charge le fichier
+
+
+# 2. Additionne les voix par nuance (un dictionnaire est ton ami)
+
+
+# 3. Calcule le total des exprimes SANS le compter plusieurs fois
+
+
+# 4. Affiche le classement des nuances
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. Le piège du total des exprimés
+      est volontaire : c'est le premier vrai problème d'agrégation du parcours.
+      La solution est un dictionnaire <code>code -> exprimes</code>, puis la somme
+      de ses valeurs.</p>
+      <p><strong>Le contrôle qui valide tout :</strong> son total d'exprimés doit
+      tomber sur <strong>32 057 946</strong>, et le RN sur <strong>29,26 %</strong>.
+      Ce sont les chiffres publiés. S'il ne les retrouve pas, il a un bug —
+      et il le sait sans que tu aies à le lui dire.</p>
+    </div>
+  </section>
+
+  <!-- OÙ TROUVER DES DONNÉES -->
+  <section class="etape" id="ou">
+    <div class="etape-head"><div class="etape-num">🔎</div><div>
+      <h2>Où trouver des données publiques</h2>
+      <div class="etape-meta">10 minutes · pour ton projet final</div></div></div>
+
+    <p>Le fichier d'aujourd'hui vient de <a href="https://www.data.gouv.fr/elections">data.gouv.fr</a>,
+    publié par le ministère de l'Intérieur sous <strong>Licence Ouverte 2.0</strong> :
+    réutilisation libre, y compris commerciale, avec mention de la source.</p>
+
+    <table style="border-collapse:collapse;width:100%;font-size:15px;margin:16px 0">
+      <thead><tr style="text-align:left;border-bottom:2px solid var(--line)">
+        <th style="padding:9px 8px">Portail</th><th>Ce qu'on y trouve</th></tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><strong>data.gouv.fr</strong></td><td>Élections, budget de l'État, entreprises, transports, énergie</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><strong>INSEE</strong></td><td>Population, revenus, emploi, prix, démographie des entreprises</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><strong>Eurostat</strong></td><td>Les mêmes indicateurs, comparables entre pays européens</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px"><strong>Banque mondiale</strong></td><td>PIB, dette, santé, éducation, pour presque tous les pays</td></tr>
+        <tr><td style="padding:8px"><strong>geoBoundaries</strong></td><td>Les fonds de carte administratifs du monde entier</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Les quatre questions avant de télécharger</div>
+      <ol style="margin-bottom:0">
+        <li><strong>Quelle granularité ?</strong> Un fichier par commune fait
+        35 000 lignes, par département il en fait 100. Prends le plus petit
+        qui répond à ta question.</li>
+        <li><strong>Quelle licence ?</strong> Licence Ouverte, CC-BY, ou rien du tout.
+        Sans licence explicite, on ne republie pas.</li>
+        <li><strong>Quel format ?</strong> CSV ou Excel se lisent. Un PDF, non —
+        et c'est souvent un choix politique de le publier ainsi.</li>
+        <li><strong>Quelle date ?</strong> Un fichier « résultats provisoires »
+        ne donne pas les mêmes chiffres que le définitif.</li>
+      </ol>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Le réflexe qui te distinguera</div>
+      <p><strong>Toujours citer la source et la date d'extraction</strong> dans ta note.
+      Pas par formalisme : parce que les fichiers publics sont corrigés en silence,
+      parfois des mois après. Sans la date, ton chiffre n'est pas reproductible,
+      donc pas vérifiable, donc contestable.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">J'ai un fichier CSV des résultats électoraux avec les colonnes code, departement, inscrits, votants, exprimes, nuance, voix. Écris-moi un programme Python qui calcule le total des voix par nuance.</p>
+      <p style="margin-top:12px">Le code est propre et la logique d'agrégation est juste.
+      <strong>Il ne lira jamais une seule ligne correctement.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Ce que l'IA ne peut pas deviner</div>
+      <p>Elle n'a jamais vu ton fichier. Elle ne connaît ni son séparateur,
+      ni son encodage, ni s'il a un en-tête. Elle applique <strong>la convention
+      la plus fréquente sur internet</strong>, qui est anglo-saxonne.</p>
+      <p>C'est une limite structurelle, pas un défaut de qualité :
+      <strong>aucune quantité d'intelligence ne compense l'absence du fichier</strong>.
+      D'où le réflexe : afficher les trois premières lignes brutes
+      avant d'écrire la moindre ligne de traitement.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Calcule le <strong>taux de participation par département</strong>, et affiche
+      les cinq plus forts et les cinq plus faibles.</p>
+      <p class="hint" style="margin-top:8px">Attention au même piège que dans le chantier :
+      <code>inscrits</code> et <code>votants</code> sont répétés sur chaque ligne
+      d'un département. Additionner la colonne brute te donnera un taux
+      parfaitement crédible et parfaitement faux.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-05.html" style="color:var(--orange);font-weight:650">← Séance 5</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+      &nbsp;·&nbsp;<a href="seance-07.html" style="color:var(--orange);font-weight:650">Séance 7 →</a>
+    </p>
+  </section>
+
+</div>
+
+<script>window.FICHIERS = ["donnees/legislatives-2024.csv"];</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=2"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Ouvrir et regarder",
+    contexte: "Avant de traiter un fichier, on le regarde. Toujours.",
+    lignes: [
+      { b:1, long:48, consigne:"Ouvre <code>legislatives-2024.csv</code> en précisant l'encodage <code>utf-8</code>, dans <code>fichier</code>.",
+        ok:['fichier = open("legislatives-2024.csv", encoding="utf-8")'],
+        indices:["L'outil s'appelle <code>open</code>, et l'encodage se passe en argument nommé.",
+                 '<code>fichier = open("legislatives-2024.csv", encoding="utf-8")</code>'],
+        pourquoi:"Sans l'encodage, les accents des noms de départements peuvent arriver cassés selon la machine." },
+      { b:1, long:26, consigne:"Lis tout le contenu dans <code>contenu</code>.",
+        ok:["contenu = fichier.read()"],
+        indices:["L'outil qui lit tout s'appelle <code>.read()</code>","<code>contenu = fichier.read()</code>"],
+        pourquoi:"" },
+      { b:1, long:18, consigne:"Ferme le fichier.",
+        ok:["fichier.close()"],
+        indices:["Toujours fermer ce qu'on a ouvert.","<code>fichier.close()</code>"],
+        pourquoi:"Sur un fichier ouvert en écriture, oublier de fermer signifie perdre les données. Autant prendre le pli tout de suite." },
+      { t: "" },
+      { b:1, long:30, consigne:"Affiche les <strong>200 premiers caractères</strong> du contenu.",
+        ok:["print(contenu[:200])"],
+        indices:["Les crochets avec deux points prennent une tranche : <code>contenu[:200]</code>",
+                 "<code>print(contenu[:200])</code>"],
+        pourquoi:"Regarder le brut avant de traiter : c'est ce qui te dit le séparateur, la présence d'un en-tête, et le format des nombres." },
+    ],
+  },
+  {
+    titre: "Découper avec le module csv",
+    contexte: "Le séparateur est un point-virgule, comme dans presque tout fichier public français.",
+    lignes: [
+      { t: "import csv" },
+      { t: "" },
+      { b:1, long:56, consigne:"Ouvre le fichier avec l'encodage <code>utf-8</code> et <code>newline=\"\"</code>, dans <code>fichier</code>.",
+        ok:['fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")'],
+        indices:["Deux arguments nommés, séparés par une virgule.",
+                 '<code>fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")</code>'],
+        pourquoi:"<code>newline=\"\"</code> est recommandé avec le module csv : il lui laisse gérer lui-même les fins de ligne, qui diffèrent entre Windows et le reste du monde." },
+      { b:1, long:46, consigne:"Crée un lecteur csv sur ce fichier, avec le <strong>point-virgule</strong> comme séparateur.",
+        ok:['lecteur = csv.reader(fichier, delimiter=";")'],
+        indices:["Le séparateur se précise avec <code>delimiter</code>.",
+                 '<code>lecteur = csv.reader(fichier, delimiter=";")</code>'],
+        pourquoi:"C'est LA ligne que l'IA rate à la fin de la séance : elle suppose la virgule, convention anglo-saxonne." },
+      { b:1, long:26, consigne:"Transforme le lecteur en liste de lignes, dans <code>lignes</code>.",
+        ok:["lignes = list(lecteur)"],
+        indices:["<code>list(...)</code> parcourt le lecteur d'un coup.","<code>lignes = list(lecteur)</code>"],
+        pourquoi:"" },
+      { t: "fichier.close()" },
+      { t: "" },
+      { b:1, long:24, consigne:"Range toutes les lignes <strong>sauf la première</strong> dans <code>donnees</code>.",
+        ok:["donnees = lignes[1:]"],
+        indices:["Une tranche qui saute la case 0 : <code>lignes[1:]</code>",
+                 "<code>donnees = lignes[1:]</code>"],
+        pourquoi:"La première ligne est l'en-tête. L'oublier ajoute une ligne fantôme dont la colonne voix vaut le texte « voix »." },
+      { b:1, long:34, consigne:"Affiche <code>1057 lignes de donnees</code>.",
+        ok:['print(f"{len(donnees)} lignes de donnees")'],
+        indices:["<code>len</code> compte les lignes.",'<code>print(f"{len(donnees)} lignes de donnees")</code>'],
+        pourquoi:"1057 : c'est le nombre de couples département-nuance du premier tour." },
+    ],
+  },
+  {
+    titre: "Tout arrive en texte",
+    contexte: "Le piège de la séance 1, qui revient par une autre porte.",
+    lignes: [
+      { t: "import csv" },
+      { t: 'fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")' },
+      { t: 'donnees = list(csv.reader(fichier, delimiter=";"))[1:]' },
+      { t: "fichier.close()" },
+      { t: "" },
+      { b:1, long:26, consigne:"Range la première ligne de données dans <code>ligne</code>.",
+        ok:["ligne = donnees[0]"],
+        indices:["La première case porte le numéro 0.","<code>ligne = donnees[0]</code>"],
+        pourquoi:"" },
+      { b:1, long:24, consigne:"Affiche la colonne <strong>voix</strong>, qui porte le numéro <code>6</code>.",
+        ok:["print(ligne[6])"],
+        indices:["Le numéro de colonne va entre crochets.","<code>print(ligne[6])</code>"],
+        pourquoi:"" },
+      { b:1, long:26, consigne:"Affiche le <strong>type</strong> de cette colonne.",
+        ok:["print(type(ligne[6]))"],
+        indices:["<code>type(...)</code> glissé dans le print.","<code>print(type(ligne[6]))</code>"],
+        pourquoi:"<code>&lt;class 'str'&gt;</code> : c'est du texte, malgré les apparences. Aucune colonne d'un fichier n'est un nombre avant conversion." },
+      { b:1, long:36, consigne:"Additionne cette valeur avec elle-même, <strong>en nombre entier</strong>.",
+        ok:["print(int(ligne[6]) + int(ligne[6]))"],
+        indices:["Il faut convertir chaque terme avec <code>int</code>.",
+                 "<code>print(int(ligne[6]) + int(ligne[6]))</code>"],
+        pourquoi:"Sans les <code>int</code>, tu obtiendrais les deux nombres collés bout à bout. Silencieux, crédible, faux." },
+    ],
+  },
+  {
+    titre: "Le total par nuance",
+    contexte: "L'agrégation qui reconstitue le résultat national.",
+    lignes: [
+      { t: "import csv" },
+      { t: 'fichier = open("legislatives-2024.csv", encoding="utf-8", newline="")' },
+      { t: 'donnees = list(csv.reader(fichier, delimiter=";"))[1:]' },
+      { t: "fichier.close()" },
+      { t: "" },
+      { b:1, long:14, consigne:"Crée un dictionnaire <code>totaux</code>, <strong>vide</strong>.",
+        ok:["totaux = {}"],
+        indices:["Des accolades, et rien entre les deux.","<code>totaux = {}</code>"],
+        pourquoi:"On ne connaît pas d'avance la liste des nuances : on la découvre en parcourant le fichier." },
+      { b:1, long:24, consigne:"Une boucle sur <code>donnees</code>, en appelant chaque élément <code>ligne</code>.",
+        ok:["for ligne in donnees:"],
+        indices:["Un parcours de liste classique.","<code>for ligne in donnees:</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:26, consigne:"Range la nuance (colonne <code>5</code>) dans <code>nuance</code>.",
+        ok:["nuance = ligne[5]"],
+        indices:["La colonne 5.","<code>nuance = ligne[5]</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:26, consigne:"Range les voix (colonne <code>6</code>) <strong>converties en entier</strong> dans <code>voix</code>.",
+        ok:["voix = int(ligne[6])"],
+        indices:["N'oublie pas la conversion.","<code>voix = int(ligne[6])</code>"],
+        pourquoi:"" },
+      { b:1, indent:4, long:44, consigne:"Ajoute ces voix au total de la nuance. Utilise <code>.get()</code> pour gérer la première rencontre.",
+        ok:["totaux[nuance] = totaux.get(nuance, 0) + voix"],
+        indices:["<code>totaux.get(nuance, 0)</code> rend 0 si la nuance n'est pas encore connue.",
+                 "<code>totaux[nuance] = totaux.get(nuance, 0) + voix</code>"],
+        pourquoi:"C'est le motif d'agrégation le plus utile de tout Python. Sans <code>.get()</code>, la première rencontre planterait sur un KeyError." },
+      { t: "" },
+      { b:1, long:34, consigne:"Affiche le total du <code>RN</code>.",
+        ok:['print(totaux["RN"])'],
+        indices:["On demande la clé entre crochets.",'<code>print(totaux["RN"])</code>'],
+        pourquoi:"9 379 092 voix. C'est le chiffre officiel du premier tour : ton programme vient de reconstituer un résultat national à partir du fichier brut." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=2"></script>
+
+<script>
+/* ---------- Le code de l'IA : le mauvais séparateur ---------- */
+(function () {
+  const LIGNES = [
+    "import csv",
+    "",
+    "totaux = {}",
+    "",
+    'with open("legislatives-2024.csv") as f:',
+    "    lecteur = csv.reader(f)",
+    "    next(lecteur)",
+    "    for ligne in lecteur:",
+    "        nuance = ligne[5]",
+    "        totaux[nuance] = totaux.get(nuance, 0) + int(ligne[6])",
+    "",
+    "for nuance, voix in totaux.items():",
+    '    print(f"{nuance} : {voix}")',
+  ];
+  const BUGS = [5];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 6</div>' +
+        "<p><code>csv.reader(f)</code> suppose la <strong>virgule</strong>. " +
+        "Le fichier est séparé par des <strong>points-virgules</strong>, " +
+        "comme presque tout fichier public français.</p>" +
+        "<p>Chaque ligne arrive donc en <strong>une seule colonne</strong>. " +
+        "<code>ligne[5]</code> plante immédiatement sur un " +
+        "<code>IndexError: list index out of range</code> : le programme ne lit " +
+        "pas une seule ligne correctement.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        'lecteur = csv.reader(f, delimiter=";")</p>' +
+        "<p style='margin-bottom:0'>Et tant qu'on y est, la ligne 5 mériterait aussi " +
+        "<code>encoding=\"utf-8\"</code> : sans lui, selon la machine, " +
+        "<em>Côte-d'Or</em> peut arriver en <em>CÃ´te-d'Or</em>.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 La bonne nouvelle</div>' +
+        "<p style='margin-bottom:0'>Cette erreur <strong>plante bruyamment</strong>. " +
+        "Elle coûtera cinq minutes. Les erreurs des séances précédentes, elles, " +
+        "sortaient un chiffre faux sans rien dire. <strong>Un plantage est toujours " +
+        "une bonne nouvelle</strong> comparé à un résultat silencieusement faux.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Reviens au widget plus haut : " +
+        "<em>qu'est-ce qui sépare les colonnes dans ce fichier, et qu'est-ce que " +
+        "ce code suppose ?</em></p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Brut contre tableau ---------- */
+(function () {
+  const BRUT = [
+    ["code;departement;inscrits;votants;exprimes;nuance;voix", true],
+    ["01;Ain;462144;308906;303982;RN;103524", false],
+    ["01;Ain;462144;308906;303982;ENS;73218", false],
+    ["01;Ain;462144;308906;303982;UG;60849", false],
+    ["02;Aisne;389093;250243;245829;RN;108739", false],
+    ["02;Aisne;389093;250243;245829;UG;54073", false],
+  ];
+
+  const eV = document.getElementById("vue-fichier");
+  const eN = document.getElementById("vue-note");
+
+  function montre(v) {
+    if (v === "brut") {
+      eV.innerHTML = '<div class="brut">' + BRUT.map(([l, ent]) =>
+        (ent ? '<span class="ent">' : "<span>") +
+        l.replace(/;/g, '<span class="sep">;</span>') + "</span>"
+      ).join("\n") + "</div>";
+      eN.innerHTML = "Une suite de caractères, rien d'autre. Les <strong style='color:var(--red)'>" +
+        "points-virgules</strong> séparent les colonnes, les retours à la ligne séparent " +
+        "les lignes. <strong>Tout est du texte</strong>, y compris 103524.";
+    } else {
+      const t = BRUT.slice(1).map((x) => x[0].split(";"));
+      const e = BRUT[0][0].split(";");
+      eV.innerHTML = '<div style="overflow-x:auto"><table class="tbl"><thead><tr>' +
+        e.map((c) => "<th>" + c + "</th>").join("") + "</tr></thead><tbody>" +
+        t.map((r) => "<tr>" + r.map((c) => "<td>" + c + "</td>").join("") + "</tr>").join("") +
+        "</tbody></table></div>";
+      eN.innerHTML = "C'est ce qu'un tableur affiche, et ce que ton cerveau lit. " +
+        "<strong>Python ne voit pas ça</strong> tant que tu ne l'as pas construit. " +
+        "Le module <code>csv</code> fait exactement ce passage.";
+    }
+    document.querySelectorAll(".bascule-vue button").forEach((b) =>
+      b.classList.toggle("on", b.dataset.v === v));
+  }
+
+  document.querySelectorAll(".bascule-vue button").forEach((b) =>
+    (b.onclick = () => montre(b.dataset.v)));
+  montre("brut");
+})();
+</script>
+
+</body>
+</html>

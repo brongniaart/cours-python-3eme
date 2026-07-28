@@ -9,11 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="../assets/style.css?v=2">
 <style>
-  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
-  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
-  .etape-num { background: #1f6feb; }
-  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
-  .box.prof .box-title { color: #2b4b7e; }
 
   .duel { display: grid; grid-template-columns: 1fr 320px; gap: 26px; align-items: start; }
   @media (max-width: 860px) { .duel { grid-template-columns: 1fr; } }
@@ -23,10 +18,10 @@
     text-transform: uppercase; color: var(--ink-soft); }
   .carte-chiffre .val { font-size: 30px; font-weight: 780; letter-spacing: -.02em; margin-top: 4px; }
   .carte-chiffre.simple .val { color: #8a8f99; }
-  .carte-chiffre.compose .val { color: #1f6feb; }
+  .carte-chiffre.compose .val { color: #f07818; }
   .carte-chiffre .sous { font-size: 13px; color: var(--ink-soft); margin-top: 3px; }
   .ecart { background: #e8effb; border: 1px solid #cfd9ea; border-radius: 12px; padding: 15px 18px; }
-  .ecart .val { font-size: 26px; font-weight: 780; color: #1f6feb; }
+  .ecart .val { font-size: 26px; font-weight: 780; color: #f07818; }
 </style>
 </head>
 <body>
@@ -644,9 +639,9 @@ window.EXERCICES = [
       ctx.lineJoin = "round"; ctx.stroke();
     };
     trace(simple, "#a8a29a", 2.5);
-    trace(compose, "#1f6feb", 3.5);
+    trace(compose, "#f07818", 3.5);
 
-    [[simple, "#a8a29a"], [compose, "#1f6feb"]].forEach(([s, c]) => {
+    [[simple, "#a8a29a"], [compose, "#f07818"]].forEach(([s, c]) => {
       ctx.beginPath(); ctx.arc(x(duree), y(s[duree]), 5, 0, 6.283);
       ctx.fillStyle = c; ctx.fill();
     });
@@ -658,7 +653,7 @@ window.EXERCICES = [
 
     const note = document.getElementById("r-note");
     if (ecart >= CAPITAL) {
-      note.innerHTML = "<strong style='color:#1f6feb'>L'écart dépasse le capital de départ.</strong> " +
+      note.innerHTML = "<strong style='color:#f07818'>L'écart dépasse le capital de départ.</strong> " +
         "Les intérêts des intérêts rapportent désormais plus que la mise initiale.";
     } else {
       const pct = Math.round((ecart / CAPITAL) * 100);

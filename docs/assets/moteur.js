@@ -347,6 +347,25 @@ def clear(): _reset()
 def reset(): _reset()
 `;
 
+/* ---------- Jeux de données ----------
+   Une page déclare window.FICHIERS = ["donnees/xxx.csv", ...] et les fichiers
+   sont déposés dans le dossier de travail de Python. L'élève écrit alors
+   simplement open("xxx.csv"), comme sur sa propre machine. */
+async function chargerDonnees(py) {
+  const liste = window.FICHIERS || [];
+  const charges = [];
+  for (const chemin of liste) {
+    const nom = chemin.split("/").pop();
+    try {
+      const r = await fetch(chemin);
+      if (!r.ok) continue;
+      py.FS.writeFile("/home/pyodide/" + nom, new Uint8Array(await r.arrayBuffer()));
+      charges.push(nom);
+    } catch (e) { /* fichier introuvable : on continue sans */ }
+  }
+  return charges;
+}
+
 /* ---------- Démarrage de Pyodide ---------- */
 async function demarrerPython() {
   if (pyReady) return pyReady;
@@ -359,6 +378,7 @@ async function demarrerPython() {
 import sys
 sys.path.insert(0, "/home/pyodide")
 `);
+    await chargerDonnees(pyodide);
     return pyodide;
   })();
   return pyReady;

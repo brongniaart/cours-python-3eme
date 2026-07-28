@@ -9,11 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <link rel="stylesheet" href="../assets/style.css?v=2">
 <style>
-  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
-  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
-  .etape-num { background: #1f6feb; }
-  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
-  .box.prof .box-title { color: #2b4b7e; }
 
   .dossier { display: grid; grid-template-columns: 300px 1fr; gap: 28px; align-items: start; }
   @media (max-width: 860px) { .dossier { grid-template-columns: 1fr; } }
@@ -22,7 +17,7 @@
     font-family: var(--mono); font-size: 14px; white-space: pre-wrap;
     background: rgba(0,0,0,.03); color: #8a8f99; border-left: 3px solid transparent; }
   .arbre-l.teste { background: #f4f0e8; color: var(--ink-soft); }
-  .arbre-l.gagne { background: #e8effb; color: #14315f; border-left-color: #1f6feb; font-weight: 650; }
+  .arbre-l.gagne { background: #e8effb; color: #7a3d0a; border-left-color: #f07818; font-weight: 650; }
 
   .verdict { border-radius: 12px; padding: 20px 22px; margin-top: 16px; border: 2px solid; }
   .verdict .t { font-size: 26px; font-weight: 780; letter-spacing: -.02em; }
@@ -687,9 +682,9 @@ window.EXERCICES = [
     const d = { end: (men / rev) * 100, rav: rev - men, app: app, anc: anc };
 
     document.getElementById("i-end").textContent = d.end.toFixed(1).replace(".", ",") + " %";
-    document.getElementById("i-end").style.color = d.end > 35 ? "var(--red)" : "#1f6feb";
+    document.getElementById("i-end").style.color = d.end > 35 ? "var(--red)" : "#f07818";
     document.getElementById("i-rav").textContent = eur(d.rav);
-    document.getElementById("i-rav").style.color = d.rav < 1200 ? "var(--red)" : "#1f6feb";
+    document.getElementById("i-rav").style.color = d.rav < 1200 ? "var(--red)" : "#f07818";
 
     const gagnant = verdictPour(d);
     document.getElementById("arbre").innerHTML = REGLES.map((r, i) => {
