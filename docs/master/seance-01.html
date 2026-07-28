@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 1 - Le premier modèle</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+<style>
+  :root { --orange: #1f6feb; --orange-soft: #e8effb; }
+  .brand-dot { background: linear-gradient(135deg, #1f6feb, #0e8a55); }
+  .etape-num { background: #1f6feb; }
+  .box.prof { background: #eef2f9; border-color: #cfd9ea; }
+  .box.prof .box-title { color: #2b4b7e; }
+
+  .duel { display: grid; grid-template-columns: 1fr 320px; gap: 26px; align-items: start; }
+  @media (max-width: 860px) { .duel { grid-template-columns: 1fr; } }
+  .duel-chiffres { display: flex; flex-direction: column; gap: 14px; }
+  .carte-chiffre { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: #fff; }
+  .carte-chiffre .lab { font-size: 12px; font-weight: 750; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-soft); }
+  .carte-chiffre .val { font-size: 30px; font-weight: 780; letter-spacing: -.02em; margin-top: 4px; }
+  .carte-chiffre.simple .val { color: #8a8f99; }
+  .carte-chiffre.compose .val { color: #1f6feb; }
+  .carte-chiffre .sous { font-size: 13px; color: var(--ink-soft); margin-top: 3px; }
+  .ecart { background: #e8effb; border: 1px solid #cfd9ea; border-radius: 12px; padding: 15px 18px; }
+  .ecart .val { font-size: 26px; font-weight: 780; color: #1f6feb; }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">quelques secondes la première fois</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 1</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#viz">👁</a><a href="#e2">2</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 1 · 1 h 30</div>
+    <h1>Le premier modèle</h1>
+    <p class="lede">Tu places 10 000 € à 7 % par an. Au bout de combien de temps
+    en as-tu 20 000 ? Presque tout le monde répond « une quinzaine d'années ».
+    <strong>La vraie réponse est 10,2 ans</strong>, et l'écart entre les deux
+    est exactement le sujet de la séance.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Écrire un simulateur d'épargne qui prend un capital, un taux et une durée,
+    et sort un résultat propre. Autrement dit : ta première cellule Excel,
+    mais que tu peux relire, corriger et réutiliser.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>Nommer les choses</h2>
+      <div class="etape-meta">15 minutes · variables et types</div></div></div>
+
+    <p>Un modèle financier, c'est d'abord des hypothèses nommées. En Python,
+    on range une valeur dans une <strong>variable</strong>, et le signe <code>=</code>
+    ne veut pas dire « égal » : il veut dire <strong>« range ça ici »</strong>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+capital = 10000
+taux = 0.07
+annees = 10
+
+print(capital)
+print(taux)
+print(annees)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <p>Trois hypothèses, trois noms. Remarque tout de suite deux choses :
+    le taux s'écrit <code>0.07</code> et non <code>7 %</code>, et les décimales
+    s'écrivent avec un <strong>point</strong>. Une virgule, en Python, sépare
+    des choses différentes.</p>
+
+    <div class="box bug">
+      <div class="box-title">🐛 À provoquer tout de suite</div>
+      <p>Écris <code>taux = 0,07</code> avec une virgule, puis <code>print(taux)</code>.
+      Aucune erreur, et pourtant le résultat est faux : Python a compris
+      <strong>deux valeurs</strong> au lieu d'un nombre à virgule.</p>
+      <p>C'est le premier bug silencieux du cours, et il est représentatif :
+      en modélisation, l'erreur qui ne plante pas est toujours la plus coûteuse.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Le calcul, et pourquoi l'intuition se trompe</h2>
+      <div class="etape-meta">20 minutes · opérations et puissance</div></div></div>
+
+    <p>Une année de placement, c'est une multiplication : le capital devient
+    <code>capital * 1.07</code>. Deux années, c'est deux fois cette multiplication.
+    Dix années, dix fois — d'où l'opérateur <strong>puissance</strong>,
+    qui s'écrit <code>**</code>.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+capital = 10000
+taux = 0.07
+
+# à la main, année par année
+apres_1 = capital * (1 + taux)
+apres_2 = apres_1 * (1 + taux)
+apres_3 = apres_2 * (1 + taux)
+
+print(apres_1)
+print(apres_2)
+print(apres_3)
+
+# la même chose, d'un coup
+print(capital * (1 + taux) ** 3)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ La question à poser avant de lancer</div>
+      <p>« Sur dix ans à 7 %, tu gagnes combien de plus qu'un intérêt simple
+      à 700 € par an ? » La plupart répondent « un peu plus ».</p>
+      <p>Intérêt simple : 17 000 €. Intérêt composé : <strong>19 672 €</strong>.
+      Près de 2 700 € d'écart, soit 27 % du capital de départ. Et sur trente ans,
+      l'écart dépasse le capital initial.</p>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 Retiens cette gêne</div>
+      <p>Tu viens d'écrire trois lignes presque identiques pour trois années.
+      Pour trente ans, tu en écrirais trente. <strong>Séance 3, on écrira
+      une seule ligne pour n'importe quelle durée.</strong></p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Voir l'écart se creuser</h2>
+      <div class="etape-meta">bouge le taux et la durée</div></div></div>
+
+    <p>La ligne grise, c'est ce que ton intuition calcule : un gain fixe chaque année.
+    La ligne bleue, c'est la réalité. <strong>Cherche à partir de quelle durée
+    l'écart dépasse le capital de départ.</strong></p>
+
+    <div class="widget">
+      <div class="duel">
+        <div>
+          <canvas id="courbe" width="760" height="380" style="width:100%;background:#fff;border:1px solid var(--line);border-radius:10px"></canvas>
+          <div class="slider-row" style="margin-top:18px">
+            <label>Taux annuel <span class="val" id="v-taux">7 %</span></label>
+            <input type="range" id="s-taux" min="1" max="15" step="0.5" value="7">
+          </div>
+          <div class="slider-row">
+            <label>Durée <span class="val" id="v-duree">10 ans</span></label>
+            <input type="range" id="s-duree" min="1" max="40" value="10">
+          </div>
+        </div>
+        <div class="duel-chiffres">
+          <div class="carte-chiffre simple">
+            <div class="lab">Intérêt simple</div>
+            <div class="val" id="r-simple"></div>
+            <div class="sous">le même gain chaque année</div>
+          </div>
+          <div class="carte-chiffre compose">
+            <div class="lab">Intérêt composé</div>
+            <div class="val" id="r-compose"></div>
+            <div class="sous">les intérêts produisent des intérêts</div>
+          </div>
+          <div class="ecart">
+            <div class="lab" style="font-size:12px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;color:#2b4b7e">Écart</div>
+            <div class="val" id="r-ecart"></div>
+            <div class="sous" id="r-note" style="font-size:13px;color:var(--ink-soft);margin-top:4px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Dans la vraie vie</div>
+      <p>Ce même calcul, dans l'autre sens, c'est l'<strong>inflation</strong> :
+      2 % par an pendant vingt ans, ce n'est pas 40 % de pouvoir d'achat perdu,
+      c'est 33 % — et les gens se trompent toujours dans le même sens.</p>
+      <p>C'est aussi le <strong>crédit à la consommation</strong> : un taux mensuel
+      de 1,5 % n'est pas 18 % par an, c'est 19,6 %. La différence paraît dérisoire ;
+      sur un encours de plusieurs millions, elle ne l'est plus.</p>
+      <p><strong>La règle à retenir :</strong> divise 72 par le taux, tu obtiens
+      le nombre d'années pour doubler. 72 / 7 ≈ 10,3. Tu viens de vérifier
+      qu'elle marche.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Présenter un chiffre correctement</h2>
+      <div class="etape-meta">15 minutes · f-strings et arrondis</div></div></div>
+
+    <p>Un résultat brut ne se présente pas. <code>19671.513572895998</code> n'a
+    aucun sens sur une note d'analyse. Deux outils suffisent : les
+    <strong>f-strings</strong> pour composer une phrase, et <code>round</code>
+    pour arrondir.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+capital = 10000
+taux = 0.07
+annees = 10
+
+final = capital * (1 + taux) ** annees
+gain = final - capital
+
+print(final)
+print(f"Capital final : {round(final)} EUR")
+print(f"Gain : {round(gain)} EUR, soit {round(gain / capital * 100)} %")
+print(f"Hypothese : {round(taux * 100, 1)} % par an sur {annees} ans")
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Le réflexe à installer dès aujourd'hui</div>
+      <p>Toujours réafficher les hypothèses à côté du résultat. La dernière ligne
+      n'est pas décorative : un chiffre sans son hypothèse est inutilisable,
+      et c'est la première chose qu'on te demandera en réunion.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : ton simulateur d'épargne</h2>
+      <div class="etape-meta">30 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Le programme demande un capital, un taux et une durée, puis affiche
+    un petit rapport propre : capital final, gain, gain en pourcentage,
+    et les hypothèses retenues.</p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Les deux outils dont tu as besoin</div>
+      <p><code>input("...")</code> pose une question et rend la réponse.</p>
+      <p><strong>Attention :</strong> <code>input</code> rend toujours du
+      <strong>texte</strong>, jamais un nombre. Pour calculer, il faut convertir :
+      <code>float(input("Capital ? "))</code>.</p>
+      <p>C'est le piège n°1 de tout le cours. Tu le rencontreras encore
+      en séance 6 sur de vrais fichiers.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+# 1. Demande les trois hypotheses
+
+
+# 2. Calcule
+
+
+# 3. Affiche un rapport propre
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Pas d'aide avant <strong>20 minutes</strong>. La question à poser s'il bloque :
+      <em>« qu'est-ce que <code>input</code> te rend, du texte ou un nombre ? »</em></p>
+      <p>S'il finit vite : « ajoute un versement mensuel ». Il va découvrir qu'il ne
+      peut pas le faire sans boucle — c'est exactement la séance 3.</p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : le comparateur de placements</h2>
+      <div class="etape-meta">15 minutes</div></div></div>
+
+    <p>Deux placements : le livret A à 3 % et un fonds actions à 7 %, tous deux
+    sur 20 ans, avec le même capital de départ. Affiche les deux résultats
+    et l'écart, en euros et en pourcentage.</p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+
+
+      </script></div></div>
+
+    <div class="box defi">
+      <div class="box-title">🔥 Pour aller plus loin</div>
+      <p>Le fonds actions prend <strong>1,2 % de frais de gestion par an</strong>.
+      Son rendement réel n'est donc pas 7 % mais 5,8 %. Recalcule.</p>
+      <p>Sur vingt ans, ces 1,2 % annuels coûtent bien plus que ce que
+      l'intuition suggère. C'est l'argument central de tout le débat
+      sur la gestion passive, et tu viens de le chiffrer toi-même.</p>
+    </div>
+  </section>
+
+  <!-- ============ ET SI TU L'AVAIS DEMANDÉ À UNE IA ? ============ -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes · le bloc de fin de chaque séance</div></div></div>
+
+    <p>Tu viens d'écrire ce simulateur à la main. En stage, personne ne t'en voudra
+    de le demander à une IA — <strong>on t'en voudra de livrer un chiffre faux</strong>.
+    Voici le prompt que tu aurais pu écrire, et ce que l'IA a répondu.</p>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Écris-moi un programme Python qui calcule le capital final d'un placement à intérêts composés. L'utilisateur donne le capital de départ, le taux annuel en pourcentage et la durée en années. Affiche le capital final et le gain.</p>
+      <p style="margin-top:12px">Prompt correct, précis, sans ambiguïté. Le code ci-dessous
+      s'exécute sans la moindre erreur. <strong>Il est pourtant inutilisable.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Pourquoi tu peux la voir, et pas quelqu'un qui n'a pas fait la séance</div>
+      <p>Parce que tu viens de passer une heure et demie à te battre avec la différence
+      entre <code>7</code> et <code>0.07</code>. Sans ça, ce code paraît impeccable :
+      il est bien nommé, bien indenté, il tourne, il affiche un résultat avec deux décimales.</p>
+      <p><strong>C'est exactement le profil de l'erreur qui passe en réunion.</strong>
+      Pas un plantage, pas un message rouge : un nombre bien présenté et faux.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 La règle à emporter</div>
+      <p>Avant d'accepter un chiffre produit par une IA, fais-lui passer
+      le <strong>test de l'ordre de grandeur</strong> : 10 000 € à 7 % sur 10 ans,
+      ça doit donner environ 20 000 €. Si le résultat sort à 10 millions,
+      inutile de relire le code ligne à ligne, la réponse est déjà non.</p>
+      <p>Ce réflexe vaut pour toute ta carrière, et il ne demande aucune compétence
+      technique — seulement de savoir ce qu'on attend.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies. Un indice si tu te trompes.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Un <strong>calculateur d'inflation</strong> : combien vaudront
+      10 000 € de pouvoir d'achat dans 15 ans, avec une inflation de 2,5 % par an ?</p>
+      <p class="hint" style="margin-top:8px">Puis réponds en une phrase, par écrit :
+      pourquoi une inflation de 2,5 % pendant 15 ans ne fait pas perdre 37,5 %
+      de pouvoir d'achat ? C'est la question, pas le code, qui compte.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="index.html" style="color:var(--orange);font-weight:650">← Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=2"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Nommer les hypothèses",
+    contexte: "Tout modèle commence par des hypothèses explicites, chacune dans sa variable.",
+    lignes: [
+      { b:1, long:16, consigne:"Range <code>25000</code> dans une variable <code>capital</code>.",
+        ok:["capital = 25000"],
+        indices:["Le nom, le signe <code>=</code>, la valeur.","<code>capital = 25000</code>"],
+        pourquoi:"Le <code>=</code> ne compare pas, il range. C'est la première chose à désapprendre des maths." },
+      { b:1, long:14, consigne:"Range le taux de <strong>4,5 %</strong> dans <code>taux</code>. Attention à la forme et au séparateur décimal.",
+        ok:["taux = 0.045"],
+        indices:["Un pourcentage s'écrit en décimal : 4,5 % vaut 0,045.",
+                 "Et les décimales prennent un point : <code>taux = 0.045</code>"],
+        pourquoi:"Avec une virgule, Python aurait compris deux valeurs et le calcul aurait été faux sans message d'erreur." },
+      { b:1, long:12, consigne:"Range la durée : <code>12</code> ans, dans <code>annees</code>.",
+        ok:["annees = 12"],
+        indices:["Un entier, sans guillemets.","<code>annees = 12</code>"],
+        pourquoi:"Sans accent dans le nom : c'est l'usage, et ça évite des ennuis quand on partage un fichier." },
+      { t:"" },
+      { b:1, long:34, consigne:"Affiche <code>25000 EUR a 4.5 % pendant 12 ans</code> avec une f-string.",
+        ok:['print(f"{capital} EUR a {taux * 100} % pendant {annees} ans")'],
+        indices:["Un <code>f</code> devant le guillemet, et les variables entre accolades.",
+                 '<code>print(f"{capital} EUR a {taux * 100} % pendant {annees} ans")</code>'],
+        pourquoi:"Le calcul <code>taux * 100</code> se fait directement dans l'accolade : on stocke en décimal, on affiche en pourcentage." },
+    ],
+  },
+  {
+    titre: "Le calcul composé",
+    contexte: "Une année = une multiplication. N années = une puissance.",
+    lignes: [
+      { t:"capital = 10000" },
+      { t:"taux = 0.07" },
+      { t:"annees = 10" },
+      { t:"" },
+      { b:1, long:34, consigne:"Calcule le capital final et range-le dans <code>final</code>. Utilise l'opérateur puissance.",
+        ok:["final = capital * (1 + taux) ** annees"],
+        indices:["La puissance s'écrit <code>**</code>, et le facteur annuel est <code>(1 + taux)</code>.",
+                 "<code>final = capital * (1 + taux) ** annees</code>"],
+        pourquoi:"Les parenthèses autour de <code>1 + taux</code> sont obligatoires : sans elles, Python calcule d'abord la puissance du taux." },
+      { b:1, long:24, consigne:"Calcule le <code>gain</code> : ce que tu as en plus par rapport au départ.",
+        ok:["gain = final - capital"],
+        indices:["Le final moins le capital de départ.","<code>gain = final - capital</code>"],
+        pourquoi:"" },
+      { b:1, long:36, consigne:"Affiche <code>Capital final : 19672 EUR</code>, arrondi à l'entier.",
+        ok:['print(f"Capital final : {round(final)} EUR")'],
+        indices:["<code>round(final)</code> arrondit à l'entier le plus proche.",
+                 '<code>print(f"Capital final : {round(final)} EUR")</code>'],
+        pourquoi:"Sans arrondi tu obtiendrais 19671.513572895998 : illisible et faussement précis." },
+      { b:1, long:40, consigne:"Affiche <code>Gain : 9672 EUR soit 97 %</code>, les deux arrondis à l'entier.",
+        ok:['print(f"Gain : {round(gain)} EUR soit {round(gain / capital * 100)} %")'],
+        indices:["Le pourcentage, c'est le gain divisé par le capital, fois 100.",
+                 '<code>print(f"Gain : {round(gain)} EUR soit {round(gain / capital * 100)} %")</code>'],
+        pourquoi:"97 % de gain en dix ans à 7 % par an : c'est presque le doublement annoncé au début de la séance." },
+    ],
+  },
+  {
+    titre: "Poser les hypothèses à l'utilisateur",
+    contexte: "Le piège n°1 du cours : input rend toujours du texte, jamais un nombre.",
+    lignes: [
+      { b:1, long:36, consigne:"Demande <code>Capital de depart ?</code> et convertis la réponse en nombre <strong>à virgule</strong>.",
+        ok:['capital = float(input("Capital de depart ? "))','capital = float(input("Capital de depart ?"))'],
+        indices:["Il faut envelopper le <code>input(...)</code> dans un <code>float(...)</code>.",
+                 '<code>capital = float(input("Capital de depart ? "))</code> - deux parenthèses fermantes.'],
+        pourquoi:"<code>float</code> accepte 10000 comme 10000.50. Sans lui, la multiplication répéterait le texte au lieu de calculer." },
+      { b:1, long:36, consigne:"Demande <code>Taux annuel en % ?</code>, convertis, et <strong>divise par 100</strong> pour obtenir le décimal.",
+        ok:['taux = float(input("Taux annuel en % ? ")) / 100','taux = float(input("Taux annuel en % ?")) / 100'],
+        indices:["On demande 7, on stocke 0.07 : il faut diviser par 100 après la conversion.",
+                 '<code>taux = float(input("Taux annuel en % ? ")) / 100</code>'],
+        pourquoi:"On demande à l'utilisateur ce qui lui est naturel (7), et on stocke ce qui est utile au calcul (0.07). Un bon modèle fait toujours ce travail à la place de l'utilisateur." },
+      { b:1, long:32, consigne:"Demande <code>Duree en annees ?</code> et convertis en <strong>entier</strong>.",
+        ok:['annees = int(input("Duree en annees ? "))','annees = int(input("Duree en annees ?"))'],
+        indices:["Une durée en années entières : <code>int</code> et non <code>float</code>.",
+                 '<code>annees = int(input("Duree en annees ? "))</code>'],
+        pourquoi:"" },
+      { t:"" },
+      { t:"final = capital * (1 + taux) ** annees" },
+      { b:1, long:44, consigne:"Affiche le rapport : <code>Sur 10 ans a 7.0 %, 10000.0 devient 19672 EUR</code>.",
+        ok:['print(f"Sur {annees} ans a {taux * 100} %, {capital} devient {round(final)} EUR")'],
+        indices:["Quatre accolades dans la même phrase.",
+                 '<code>print(f"Sur {annees} ans a {taux * 100} %, {capital} devient {round(final)} EUR")</code>'],
+        pourquoi:"Le résultat et ses hypothèses dans la même ligne : c'est ce qui rend un chiffre défendable." },
+    ],
+  },
+  {
+    titre: "Comparer deux placements",
+    contexte: "Le vrai travail d'analyse commence quand on met deux chiffres côte à côte.",
+    lignes: [
+      { t:"capital = 20000" },
+      { t:"annees = 20" },
+      { t:"" },
+      { b:1, long:34, consigne:"Calcule le résultat du livret à <strong>3 %</strong>, dans <code>livret</code>.",
+        ok:["livret = capital * (1 + 0.03) ** annees","livret = capital * 1.03 ** annees"],
+        indices:["Même formule que l'exercice 2, avec le taux écrit directement.",
+                 "<code>livret = capital * (1 + 0.03) ** annees</code>"],
+        pourquoi:"" },
+      { b:1, long:34, consigne:"Calcule le résultat du fonds à <strong>7 %</strong>, dans <code>fonds</code>.",
+        ok:["fonds = capital * (1 + 0.07) ** annees","fonds = capital * 1.07 ** annees"],
+        indices:["La même ligne, autre taux.","<code>fonds = capital * (1 + 0.07) ** annees</code>"],
+        pourquoi:"" },
+      { b:1, long:24, consigne:"Calcule l'<code>ecart</code> entre les deux.",
+        ok:["ecart = fonds - livret"],
+        indices:["Le plus grand moins le plus petit.","<code>ecart = fonds - livret</code>"],
+        pourquoi:"" },
+      { t:"" },
+      { b:1, long:46, consigne:"Affiche <code>Livret 36122 EUR, fonds 77394 EUR, ecart 41272 EUR</code>, tous arrondis.",
+        ok:['print(f"Livret {round(livret)} EUR, fonds {round(fonds)} EUR, ecart {round(ecart)} EUR")'],
+        indices:["Trois accolades, chacune avec <code>round</code>.",
+                 '<code>print(f"Livret {round(livret)} EUR, fonds {round(fonds)} EUR, ecart {round(ecart)} EUR")</code>'],
+        pourquoi:"Quatre points d'écart de rendement pendant vingt ans, et l'écart final dépasse le double du capital de départ. Voilà pourquoi on parle de rendement composé." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=2"></script>
+
+<script>
+/* ---------- Le code de l'IA, et son erreur ---------- */
+(function () {
+  const LIGNES = [
+    'capital = float(input("Capital de depart ? "))',
+    'taux = float(input("Taux annuel en % ? "))',
+    'annees = int(input("Duree en annees ? "))',
+    "",
+    "final = capital * (1 + taux) ** annees",
+    "gain = final - capital",
+    "",
+    'print(f"Capital final : {round(final, 2)} EUR")',
+    'print(f"Gain : {round(gain, 2)} EUR")',
+  ];
+  // deux lignes acceptables : on peut corriger à la saisie ou au calcul
+  const BUGS = [1, 4];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) {
+      eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+    }
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé</div>' +
+        "<p>L'utilisateur tape <strong>7</strong>, et l'IA utilise <strong>7</strong> " +
+        "dans le calcul. Or la formule attend <strong>0,07</strong>. " +
+        "Le programme calcule donc un placement à <strong>700 %</strong> par an.</p>" +
+        "<p>Sur 10 000 € pendant 10 ans, il annonce <strong>10 737 418 240 €</strong> " +
+        "au lieu de 19 672 €. Aucun message d'erreur, deux décimales bien alignées.</p>" +
+        "<p style='margin-bottom:0'><strong>La correction, au choix :</strong></p>" +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#a9e5b8;padding:11px 14px;border-radius:7px;white-space:pre;margin-top:6px'>" +
+        'taux = float(input("Taux annuel en % ? ")) / 100\n' +
+        "\nou bien\n\n" +
+        "final = capital * (1 + taux / 100) ** annees</p>" +
+        "<p style='margin-bottom:0'>Les deux marchent. Le premier est meilleur : " +
+        "après cette ligne, <code>taux</code> a la même signification partout " +
+        "dans le programme.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Le deuxième défaut, plus discret</div>' +
+        "<p>Ligne 8 : <code>round(final, 2)</code> affiche des centimes sur un modèle " +
+        "dont l'hypothèse de rendement est incertaine à plusieurs points près. " +
+        "<strong>Deux décimales sur un chiffre à ± 30 %, c'est une fausse précision</strong>, " +
+        "et en conseil ça se remarque.</p>" +
+        "<p style='margin-bottom:0'>L'IA ne peut pas le savoir : elle ne connaît " +
+        "ni ton sujet, ni le degré de confiance de tes hypothèses. Toi si.</p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne est correcte. Relis le programme en te demandant : " +
+        "<em>si l'utilisateur tape 7, qu'est-ce qui vaut 7 dans la suite du calcul, " +
+        "et qu'est-ce que la formule attend ?</em></p></div>";
+    }
+    rendu(i);
+  }
+
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- Simple contre composé ---------- */
+(function () {
+  const cv = document.getElementById("courbe");
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+  const CAPITAL = 10000;
+  const M = { g: 62, d: 18, h: 20, b: 34 };
+
+  const eur = (n) => Math.round(n).toLocaleString("fr-FR") + " €";
+
+  function dessiner() {
+    const taux = parseFloat(document.getElementById("s-taux").value) / 100;
+    const duree = parseInt(document.getElementById("s-duree").value, 10);
+
+    document.getElementById("v-taux").textContent =
+      (taux * 100).toString().replace(".", ",") + " %";
+    document.getElementById("v-duree").textContent = duree + " ans";
+
+    const simple = [], compose = [];
+    for (let a = 0; a <= duree; a++) {
+      simple.push(CAPITAL * (1 + taux * a));
+      compose.push(CAPITAL * Math.pow(1 + taux, a));
+    }
+    const max = Math.max(compose[duree], simple[duree]) * 1.06;
+
+    const x = (a) => M.g + (a / Math.max(1, duree)) * (W - M.g - M.d);
+    const y = (v) => H - M.b - (v / max) * (H - M.h - M.b);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+
+    // grille
+    ctx.strokeStyle = "#eee9e0"; ctx.lineWidth = 1;
+    ctx.font = "11px -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "#9a9287"; ctx.textAlign = "right";
+    for (let i = 0; i <= 4; i++) {
+      const v = (max / 4) * i, yy = y(v);
+      ctx.beginPath(); ctx.moveTo(M.g, yy); ctx.lineTo(W - M.d, yy); ctx.stroke();
+      ctx.fillText(Math.round(v / 1000) + "k", M.g - 8, yy + 4);
+    }
+    ctx.textAlign = "center";
+    const pas = duree <= 10 ? 1 : duree <= 20 ? 5 : 10;
+    for (let a = 0; a <= duree; a += pas) ctx.fillText(a, x(a), H - 12);
+
+    // aire d'écart
+    ctx.beginPath();
+    compose.forEach((v, a) => (a ? ctx.lineTo(x(a), y(v)) : ctx.moveTo(x(a), y(v))));
+    for (let a = duree; a >= 0; a--) ctx.lineTo(x(a), y(simple[a]));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(31,111,235,.13)"; ctx.fill();
+
+    const trace = (serie, couleur, epais) => {
+      ctx.beginPath();
+      serie.forEach((v, a) => (a ? ctx.lineTo(x(a), y(v)) : ctx.moveTo(x(a), y(v))));
+      ctx.strokeStyle = couleur; ctx.lineWidth = epais;
+      ctx.lineJoin = "round"; ctx.stroke();
+    };
+    trace(simple, "#a8a29a", 2.5);
+    trace(compose, "#1f6feb", 3.5);
+
+    [[simple, "#a8a29a"], [compose, "#1f6feb"]].forEach(([s, c]) => {
+      ctx.beginPath(); ctx.arc(x(duree), y(s[duree]), 5, 0, 6.283);
+      ctx.fillStyle = c; ctx.fill();
+    });
+
+    const ecart = compose[duree] - simple[duree];
+    document.getElementById("r-simple").textContent = eur(simple[duree]);
+    document.getElementById("r-compose").textContent = eur(compose[duree]);
+    document.getElementById("r-ecart").textContent = eur(ecart);
+
+    const note = document.getElementById("r-note");
+    if (ecart >= CAPITAL) {
+      note.innerHTML = "<strong style='color:#1f6feb'>L'écart dépasse le capital de départ.</strong> " +
+        "Les intérêts des intérêts rapportent désormais plus que la mise initiale.";
+    } else {
+      const pct = Math.round((ecart / CAPITAL) * 100);
+      note.textContent = "Soit " + pct + " % du capital de départ. Continue d'allonger la durée.";
+    }
+  }
+
+  ["s-taux", "s-duree"].forEach((id) =>
+    document.getElementById(id).addEventListener("input", dessiner));
+  dessiner();
+})();
+</script>
+
+</body>
+</html>

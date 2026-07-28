@@ -13,8 +13,12 @@ let pyReady = null;
    ============================================================ */
 const MEM = {
   page() {
-    const f = location.pathname.split("/").pop() || "index.html";
-    return f.replace(".html", "") || "index";
+    const f = (location.pathname.split("/").pop() || "index.html")
+      .replace(".html", "") || "index";
+    // chaque parcours a son espace, pour que deux séance-01 ne s'écrasent pas
+    const m = document.querySelector('meta[name="parcours"]');
+    const parcours = m ? m.content : "";
+    return (parcours ? parcours + ":" : "") + f;
   },
   lire(cle) {
     try { return localStorage.getItem("cp3:" + cle); } catch (e) { return null; }
