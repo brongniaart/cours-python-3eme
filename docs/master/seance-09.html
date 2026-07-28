@@ -45,7 +45,7 @@
     <h1>pandas, premiers pas</h1>
     <p class="lede">En séance 6, agréger le fichier t'a pris vingt-cinq lignes.
     <strong>pandas le fait en une.</strong> Mais il rend aussi la mauvaise réponse
-    plus facile à écrire que la bonne — et c'est le vrai sujet du jour.</p>
+    plus facile à écrire que la bonne, et c'est le vrai sujet du jour.</p>
   </div>
 
   <div class="box prof">
@@ -90,7 +90,7 @@ print(df.head())
       <p><code>.dtypes</code> est la plus importante : c'est elle qui te dit si
       <code>voix</code> est un nombre (<code>int64</code>) ou du texte
       (<code>object</code>). Une colonne numérique qui apparaît en <code>object</code>,
-      c'est qu'une cellule contient autre chose qu'un nombre — et pandas a tout basculé
+      c'est qu'une cellule contient autre chose qu'un nombre, et pandas a tout basculé
       en texte sans rien dire.</p>
     </div>
 
@@ -334,7 +334,7 @@ df = pd.read_csv("legislatives-2024.csv", sep=";")
       les mêmes départements.</p>
       <p>En voix, les gros départements dominent mécaniquement. En points,
       un département de 60 000 électeurs pèse autant que le Nord.
-      <strong>Il n'y a pas de bonne réponse dans l'absolu</strong> — il y a
+      <strong>Il n'y a pas de bonne réponse dans l'absolu</strong> : il y a
       une réponse selon la question posée, et un analyste doit dire laquelle
       il a choisie et pourquoi.</p>
     </div>
@@ -364,7 +364,7 @@ df = pd.read_csv("legislatives-2024.csv", sep=";")
     <div class="box reel">
       <div class="box-title">🌍 Pourquoi pandas rend cette erreur plus probable</div>
       <p>En séance 6, la boucle t'obligeait à décider explicitement quoi faire
-      de chaque ligne — et tu <em>voyais</em> que le département revenait.
+      de chaque ligne, et tu <em>voyais</em> que le département revenait.
       <code>df["inscrits"].sum()</code> ne demande aucune décision.</p>
       <p><strong>Un outil qui rend le calcul plus facile rend aussi l'erreur
       plus facile.</strong> C'est vrai de pandas, d'Excel, et de toutes les IA.
