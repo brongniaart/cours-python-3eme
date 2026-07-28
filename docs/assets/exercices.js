@@ -22,6 +22,7 @@ class Exerciseur {
     this.el = el;
     this.exos = exos;
     this.cle = "exo:" + MEM.page();
+    this.cleBlocages = "bloc:" + MEM.page();
     const repris = MEM.lireObjet(this.cle, null);
     this.iExo = repris ? Math.min(repris.finis || 0, exos.length - 1) : 0;
     this.iTrou = 0;
@@ -30,6 +31,20 @@ class Exerciseur {
     this.stats = repris ? repris.stats : { reussis: 0, montres: 0 };
     this.reprise = !!(repris && repris.finis);
     this.rendre();
+  }
+
+  /* Note les lignes qui ont résisté : c'est le diagnostic que le prof lira.
+     essais = nombre de tentatives ratées, montre = la réponse a dû être affichée. */
+  _noterBlocage(ligne, essais, montre) {
+    const liste = MEM.lireObjet(this.cleBlocages, []);
+    liste.push([
+      this.iExo,
+      (this.exo.titre || "").slice(0, 60),
+      ((ligne.ok || [""])[0] || "").slice(0, 90),
+      essais,
+      montre ? 1 : 0,
+    ]);
+    MEM.ecrireObjet(this.cleBlocages, liste);
   }
 
   /* combien d'exercices terminés, pour reprendre plus tard */
@@ -123,6 +138,7 @@ class Exerciseur {
     if (zero) zero.onclick = (e) => {
       e.preventDefault();
       MEM.effacer(this.cle);
+      MEM.effacer(this.cleBlocages);
       this.iExo = 0; this.iTrou = 0; this.essais = 0;
       this.reponses = {}; this.stats = { reussis: 0, montres: 0 };
       this.reprise = false;
@@ -155,6 +171,7 @@ class Exerciseur {
     const juste = attendu.includes(normaliser(saisie));
 
     if (juste) {
+      if (this.essais > 0) this._noterBlocage(l, this.essais, false);
       this.essais = 0;
       this.stats.reussis++;
       inp.classList.add("juste");
@@ -173,6 +190,7 @@ class Exerciseur {
 
     if (this.essais >= 3) {
       this.stats.montres++;
+      this._noterBlocage(l, 3, true);
       const bonne = (l.ok || [""])[0];
       this.reponses[this.ligneActive] =
         (l.indent ? " ".repeat(l.indent) : "") + bonne;
@@ -266,6 +284,7 @@ class Exerciseur {
 
     this.el.querySelector("#exo-again").onclick = () => {
       MEM.effacer(this.cle);
+      MEM.effacer(this.cleBlocages);
       this.iExo = 0; this.iTrou = 0; this.essais = 0;
       this.reponses = {}; this.stats = { reussis: 0, montres: 0 };
       this.reprise = false;

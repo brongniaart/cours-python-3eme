@@ -398,3 +398,15 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
 .jeu-carte .chip { display: inline-block; margin-top: 14px; font-size: 12.5px;
   font-weight: 650; background: var(--bg-soft); border: 1px solid var(--line);
   padding: 3px 10px; border-radius: 20px; color: var(--ink-soft); }
+
+/* ---------- Boîte du rapport prof ---------- */
+.boite-rapport {
+  display: none; margin-top: 18px; padding: 18px 20px;
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px;
+}
+.boite-rapport p { font-size: 15px; }
+.boite-rapport textarea {
+  width: 100%; height: 110px; font-family: var(--mono); font-size: 12px;
+  line-height: 1.5; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: 9px; resize: vertical; background: #fff; color: var(--ink-soft);
+}

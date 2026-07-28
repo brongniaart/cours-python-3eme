@@ -80,6 +80,68 @@ function assembler() {
   return out;
 }
 
+/* ---------- Rapport pour le prof ----------
+   Un texte compact que l'élève copie et envoie. Il ne contient que
+   son avancement et les lignes qui lui ont résisté : aucun code,
+   aucune donnée personnelle. */
+function blocagesDe(page) {
+  const b = lireBrut("bloc:" + page);
+  if (!b) return [];
+  try { return JSON.parse(b); } catch (e) { return []; }
+}
+
+function fabriquerCode() {
+  const t = new Date();
+  const jour = t.getFullYear() + "-" +
+    String(t.getMonth() + 1).padStart(2, "0") + "-" +
+    String(t.getDate()).padStart(2, "0");
+
+  const seances = [], blocages = [];
+  SEANCES.forEach(([page], n) => {
+    const codes = codesDe(page).length;
+    const ex = exosDe(page);
+    if (codes || ex.finis) seances.push([n, codes, ex.finis, ex.total]);
+    blocagesDe(page).forEach((b) => {
+      blocages.push([n, b[0], b[1], b[2], b[3], b[4]]);
+    });
+  });
+
+  const charge = JSON.stringify({ v: 1, d: jour, s: seances, b: blocages });
+  const octets = new TextEncoder().encode(charge);
+  let brut = "";
+  octets.forEach((o) => { brut += String.fromCharCode(o); });
+  return "CP3-" + btoa(brut);
+}
+
+function ouvrirRapport() {
+  const code = fabriquerCode();
+  const boite = document.getElementById("boite-rapport");
+  boite.style.display = "block";
+  boite.innerHTML =
+    "<p><strong>Copie tout ce bloc et envoie-le à ton prof.</strong> " +
+    "Il contient ton avancement et les lignes sur lesquelles tu as buté, " +
+    "rien d'autre : ni ton code, ni aucune information personnelle.</p>" +
+    '<textarea id="code-rapport" readonly>' + code + "</textarea>" +
+    '<div class="avanc-bar" style="margin-top:12px">' +
+      '<button class="btn-run" id="copier">📋  Copier le code</button>' +
+      '<button class="btn-ghost" id="fermer-rapport">Fermer</button>' +
+      '<span class="hint" id="copie-ok" style="margin-left:6px"></span>' +
+    "</div>";
+
+  const zone = document.getElementById("code-rapport");
+  document.getElementById("copier").onclick = () => {
+    zone.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    if (navigator.clipboard) navigator.clipboard.writeText(code).catch(() => {});
+    document.getElementById("copie-ok").textContent =
+      ok || navigator.clipboard ? "copié !" : "sélectionne et fais Cmd+C";
+  };
+  document.getElementById("fermer-rapport").onclick = () => {
+    boite.style.display = "none";
+  };
+}
+
 function telecharger() {
   const blob = new Blob([assembler()], { type: "text/plain;charset=utf-8" });
   const a = document.createElement("a");
@@ -99,11 +161,13 @@ function rendreBilan() {
   const lignes = SEANCES.map(([page, titre], n) => {
     const codes = codesDe(page);
     const ex = exosDe(page);
+    const bl = blocagesDe(page).length;
     nbCodes += codes.length;
     nbExos += ex.finis;
-    const touche = codes.length > 0 || ex.finis > 0;
+    // une séance compte comme commencée dès qu'il a écrit, terminé ou buté
+    const touche = codes.length > 0 || ex.finis > 0 || bl > 0;
     if (touche) seancesTouchees++;
-    return { n, page, titre, codes: codes.length, ex, touche };
+    return { n, page, titre, codes: codes.length, ex, bl, touche };
   });
 
   if (!seancesTouchees) {
@@ -131,20 +195,24 @@ function rendreBilan() {
         '<span class="avanc-n">' + l.n + "</span>" +
         "<span class='avanc-t'>" + l.titre + "</span>" +
         "<span class='avanc-d'>" +
-          (l.codes ? l.codes + " programme" + (l.codes > 1 ? "s" : "") : "") +
-          (l.codes && l.ex.finis ? " · " : "") +
-          (l.ex.finis ? l.ex.finis + "/" + l.ex.total + " exercices" : "") +
+          [
+            l.codes ? l.codes + " programme" + (l.codes > 1 ? "s" : "") : "",
+            l.ex.finis ? l.ex.finis + "/" + l.ex.total + " exercices" : "",
+          ].filter(Boolean).join(" · ") +
         "</span></a>"
       ).join("") +
     "</div>" +
     '<div class="avanc-bar">' +
       '<button class="btn-run" id="dl">⬇  Télécharger tout mon code</button>' +
+      '<button class="btn-ghost" id="rap">📤  Envoyer mon avancement au prof</button>' +
       '<button class="btn-ghost" id="rz">Tout effacer</button>' +
     "</div>" +
+    '<div id="boite-rapport" class="boite-rapport"></div>' +
     '<p class="hint" style="margin-top:10px">Ton code est gardé dans ce navigateur, ' +
     "sur cet ordinateur. Télécharge-le si tu changes de machine.</p>";
 
   document.getElementById("dl").onclick = telecharger;
+  document.getElementById("rap").onclick = ouvrirRapport;
   document.getElementById("rz").onclick = () => {
     if (!confirm("Effacer tout ton code et ton avancement ? C'est définitif.\n\nPense à télécharger avant.")) return;
     toutesLesCles().forEach((k) => {
