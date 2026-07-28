@@ -425,3 +425,14 @@ input[type=range] { width: 100%; accent-color: var(--orange); }
 .chasse-code.fini .l { cursor: default; }
 .chasse-code.fini .l:hover { background: transparent; border-left-color: transparent; }
 .chasse-code.fini .l.bonne:hover { background: rgba(14,138,85,.26); }
+
+/* ---------- Figures matplotlib rendues dans la sortie ---------- */
+.figures { margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
+.figures img {
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+  border-radius: 9px;
+  padding: 6px;
+  display: block;
+}

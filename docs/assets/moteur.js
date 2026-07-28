@@ -384,6 +384,34 @@ sys.path.insert(0, "/home/pyodide")
       try { await pyodide.loadPackage(paquets); }
       catch (e) { console.warn("paquets non chargés :", e); }
     }
+    // pandas prévient à chaque exécution qu'il voudra pyarrow en version 3 :
+    // six lignes d'avertissement au-dessus de chaque résultat, pour rien
+    if (paquets.indexOf("pandas") >= 0) {
+      try {
+        pyodide.runPython(`
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+`);
+      } catch (e) { console.warn("warnings :", e); }
+    }
+    // matplotlib doit dessiner hors écran : on récupère les figures en PNG
+    if (paquets.indexOf("matplotlib") >= 0) {
+      try {
+        pyodide.runPython(`
+import matplotlib
+matplotlib.use("AGG")
+import matplotlib.pyplot as plt
+plt.rcParams["figure.figsize"] = (7.2, 4.2)
+plt.rcParams["figure.dpi"] = 110
+plt.rcParams["axes.grid"] = True
+plt.rcParams["grid.alpha"] = 0.25
+plt.rcParams["axes.spines.top"] = False
+plt.rcParams["axes.spines.right"] = False
+plt.rcParams["font.size"] = 10
+`);
+      } catch (e) { console.warn("matplotlib :", e); }
+    }
     await chargerDonnees(pyodide);
     return pyodide;
   })();
@@ -667,8 +695,40 @@ builtins.input = lambda p="": _js_input(str(p))
         ops = JSON.parse(brut);
       }
 
+      // matplotlib : on récupère les figures ouvertes, en PNG encodé
+      let figures = [];
+      if ((window.PAQUETS || []).indexOf("matplotlib") >= 0) {
+        try {
+          figures = JSON.parse(py.runPython(`
+import json as _json, io as _io, base64 as _b64
+import matplotlib.pyplot as _plt
+_out = []
+for _n in _plt.get_fignums():
+    _f = _plt.figure(_n)
+    _buf = _io.BytesIO()
+    _f.savefig(_buf, format="png", bbox_inches="tight")
+    _out.append(_b64.b64encode(_buf.getvalue()).decode())
+_plt.close("all")
+_json.dumps(_out)
+`));
+        } catch (e) { console.warn("figures :", e); }
+      }
+
       this.sortie.textContent = lignes.join("\n");
-      if (!lignes.length) this.sortie.textContent = "(le programme s'est exécuté, sans rien afficher)";
+      if (!lignes.length && !figures.length) {
+        this.sortie.textContent = "(le programme s'est exécuté, sans rien afficher)";
+      }
+      if (figures.length) {
+        const bac = document.createElement("div");
+        bac.className = "figures";
+        figures.forEach((b64) => {
+          const img = document.createElement("img");
+          img.src = "data:image/png;base64," + b64;
+          img.alt = "figure";
+          bac.appendChild(img);
+        });
+        this.sortie.appendChild(bac);
+      }
 
       if (ops && ops.length) {
         this.toile.cv.classList.add("on");

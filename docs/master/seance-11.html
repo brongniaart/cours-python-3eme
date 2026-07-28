@@ -7,7 +7,7 @@
 <title>Séance 11 - Séries temporelles</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=3">
+<link rel="stylesheet" href="../assets/style.css?v=4">
 <style>
   .alloc { display: grid; grid-template-columns: 1fr 260px; gap: 26px; align-items: start; }
   @media (max-width: 900px) { .alloc { grid-template-columns: 1fr; } }
@@ -459,7 +459,7 @@ window.FICHIERS = ["donnees/marches.csv"];
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-<script src="../assets/moteur.js?v=3"></script>
+<script src="../assets/moteur.js?v=4"></script>
 
 <script>
 window.EXERCICES = [
@@ -583,7 +583,7 @@ window.EXERCICES = [
   },
 ];
 </script>
-<script src="../assets/exercices.js?v=3"></script>
+<script src="../assets/exercices.js?v=4"></script>
 
 <script>
 /* ---------- Le code de l'IA : le commentaire inventé ---------- */
@@ -662,7 +662,7 @@ window.EXERCICES = [
   const COLS = ["actions_europe", "actions_tech", "obligations", "or"];
   let SERIES = null;
 
-  fetch("donnees/marches.csv?v=3")
+  fetch("donnees/marches.csv?v=4")
     .then((r) => r.text())
     .then((txt) => {
       /* le fichier est en fins de ligne Windows : on retire les \r */

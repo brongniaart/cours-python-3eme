@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="parcours" content="master">
+<title>Séance 12 - Le graphique qui ment</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="../assets/style.css?v=4">
+<style>
+  .menteur { display: grid; grid-template-columns: 1fr 270px; gap: 26px; align-items: start; }
+  @media (max-width: 900px) { .menteur { grid-template-columns: 1fr; } }
+  .titraille { border-radius: 11px; padding: 15px 17px; border: 1px solid;
+               transition: background .25s, border-color .25s; }
+  .titraille.ok { background: var(--green-soft); border-color: #bfe3d3; }
+  .titraille.ko { background: var(--red-soft); border-color: #f5c9c4; }
+  .titraille .une { font-size: 18.5px; font-weight: 760; letter-spacing: -.015em;
+                    line-height: 1.28; margin-bottom: 7px; }
+  .formes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 16px 0; }
+  @media (max-width: 720px) { .formes { grid-template-columns: 1fr; } }
+  .forme { background: var(--bg-soft); border-radius: 11px; padding: 14px 16px; }
+  .forme h4 { font-size: 15px; margin: 0 0 5px; }
+  .forme p { font-size: 14px; margin: 0; color: var(--ink-soft); }
+  .forme .q { font-size: 12.5px; font-weight: 700; color: var(--orange);
+              text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .ratio-box { background: var(--bg-soft); border-radius: 11px;
+               padding: 13px 15px; margin-top: 14px; }
+  .ratio-box .k { font-size: 10.5px; font-weight: 750; letter-spacing: .05em;
+                  text-transform: uppercase; color: var(--ink-soft); }
+  .ratio-box .v { font-size: 30px; font-weight: 780; letter-spacing: -.025em;
+                  font-family: var(--mono); line-height: 1.15; }
+  .ratio-box .s { font-size: 12.5px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div id="boot"><div class="boot-inner"><div class="boot-flag"></div>
+  <p>On démarre Python…<br><span style="font-size:13.5px;opacity:.7">matplotlib est lourd, comptez une quinzaine de secondes</span></p></div></div>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><span class="brand-dot"></span> Python - Séance 12</a>
+  <nav class="steps"><a href="#e1">1</a><a href="#e2">2</a><a href="#viz">👁</a>
+    <a href="#e3">3</a><a href="#e4">4</a><a href="#defi">★</a><a href="#ia">🤖</a><a href="#exos">✍</a></nav>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Séance 12 · 1 h 30</div>
+    <h1>Le graphique qui ment</h1>
+    <p class="lede">Le RN a fait 29,26 % et Ensemble 20,04 %. Un rapport de
+    <strong>1,46</strong>. En déplaçant une seule ligne de code, je peux faire
+    en sorte que ta barre paraisse <strong>dix fois</strong> plus haute que l'autre,
+    sans écrire un seul chiffre faux.</p>
+  </div>
+
+  <div class="box prof">
+    <div class="box-title">🎯 Ce que tu sauras faire dans 1 h 30</div>
+    <p>Produire une figure propre en matplotlib, choisir la bonne forme selon
+    la question posée, et surtout <strong>repérer instantanément les quatre
+    manipulations visuelles</strong> qu'on te servira toute ta carrière
+    en réunion.</p>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <section class="etape" id="e1">
+    <div class="etape-head"><div class="etape-num">1</div><div>
+      <h2>La grammaire minimale</h2>
+      <div class="etape-meta">15 minutes · fig, ax</div></div></div>
+
+    <p>Il existe deux façons d'écrire du matplotlib. Celle des tutoriels
+    (<code>plt.plot</code>, <code>plt.title</code>) et celle des gens qui
+    livrent des figures. On apprend directement la seconde.</p>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("marches.csv", sep=";")
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+
+fig, ax = plt.subplots(figsize=(7.5, 4))
+
+ax.plot(df.index, df["actions_europe"], color="#f07818",
+        linewidth=1.6, label="Actions Europe")
+ax.plot(df.index, df["obligations"], color="#0e8a55",
+        linewidth=1.6, label="Obligations")
+
+ax.set_title("Base 100 au 2 janvier 2019", loc="left", fontsize=12, weight="bold")
+ax.set_ylabel("indice")
+ax.legend(frameon=False)
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 <code>fig</code> et <code>ax</code>, une bonne fois</div>
+      <p><code>fig</code> est la feuille de papier : sa taille, sa résolution,
+      son enregistrement. <code>ax</code> est le graphique dessiné dessus :
+      ses courbes, ses axes, son titre.</p>
+      <p>Dès que tu veux deux graphiques côte à côte, une échelle secondaire
+      ou une figure enregistrée proprement, <code>plt.plot</code> ne suffit plus.
+      <strong>Prends l'habitude tout de suite, tu n'auras pas à la reprendre.</strong></p>
+      <p class="hint" style="margin-bottom:0">Ici, pas besoin de <code>plt.show()</code> :
+      la page récupère les figures ouvertes et les affiche sous ton code.
+      Dans un script ou un notebook, il te faudra <code>plt.show()</code>.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 2 -->
+  <section class="etape" id="e2">
+    <div class="etape-head"><div class="etape-num">2</div><div>
+      <h2>Choisir la forme, pas la décorer</h2>
+      <div class="etape-meta">15 minutes · quatre familles, quatre questions</div></div></div>
+
+    <p>Le choix du type de graphique n'est pas esthétique. Il est dicté par
+    la question à laquelle tu réponds. Une seule règle : <strong>une question,
+    une forme</strong>.</p>
+
+    <div class="formes">
+      <div class="forme"><div class="q">Évolution</div>
+        <h4>Courbe</h4><p>Une grandeur dans le temps. Les points sont reliés
+        parce que l'ordre a un sens.</p></div>
+      <div class="forme"><div class="q">Comparaison</div>
+        <h4>Barres</h4><p>Des catégories sans ordre naturel. Trie-les par valeur,
+        jamais par ordre alphabétique.</p></div>
+      <div class="forme"><div class="q">Relation</div>
+        <h4>Nuage de points</h4><p>Deux grandeurs mesurées sur les mêmes
+        individus. Répond à « est-ce que ça va ensemble ».</p></div>
+      <div class="forme"><div class="q">Répartition</div>
+        <h4>Histogramme</h4><p>Une seule grandeur, beaucoup d'observations.
+        Montre ce que la moyenne cache.</p></div>
+    </div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+
+deps = df.drop_duplicates(subset="code").copy()
+deps["participation"] = deps["votants"] / deps["inscrits"] * 100
+
+fig, (g, d) = plt.subplots(1, 2, figsize=(11, 4))
+
+# comparaison : des barres, triees
+top = df.groupby("nuance")["voix"].sum().nlargest(6).sort_values()
+g.barh(top.index, top.values / 1e6, color="#f07818")
+g.set_title("Voix au premier tour, en millions", loc="left", fontsize=11, weight="bold")
+
+# repartition : un histogramme
+d.hist(deps["participation"], bins=20, color="#0e8a55")
+d.axvline(deps["participation"].mean(), color="#c0392b", linestyle="--")
+d.set_title("Participation par departement", loc="left", fontsize=11, weight="bold")
+
+fig.tight_layout()
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Le camembert, et pourquoi je te l'interdis</div>
+      <p>L'œil humain compare mal des angles. Au-delà de trois parts,
+      personne ne sait dire laquelle est la plus grosse sans lire les étiquettes.
+      Et s'il faut lire les étiquettes, un tableau aurait suffi.</p>
+      <p style="margin-bottom:0">Le fichier des législatives compte
+      <strong>22 nuances</strong>. Un camembert à 22 parts n'est pas un graphique,
+      c'est une décoration. Des barres triées répondent à la même question
+      en un dixième de seconde.</p>
+    </div>
+  </section>
+
+  <!-- VISUALISATION -->
+  <section class="etape" id="viz">
+    <div class="etape-head"><div class="etape-num">👁️</div><div>
+      <h2>Déplace l'axe, change la une du lendemain</h2>
+      <div class="etape-meta">trois vrais chiffres, aucun mensonge écrit</div></div></div>
+
+    <p>Voici les trois premières nuances du premier tour des législatives 2024.
+    Les valeurs affichées sont exactes et ne bougent pas.
+    <strong>Seule la base de l'axe vertical change.</strong></p>
+
+    <div class="widget">
+      <div class="menteur">
+        <div>
+          <canvas id="cv" width="700" height="340" style="width:100%;height:auto"></canvas>
+          <div class="slider-row" style="margin-top:16px">
+            <label>Base de l'axe vertical <span class="val" id="v-base">0 %</span></label>
+            <input type="range" id="s-base" min="0" max="19" step="0.5" value="0">
+          </div>
+        </div>
+        <div>
+          <div class="titraille ok" id="une">
+            <div class="une" id="t-une"></div>
+            <div class="hint" id="t-note"></div>
+          </div>
+          <div class="ratio-box">
+            <div class="k">Rapport RN / Ensemble</div>
+            <div class="v" id="t-ratio"></div>
+            <div class="s">tel que l'œil le perçoit</div>
+          </div>
+          <p class="hint" style="margin-top:12px">Rapport réel, invariable :
+          <strong>1,46</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box att" style="background:var(--red-soft);border:1px solid #f5c9c4;border-radius:11px;padding:17px 20px;margin:20px 0">
+      <div class="box-title" style="color:var(--red)">⚠️ Les quatre manipulations à connaître</div>
+      <p><strong>1. L'axe tronqué.</strong> Celui que tu viens de manipuler.
+      Le plus courant, et le plus efficace. Sur des barres, il est toujours
+      malhonnête : une barre représente une quantité par sa longueur,
+      donc elle doit partir de zéro.</p>
+      <p><strong>2. La période choisie.</strong> Montrer 2024 plutôt que
+      2019-2024 change complètement l'histoire, et personne ne peut le deviner
+      si la légende ne le dit pas.</p>
+      <p><strong>3. Le double axe.</strong> Deux courbes, deux échelles
+      indépendantes : on peut faire coïncider n'importe quoi avec n'importe
+      quoi en réglant les deux échelles.</p>
+      <p style="margin-bottom:0"><strong>4. L'agrégation qui arrange.</strong>
+      Une moyenne nationale au lieu de la dispersion départementale,
+      un trimestre au lieu d'un mois. Chaque agrégation efface quelque chose,
+      et le choix de ce qu'on efface est une décision éditoriale.</p>
+    </div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Ce que je veux que tu retiennes</div>
+      <p>Aucun chiffre n'a été falsifié dans ce widget. Un graphique
+      peut être <strong>entièrement exact et entièrement trompeur</strong>.
+      C'est ce qui le rend redoutable : il n'y a rien à démentir.</p>
+      <p style="margin-bottom:0">Et donc, dans l'autre sens : quand tu produis
+      une figure, tu es responsable de l'impression qu'elle laisse,
+      pas seulement de l'exactitude des nombres qu'elle contient.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 3 -->
+  <section class="etape" id="e3">
+    <div class="etape-head"><div class="etape-num">3</div><div>
+      <h2>Fabrique le mensonge, puis répare-le</h2>
+      <div class="etape-meta">15 minutes · set_ylim</div></div></div>
+
+    <div class="duo">
+      <div class="panel ref"><div class="panel-label"><span class="tag"></span> Le code du prof</div>
+        <div data-ref><script type="text/python">
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+voix = df.groupby("nuance")["voix"].sum()
+part = voix / voix.sum() * 100
+trois = part[["RN", "UG", "ENS"]]
+
+fig, (g, d) = plt.subplots(1, 2, figsize=(11, 4))
+
+g.bar(trois.index, trois.values, color="#c0392b")
+g.set_ylim(19, 30)                      # <- le mensonge tient ici
+g.set_title("Une avance ecrasante", loc="left", fontsize=11, weight="bold")
+
+d.bar(trois.index, trois.values, color="#0e8a55")
+d.set_ylim(0, 35)                       # <- l'honnetete aussi
+d.set_title("Trois blocs proches", loc="left", fontsize=11, weight="bold")
+for i, v in enumerate(trois.values):
+    d.text(i, v + 0.7, f"{v:.1f} %", ha="center", fontsize=10)
+
+fig.tight_layout()
+        </script></div></div>
+      <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de taper</div>
+        <div data-cellule><script type="text/python">
+        </script></div></div>
+    </div>
+
+    <div class="box defi">
+      <div class="box-title">💡 La règle, en une phrase</div>
+      <p><strong>Une barre part de zéro. Une courbe n'y est pas obligée.</strong></p>
+      <p style="margin-bottom:0">Parce qu'une barre code une quantité par sa
+      <em>longueur</em> : la couper, c'est mentir sur la longueur.
+      Une courbe code une <em>variation</em> par sa pente : forcer son axe à zéro
+      écrase souvent l'information utile. Sur une courbe, ce qui est obligatoire,
+      c'est d'afficher l'échelle lisiblement.</p>
+    </div>
+  </section>
+
+  <!-- ÉTAPE 4 -->
+  <section class="etape" id="e4">
+    <div class="etape-head"><div class="etape-num">4</div><div>
+      <h2>Chantier : la figure de ta note</h2>
+      <div class="etape-meta">25 minutes · tu es seul aux commandes</div></div></div>
+
+    <p>Produis <strong>une seule figure</strong>, celle que tu mettrais dans une
+    note d'une page. Sujet : <em>la participation aux législatives 2024
+    varie-t-elle beaucoup d'un département à l'autre ?</em></p>
+
+    <div class="box defi">
+      <div class="box-title">🎯 Le cahier des charges</div>
+      <p style="margin-bottom:0">Un titre qui énonce la <strong>conclusion</strong>,
+      pas le contenu. Les axes nommés avec leur unité. Les dix départements
+      les plus bas et les dix plus hauts, triés. La moyenne nationale
+      matérialisée. Aucune couleur qui ne serve à rien.</p>
+    </div>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> À toi de jouer</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("legislatives-2024.csv", sep=";")
+deps = df.drop_duplicates(subset="code").copy()
+deps["participation"] = deps["votants"] / deps["inscrits"] * 100
+
+# a toi
+
+      </script></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🎙️ Consigne prof</div>
+      <p>Le test du titre : cache la figure, lis seulement le titre.
+      Si tu n'apprends rien, le titre est mauvais.
+      <em>« Participation par département »</em> n'apprend rien.
+      <em>« Vingt points d'écart entre le département le plus mobilisé
+      et le moins mobilisé »</em> apprend quelque chose.</p>
+      <p><strong>Le contrôle, et la nuance :</strong> la participation nationale
+      vaut <strong>66,71 %</strong>, la moyenne des 107 taux départementaux
+      vaut <strong>66,56 %</strong>. Deux nombres différents, tous les deux justes,
+      qui ne répondent pas à la même question : le premier pèse chaque département
+      par ses inscrits, le second traite la Lozère et le Nord à égalité.</p>
+      <p style="margin-bottom:0">Si sa figure affiche l'un en le nommant l'autre,
+      c'est là que ça se joue. <strong>Dis toujours lequel des deux tu montres.</strong></p>
+    </div>
+  </section>
+
+  <!-- DÉFI -->
+  <section class="etape" id="defi">
+    <div class="etape-head"><div class="etape-num">★</div><div>
+      <h2>Défi : le double axe, l'arme absolue</h2>
+      <div class="etape-meta">20 minutes · fais coïncider deux choses sans rapport</div></div></div>
+
+    <p>Avec <code>ax.twinx()</code>, deux courbes partagent l'axe horizontal
+    mais ont chacune leur échelle verticale. En réglant les deux échelles,
+    <strong>on fait se superposer n'importe quelles séries.</strong></p>
+
+    <div class="panel moi"><div class="panel-label"><span class="tag"></span> Ton terrain de jeu</div>
+      <div data-cellule><script type="text/python">
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("marches.csv", sep=";")
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index("date")
+
+# 1. Trace actions_tech et obligations sur un seul axe.
+#    Elles n'ont visiblement rien a voir.
+
+
+# 2. Recommence avec ax2 = ax.twinx() et regle set_ylim
+#    des deux cotes pour les faire coincider presque parfaitement.
+
+
+# 3. Ecris en commentaire la phrase que ce graphique
+#    permettrait de faire passer, et pourquoi elle est fausse.
+
+      </script></div></div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 Là où tu le rencontreras</div>
+      <p>Le double axe est partout : croissance et chômage, budget publicitaire
+      et chiffre d'affaires, température et cours d'une matière première.
+      À chaque fois, les deux échelles ont été choisies <em>après</em> avoir vu
+      les données, pour que les courbes se ressemblent.</p>
+      <p style="margin-bottom:0"><strong>La parade tient en une question :
+      « quelle est l'échelle de droite ? »</strong> Elle suffit à faire
+      s'effondrer la démonstration, et presque personne ne la pose.</p>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="etape" id="ia">
+    <div class="etape-head"><div class="etape-num">🤖</div><div>
+      <h2>Et si tu l'avais demandé à une IA ?</h2>
+      <div class="etape-meta">10 minutes · cette fois, le problème vient de toi</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">💬 Le prompt</div>
+      <p style="font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 16px">Fais-moi un graphique matplotlib qui montre bien à quel point le RN est arrivé en tête, à partir des résultats du premier tour.</p>
+      <p style="margin-top:12px">Le code fonctionne du premier coup et la figure
+      est jolie. <strong>Elle est aussi trompeuse, et c'est toi qui l'as demandé.</strong></p>
+    </div>
+
+    <p><strong>Clique sur la ligne qui pose problème.</strong></p>
+
+    <div class="widget">
+      <div class="chasse-code" id="ia-code"></div>
+      <div id="ia-retour" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box bug">
+      <div class="box-title">🐛 Le vrai enseignement de la séance</div>
+      <p>Aux séances 7, 9, 10 et 11, l'IA se trompait. Ici, elle ne se trompe pas :
+      <strong>elle obéit.</strong> « Montre bien à quel point » est une commande
+      de conclusion, pas une demande d'analyse, et elle a été exécutée fidèlement.</p>
+      <p>Un outil qui produit ce qu'on lui demande amplifie ce qu'on lui apporte.
+      Si tu arrives avec une conclusion, il te fabriquera les graphiques
+      qui la soutiennent, plus vite et plus proprement que tu ne l'aurais fait seul.</p>
+      <p style="margin-bottom:0"><strong>Demande « quelle figure représente
+      honnêtement ces résultats », pas « montre que ».</strong>
+      La différence entre les deux formulations, c'est toute la différence
+      entre une analyse et une plaidoirie.</p>
+    </div>
+  </section>
+
+  <!-- EXERCICES -->
+  <section class="etape" id="exos">
+    <div class="etape-head"><div class="etape-num">✍️</div><div>
+      <h2>Les 4 exercices de fin de séance</h2>
+      <div class="etape-meta">15 minutes · une ligne à la fois</div></div></div>
+    <p>Une ligne, une consigne, tu écris, tu vérifies.
+    <strong>Au bout de trois essais, la réponse s'affiche.</strong></p>
+  </section>
+
+  <div id="exerciseur"></div>
+
+  <!-- FIN -->
+  <section class="etape">
+    <div class="etape-head"><div class="etape-num">🏠</div><div>
+      <h2>Avant la prochaine séance</h2><div class="etape-meta">30 minutes</div></div></div>
+
+    <div class="box prof">
+      <div class="box-title">🏠 Travail personnel</div>
+      <p>Trouve dans la presse, cette semaine, <strong>un graphique
+      qui utilise l'une des quatre manipulations</strong>. Capture-le,
+      et reconstruis-en la version honnête avec matplotlib.</p>
+      <p class="hint" style="margin-top:8px">Tu n'auras pas les données exactes :
+      relève les valeurs à l'œil, ça suffit largement. L'exercice porte
+      sur la forme, pas sur la précision.</p>
+    </div>
+
+    <div class="box reel">
+      <div class="box-title">🌍 La séance 13</div>
+      <p style="margin-bottom:0">On passe à la carte : la France en rouge et bleu,
+      les scores au survol du curseur. Le graphique le plus lu, et celui
+      qui se trompe le plus souvent, parce qu'<strong>une carte électorale
+      montre des surfaces alors qu'on vote avec des personnes</strong>.</p>
+    </div>
+
+    <p style="margin-top:30px">
+      <a href="seance-11.html" style="color:var(--orange);font-weight:650">← Séance 11</a>
+      &nbsp;·&nbsp;<a href="index.html" style="color:var(--orange);font-weight:650">Programme</a>
+    </p>
+  </section>
+
+</div>
+
+<script>
+window.PAQUETS = ["pandas", "numpy", "matplotlib"];
+window.FICHIERS = ["donnees/legislatives-2024.csv", "donnees/marches.csv"];
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="../assets/moteur.js?v=4"></script>
+
+<script>
+window.EXERCICES = [
+  {
+    titre: "Une figure propre",
+    contexte: "fig et ax, la seule façon d'écrire du matplotlib qu'on livre.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "import matplotlib.pyplot as plt" },
+      { t: 'df = pd.read_csv("marches.csv", sep=";")' },
+      { t: 'df["date"] = pd.to_datetime(df["date"])' },
+      { t: 'df = df.set_index("date")' },
+      { t: "" },
+      { b:1, long:46, consigne:"Crée une figure et son graphique, en 7,5 sur 4 pouces.",
+        ok:["fig, ax = plt.subplots(figsize=(7.5, 4))"],
+        indices:["<code>plt.subplots</code> rend deux objets d'un coup.",
+                 "<code>fig, ax = plt.subplots(figsize=(7.5, 4))</code>"],
+        pourquoi:"<code>fig</code> est la feuille, <code>ax</code> le graphique dessiné dessus. Tout le reste se joue sur <code>ax</code>." },
+      { b:1, long:66, consigne:"Trace <code>actions_europe</code> en orange <code>#f07818</code>, avec la légende « Actions Europe ».",
+        ok:['ax.plot(df.index, df["actions_europe"], color="#f07818", label="Actions Europe")'],
+        indices:["<code>ax.plot(x, y, color=..., label=...)</code>",
+                 '<code>ax.plot(df.index, df["actions_europe"], color="#f07818", label="Actions Europe")</code>'],
+        pourquoi:"<code>label</code> ne s'affiche pas tout seul : il faut appeler la légende ensuite." },
+      { b:1, long:66, consigne:"Mets un titre aligné à gauche, en gras : « Base 100 au 2 janvier 2019 ».",
+        ok:['ax.set_title("Base 100 au 2 janvier 2019", loc="left", weight="bold")'],
+        indices:['<code>loc="left"</code> et <code>weight="bold"</code>',
+                 '<code>ax.set_title("Base 100 au 2 janvier 2019", loc="left", weight="bold")</code>'],
+        pourquoi:"Le titre aligné à gauche se lit dans le même mouvement que le texte autour. Le titre centré est une habitude de tableur." },
+      { b:1, long:34, consigne:"Affiche la légende, sans cadre autour.",
+        ok:["ax.legend(frameon=False)"],
+        indices:["<code>frameon=False</code> retire le cadre.",
+                 "<code>ax.legend(frameon=False)</code>"],
+        pourquoi:"Chaque trait qui ne porte pas d'information vole de l'attention à ceux qui en portent." },
+    ],
+  },
+  {
+    titre: "Des barres, triées",
+    contexte: "La comparaison de catégories, faite correctement.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "import matplotlib.pyplot as plt" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:60, consigne:"Récupère les six nuances les plus votées, dans <code>top</code>.",
+        ok:['top = df.groupby("nuance")["voix"].sum().nlargest(6)'],
+        indices:["<code>groupby</code> puis <code>nlargest(6)</code>",
+                 '<code>top = df.groupby("nuance")["voix"].sum().nlargest(6)</code>'],
+        pourquoi:"" },
+      { b:1, long:34, consigne:"Remets-les dans l'ordre croissant, pour un graphique horizontal.",
+        ok:["top = top.sort_values()"],
+        indices:["<code>.sort_values()</code> trie en croissant par défaut.",
+                 "<code>top = top.sort_values()</code>"],
+        pourquoi:"Sur un graphique horizontal, matplotlib dessine la première valeur en bas. Sans ce tri croissant, la plus grande barre se retrouve en bas." },
+      { t: "fig, ax = plt.subplots(figsize=(7, 4))" },
+      { b:1, long:56, consigne:"Trace des barres horizontales, en millions de voix, en orange <code>#f07818</code>.",
+        ok:['ax.barh(top.index, top.values / 1e6, color="#f07818")'],
+        indices:["<code>barh</code> pour horizontal, et on divise par <code>1e6</code>.",
+                 '<code>ax.barh(top.index, top.values / 1e6, color="#f07818")</code>'],
+        pourquoi:"Barres horizontales dès que les étiquettes sont des mots : elles restent lisibles sans pivoter la tête." },
+      { b:1, long:52, consigne:"Nomme l'axe horizontal : « millions de voix ».",
+        ok:['ax.set_xlabel("millions de voix")'],
+        indices:["<code>set_xlabel</code>", '<code>ax.set_xlabel("millions de voix")</code>'],
+        pourquoi:"Un axe sans unité rend le graphique inutilisable hors contexte, et un graphique finit toujours par circuler seul." },
+    ],
+  },
+  {
+    titre: "Le mensonge, et sa réparation",
+    contexte: "Une seule ligne sépare les deux.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "import matplotlib.pyplot as plt" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: 'voix = df.groupby("nuance")["voix"].sum()' },
+      { t: "part = voix / voix.sum() * 100" },
+      { t: "" },
+      { b:1, long:44, consigne:"Garde les trois nuances <code>RN</code>, <code>UG</code> et <code>ENS</code>, dans <code>trois</code>.",
+        ok:['trois = part[["RN", "UG", "ENS"]]'],
+        indices:["Une liste de trois étiquettes entre doubles crochets.",
+                 '<code>trois = part[["RN", "UG", "ENS"]]</code>'],
+        pourquoi:"" },
+      { t: "fig, (g, d) = plt.subplots(1, 2, figsize=(11, 4))" },
+      { b:1, long:52, consigne:"À gauche : des barres rouges <code>#c0392b</code>, avec l'axe vertical de 19 à 30.",
+        ok:['g.bar(trois.index, trois.values, color="#c0392b")'],
+        indices:["<code>g.bar(...)</code> d'abord, l'axe vient à la ligne suivante.",
+                 '<code>g.bar(trois.index, trois.values, color="#c0392b")</code>'],
+        pourquoi:"" },
+      { b:1, long:28, consigne:"Tronque l'axe vertical de gauche entre 19 et 30.",
+        ok:["g.set_ylim(19, 30)"],
+        indices:["<code>set_ylim(bas, haut)</code>", "<code>g.set_ylim(19, 30)</code>"],
+        pourquoi:"Voilà le mensonge complet : une seule ligne, aucun chiffre faux, un rapport de 1,46 qui paraît proche de 10." },
+      { b:1, long:52, consigne:"À droite : les mêmes barres en vert <code>#0e8a55</code>, puis l'axe de 0 à 35.",
+        ok:['d.bar(trois.index, trois.values, color="#0e8a55")'],
+        indices:['<code>d.bar(trois.index, trois.values, color="#0e8a55")</code>',
+                 '<code>d.bar(trois.index, trois.values, color="#0e8a55")</code>'],
+        pourquoi:"" },
+      { b:1, long:28, consigne:"Fixe l'axe vertical de droite entre 0 et 35.",
+        ok:["d.set_ylim(0, 35)"],
+        indices:["<code>set_ylim(0, 35)</code>", "<code>d.set_ylim(0, 35)</code>"],
+        pourquoi:"Une barre part de zéro. Toujours. C'est la seule règle non négociable de toute la séance." },
+    ],
+  },
+  {
+    titre: "Un histogramme, et ce que la moyenne cache",
+    contexte: "La répartition dit ce que le résumé efface.",
+    lignes: [
+      { t: "import pandas as pd" },
+      { t: "import matplotlib.pyplot as plt" },
+      { t: 'df = pd.read_csv("legislatives-2024.csv", sep=";")' },
+      { t: "" },
+      { b:1, long:56, consigne:"Réduis à une ligne par département, dans <code>deps</code>, avec une copie.",
+        ok:['deps = df.drop_duplicates(subset="code").copy()'],
+        indices:["<code>drop_duplicates</code> puis <code>.copy()</code>",
+                 '<code>deps = df.drop_duplicates(subset="code").copy()</code>'],
+        pourquoi:"Le <code>.copy()</code> évite l'avertissement de pandas quand on ajoutera une colonne à une tranche d'un autre tableau." },
+      { b:1, long:60, consigne:"Ajoute la colonne <code>participation</code>, en pourcentage.",
+        ok:['deps["participation"] = deps["votants"] / deps["inscrits"] * 100'],
+        indices:["Votants sur inscrits, fois 100.",
+                 '<code>deps["participation"] = deps["votants"] / deps["inscrits"] * 100</code>'],
+        pourquoi:"" },
+      { t: "fig, ax = plt.subplots(figsize=(7, 4))" },
+      { b:1, long:60, consigne:"Trace l'histogramme de la participation, en 20 classes, en vert <code>#0e8a55</code>.",
+        ok:['ax.hist(deps["participation"], bins=20, color="#0e8a55")'],
+        indices:["<code>ax.hist(serie, bins=..., color=...)</code>",
+                 '<code>ax.hist(deps["participation"], bins=20, color="#0e8a55")</code>'],
+        pourquoi:"Le nombre de classes est un choix, et il change l'allure du résultat. Essaie 5 puis 50 pour t'en convaincre." },
+      { b:1, long:74, consigne:"Ajoute une ligne verticale rouge en pointillés sur la moyenne des départements.",
+        ok:['ax.axvline(deps["participation"].mean(), color="#c0392b", linestyle="--")'],
+        indices:["<code>axvline</code> trace une verticale à l'abscisse donnée.",
+                 '<code>ax.axvline(deps["participation"].mean(), color="#c0392b", linestyle="--")</code>'],
+        pourquoi:"Attention : c'est la moyenne des taux départementaux, pas la participation nationale de 66,71 %. Les deux nombres sont différents, et c'est exactement le piège de la séance 9." },
+    ],
+  },
+];
+</script>
+<script src="../assets/exercices.js?v=4"></script>
+
+<script>
+/* ---------- Le code de l'IA : le prompt orienté ---------- */
+(function () {
+  const LIGNES = [
+    "import pandas as pd",
+    "import matplotlib.pyplot as plt",
+    "",
+    'df = pd.read_csv("legislatives-2024.csv", sep=";")',
+    'part = df.groupby("nuance")["voix"].sum()',
+    "part = part / part.sum() * 100",
+    'trois = part[["RN", "UG", "ENS"]]',
+    "",
+    "fig, ax = plt.subplots(figsize=(7, 4.5))",
+    'ax.bar(trois.index, trois.values, color=["#c0392b", "#95a5a6", "#95a5a6"])',
+    "ax.set_ylim(19, 30)",
+    'ax.set_title("Le RN largement en tete", loc="left", weight="bold")',
+    "plt.show()",
+  ];
+  const BUGS = [10];
+
+  const eC = document.getElementById("ia-code");
+  const eR = document.getElementById("ia-retour");
+  let fini = false;
+
+  function rendu(clique) {
+    eC.className = "chasse-code" + (fini ? " fini" : "");
+    eC.innerHTML = LIGNES.map((l, i) => {
+      let cls = "l";
+      if (fini && BUGS.indexOf(i) >= 0) cls += " bonne";
+      else if (clique === i && BUGS.indexOf(i) < 0) cls += " ratee";
+      return '<span class="' + cls + '" data-i="' + i + '">' +
+        '<span class="n">' + (i + 1) + "</span>" +
+        (l || " ").replace(/</g, "&lt;") + "</span>";
+    }).join("");
+    if (!fini) eC.querySelectorAll(".l").forEach((el) => (el.onclick = () => choisir(+el.dataset.i)));
+  }
+
+  function choisir(i) {
+    if (BUGS.indexOf(i) >= 0) {
+      fini = true;
+      eR.innerHTML =
+        '<div class="box defi" style="margin:0"><div class="box-title">✅ Trouvé - ligne 11</div>' +
+        "<p><code>set_ylim(19, 30)</code> sur un graphique en barres. " +
+        "L'écart réel de 9,2 points occupe alors presque toute la hauteur, " +
+        "et la barre du RN paraît près de dix fois plus haute que celle d'Ensemble, " +
+        "pour un rapport réel de <strong>1,46</strong>.</p>" +
+        "<p>Deux complices, moins visibles : la <strong>couleur</strong> " +
+        "de la ligne 10, qui isole le RN en rouge et grise les deux autres, " +
+        "et le <strong>titre</strong> de la ligne 12, qui énonce la conclusion " +
+        "voulue avant même qu'on ait regardé la figure.</p>" +
+        "<p style='margin-bottom:0'>L'IA n'a rien inventé et n'a commis aucune erreur. " +
+        "<strong>Elle a fait exactement ce qu'on lui a demandé</strong> : " +
+        "montrer bien à quel point.</p></div>" +
+        '<div class="box bug" style="margin-top:14px"><div class="box-title">🐛 Le prompt qu\'il fallait écrire</div>' +
+        "<p style='font-family:var(--mono);font-size:13.5px;background:var(--code-bg);color:#cdd6e6;padding:12px 15px;border-radius:8px;margin:8px 0'>" +
+        "Fais un graphique qui represente honnetement les scores des trois " +
+        "premieres nuances au premier tour. Axe a zero, valeurs affichees, " +
+        "titre descriptif et non conclusif.</p>" +
+        "<p style='margin-bottom:0'>Même modèle, même fichier, deux minutes plus tard : " +
+        "une figure dont tu peux répondre devant un jury. " +
+        "<strong>La qualité de la réponse est bornée par l'honnêteté de la question.</strong></p></div>";
+    } else {
+      eR.innerHTML =
+        '<div class="box bug" style="margin:0"><div class="box-title">❌ Pas celle-là</div>' +
+        "<p style='margin-bottom:0'>Cette ligne fait ce qu'elle annonce. " +
+        "Cherche celle qui décide de <strong>ce que l'œil va percevoir</strong>, " +
+        "et non de ce qui est calculé.</p></div>";
+    }
+    rendu(i);
+  }
+  rendu();
+})();
+</script>
+
+<script>
+/* ---------- L'axe tronqué, en direct ---------- */
+(function () {
+  /* parts des exprimes au premier tour, legislatives 2024 */
+  const D = [
+    { n: "RN", v: 29.26, c: "#3c3c8c" },
+    { n: "UG", v: 27.99, c: "#d4506a" },
+    { n: "ENS", v: 20.04, c: "#f0a828" },
+  ];
+  const HAUT = 32;
+
+  const cv = document.getElementById("cv");
+  const ct = cv.getContext("2d");
+
+  function tracer(base) {
+    const w = cv.width, h = cv.height;
+    const gx = 62, gy = 18, gw = w - gx - 24, gh = h - gy - 46;
+    ct.clearRect(0, 0, w, h);
+    ct.font = "13px ui-monospace, monospace";
+
+    const y = (v) => gy + gh - ((v - base) / (HAUT - base)) * gh;
+
+    // graduations
+    ct.strokeStyle = "#e2ded7"; ct.lineWidth = 1;
+    ct.fillStyle = "#8a8378"; ct.textAlign = "right";
+    const pas = HAUT - base > 20 ? 5 : HAUT - base > 8 ? 2 : 1;
+    for (let v = Math.ceil(base / pas) * pas; v <= HAUT; v += pas) {
+      const yy = Math.round(y(v)) + 0.5;
+      ct.beginPath(); ct.moveTo(gx, yy); ct.lineTo(gx + gw, yy); ct.stroke();
+      ct.fillText(v + " %", gx - 9, yy + 4);
+    }
+
+    // barres
+    const bw = gw / (D.length * 2 + 1);
+    D.forEach((d, i) => {
+      const x = gx + bw * (1 + i * 2);
+      const yy = y(d.v);
+      ct.fillStyle = d.c;
+      ct.fillRect(x, yy, bw, gy + gh - yy);
+      ct.fillStyle = "#2b2722";
+      ct.textAlign = "center";
+      ct.font = "bold 14px ui-monospace, monospace";
+      ct.fillText(d.v.toFixed(2).replace(".", ",") + " %", x + bw / 2, yy - 8);
+      ct.font = "13px system-ui, sans-serif";
+      ct.fillText(d.n, x + bw / 2, gy + gh + 20);
+    });
+
+    // ligne de base
+    ct.strokeStyle = base > 0 ? "#c0392b" : "#2b2722";
+    ct.lineWidth = base > 0 ? 2 : 1.5;
+    ct.beginPath();
+    ct.moveTo(gx, gy + gh + 0.5);
+    ct.lineTo(gx + gw, gy + gh + 0.5);
+    ct.stroke();
+    if (base > 0) {
+      ct.fillStyle = "#c0392b";
+      ct.textAlign = "left";
+      ct.font = "bold 12px system-ui, sans-serif";
+      ct.fillText("axe coupé à " + base.toString().replace(".", ",") + " %",
+                  gx + 4, gy + gh + 34);
+    }
+  }
+
+  function maj() {
+    const base = parseFloat(document.getElementById("s-base").value);
+    document.getElementById("v-base").textContent =
+      base.toString().replace(".", ",") + " %";
+    tracer(base);
+
+    const percu = (29.26 - base) / (20.04 - base);
+    document.getElementById("t-ratio").textContent =
+      "× " + percu.toFixed(2).replace(".", ",");
+
+    const box = document.getElementById("une");
+    const une = document.getElementById("t-une");
+    const note = document.getElementById("t-note");
+
+    if (base === 0) {
+      box.className = "titraille ok";
+      une.textContent = "Trois blocs à moins de dix points d'écart";
+      note.innerHTML = "Axe à zéro. Ce que l'œil voit correspond aux chiffres.";
+    } else if (percu < 2.2) {
+      box.className = "titraille ok";
+      une.textContent = "Le RN devant, l'écart reste lisible";
+      note.innerHTML = "L'axe est coupé, mais la déformation reste modérée. " +
+        "Elle devrait quand même être signalée.";
+    } else if (percu < 4.5) {
+      box.className = "titraille ko";
+      une.textContent = "Le RN creuse l'écart";
+      note.innerHTML = "La barre paraît maintenant <strong>" +
+        percu.toFixed(1).replace(".", ",") + " fois</strong> plus haute. " +
+        "Un lecteur pressé retiendra ce rapport-là, pas les étiquettes.";
+    } else {
+      box.className = "titraille ko";
+      une.textContent = "Raz-de-marée RN : la carte politique bouleversée";
+      note.innerHTML = "Rapport percu : <strong>" +
+        percu.toFixed(1).replace(".", ",") + "</strong> contre 1,46 en réalité. " +
+        "Et pourtant, les trois valeurs affichées sur les barres sont exactes.";
+    }
+  }
+
+  document.getElementById("s-base").addEventListener("input", maj);
+  maj();
+})();
+</script>
+
+</body>
+</html>
